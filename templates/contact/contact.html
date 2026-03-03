@@ -107,6 +107,27 @@
                   x-effect="
                       showLanguage = category !== '';
                       showCohort = category !== '';
+                  "
+                  @filter-cohorts.debounce.100ms="
+                      let catEl = document.getElementById('id_interested_category');
+                      let langEl = document.getElementById('id_interested_language');
+                      let cohortEl = document.getElementById('id_interested_cohort');
+                      let catVal = catEl ? catEl.value : '';
+                      let langVal = langEl ? langEl.value : '';
+                      let url = '{% url "courses:api_cohorts" %}?';
+                      if (catVal) url += 'category=' + catVal + '&';
+                      if (langVal) url += 'language=' + langVal;
+                      fetch(url)
+                          .then(r => r.json())
+                          .then(data => {
+                              cohortEl.innerHTML = '<option value=\"\">-- Choisissez une formation --</option>';
+                              data.forEach(c => {
+                                  let opt = document.createElement('option');
+                                  opt.value = c.id;
+                                  opt.textContent = c.name;
+                                  cohortEl.appendChild(opt);
+                              });
+                          });
                   ">
 
                 {% csrf_token %}
@@ -204,7 +225,7 @@
 
                     <div class="space-y-6">
                         <c-form-field label="Type d'activité" help_text="Choisissez entre formations linguistiques et ateliers culturels">
-                            <div x-on:change="category = $event.target.value">
+                            <div x-on:change="category = $event.target.value; $dispatch('filter-cohorts')">
                                 {{ form.interested_category }}
                             </div>
                             {% if form.interested_category.errors %}
@@ -215,7 +236,9 @@
                         <div x-show="showLanguage" x-transition>
                             <c-form-field label="Langue"
                                           help_text="Si vous avez choisi une formation linguistique">
-                                {{ form.interested_language }}
+                                <div x-on:change="$dispatch('filter-cohorts')">
+                                    {{ form.interested_language }}
+                                </div>
                                 {% if form.interested_language.errors %}
                                     <p class="text-red-500 text-sm mt-1">{{ form.interested_language.errors.0 }}</p>
                                 {% endif %}
