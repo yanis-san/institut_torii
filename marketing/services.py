@@ -268,7 +268,10 @@ def send_single_email(recipient, campaign, base_url=''):
     if campaign.reply_to:
         reply_to_list = [campaign.reply_to]
 
+    from .notifications import wrap_email_html
+
     # Build and send
+    full_html = wrap_email_html(html_body)
     msg = EmailMultiAlternatives(
         subject=subject,
         body=text_body,
@@ -280,7 +283,7 @@ def send_single_email(recipient, campaign, base_url=''):
             'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         },
     )
-    msg.attach_alternative(html_body, 'text/html')
+    msg.attach_alternative(full_html, 'text/html')
 
     try:
         msg.send(fail_silently=False)

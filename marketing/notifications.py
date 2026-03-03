@@ -23,17 +23,84 @@ logger = logging.getLogger(__name__)
 
 SITE_NAME = 'Institut Torii'
 SITE_URL = 'https://institut-torii.com'
-
+LOGO_URL = f'{SITE_URL}/static/img/logo/logo_horizontal.png'
 
 # ──────────────────────────────────────────────
-# Default email templates (used if no custom template in DB)
+# Email wrapper (header + footer around body)
 # ──────────────────────────────────────────────
+
+def _build_email_wrapper():
+    """Build the email wrapper HTML with logo header and branded footer."""
+    return (
+        '<!DOCTYPE html>'
+        '<html lang="fr">'
+        '<head><meta charset="UTF-8"></head>'
+        '<body style="margin:0;padding:0;background:#f4f4f5;'
+        "font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;\">"
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;">'
+        '<tr><td align="center" style="padding:32px 16px;">'
+        '<table role="presentation" width="600" cellpadding="0" cellspacing="0" '
+        'style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">'
+        # Logo header
+        '<tr><td align="center" style="padding:28px 24px 16px;border-bottom:1px solid #f0f0f0;">'
+        f'<a href="{SITE_URL}" style="text-decoration:none;">'
+        f'<img src="{LOGO_URL}" alt="Institut Torii" width="180" style="display:block;max-width:180px;height:auto;">'
+        '</a></td></tr>'
+        # Body placeholder
+        '<tr><td style="padding:0;">BODY_CONTENT_PLACEHOLDER</td></tr>'
+        # Footer
+        '<tr><td style="padding:0;">'
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
+        'style="background:#18181b;border-radius:0 0 12px 12px;">'
+        # Footer logo
+        '<tr><td align="center" style="padding:28px 24px 16px;">'
+        f'<img src="{LOGO_URL}" alt="Institut Torii" width="120" '
+        'style="display:block;max-width:120px;height:auto;opacity:0.9;">'
+        '</td></tr>'
+        # Footer text
+        '<tr><td align="center" style="padding:0 24px;">'
+        '<p style="margin:0 0 4px;font-size:15px;font-weight:600;color:#ffffff;">'
+        "L\u2019\u00e9quipe Institut Torii</p>"
+        '<p style="margin:0;font-size:13px;color:#a1a1aa;">'
+        'Centre de formation en langues asiatiques</p>'
+        '</td></tr>'
+        # Phone
+        '<tr><td align="center" style="padding:16px 24px 0;">'
+        '<span style="font-size:13px;color:#a1a1aa;">&#9742; 0542 07 33 33</span>'
+        '</td></tr>'
+        # Address
+        '<tr><td align="center" style="padding:8px 24px 0;">'
+        '<span style="font-size:13px;color:#a1a1aa;">&#128205; Alger, El Achour</span>'
+        '</td></tr>'
+        # Website link
+        '<tr><td align="center" style="padding:12px 24px 8px;">'
+        f'<a href="{SITE_URL}" style="font-size:13px;color:#ef4444;text-decoration:none;">'
+        'institut-torii.com</a>'
+        '</td></tr>'
+        # Copyright
+        '<tr><td align="center" style="padding:0 24px 24px;">'
+        '<p style="margin:0;font-size:11px;color:#52525b;">'
+        '\u00a9 2026 Institut Torii. Tous droits r\u00e9serv\u00e9s.</p>'
+        '</td></tr>'
+        '</table></td></tr>'
+        '</table>'
+        '</td></tr></table>'
+        '</body></html>'
+    )
+
+
+EMAIL_WRAPPER = _build_email_wrapper()
+
+
+def wrap_email_html(body_html):
+    """Wrap body content in the branded email template with header + footer."""
+    return EMAIL_WRAPPER.replace('BODY_CONTENT_PLACEHOLDER', body_html)
 
 DEFAULT_TEMPLATES = {
     'contact_received': {
         'subject': 'Nous avons bien reçu votre message — {{ site_name }}',
         'body_html': """
-<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+<div style="font-family: sans-serif; padding: 24px;">
     <h2 style="color: #333;">Bonjour {{ first_name }},</h2>
     <p>Nous avons bien reçu votre demande de renseignement et nous vous en remercions.</p>
     <p>Notre équipe reviendra vers vous dans les <strong>48 heures ouvrables</strong>.</p>
@@ -41,14 +108,13 @@ DEFAULT_TEMPLATES = {
     <p style="font-size: 14px; color: #666;">
         Si vous avez des questions urgentes, n'hésitez pas à nous répondre directement à cet email.
     </p>
-    <p style="font-size: 14px; color: #999;">— L'équipe {{ site_name }}</p>
 </div>""",
     },
 
     'enrollment_received': {
         'subject': 'Inscription reçue — {{ cohort_name }} — {{ site_name }}',
         'body_html': """
-<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+<div style="font-family: sans-serif; padding: 24px;">
     <h2 style="color: #333;">Bonjour {{ first_name }},</h2>
     <p>Nous avons bien reçu votre inscription à <strong>{{ cohort_name }}</strong>.</p>
     <p>Votre code de suivi est : <strong style="font-size: 18px; color: #dc2626;">{{ enrollment_code }}</strong></p>
@@ -57,14 +123,13 @@ DEFAULT_TEMPLATES = {
         <p style="margin: 0 0 8px 0; font-weight: 600;">📋 Prochaine étape :</p>
         <p style="margin: 0;">Notre équipe va vérifier votre reçu de paiement. Vous recevrez un email de confirmation dès que votre inscription sera validée.</p>
     </div>
-    <p style="font-size: 14px; color: #999;">— L'équipe {{ site_name }}</p>
 </div>""",
     },
 
     'enrollment_confirmed': {
         'subject': '✅ Inscription confirmée — {{ cohort_name }} — {{ site_name }}',
         'body_html': """
-<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+<div style="font-family: sans-serif; padding: 24px;">
     <h2 style="color: #16a34a;">Félicitations {{ first_name }} ! 🎉</h2>
     <p>Votre inscription à <strong>{{ cohort_name }}</strong> est officiellement <strong style="color: #16a34a;">confirmée</strong>.</p>
     <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin: 16px 0;">
@@ -76,14 +141,13 @@ DEFAULT_TEMPLATES = {
         </ul>
     </div>
     <p>Nous vous contacterons prochainement avec les détails pratiques (horaires, lieu, etc.).</p>
-    <p style="font-size: 14px; color: #999;">— L'équipe {{ site_name }}</p>
 </div>""",
     },
 
     'enrollment_rejected': {
         'subject': 'Inscription non validée — {{ cohort_name }} — {{ site_name }}',
         'body_html': """
-<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+<div style="font-family: sans-serif; padding: 24px;">
     <h2 style="color: #333;">Bonjour {{ first_name }},</h2>
     <p>Nous avons examiné votre inscription à <strong>{{ cohort_name }}</strong> et malheureusement, celle-ci n'a pas pu être validée.</p>
     {% if rejection_reason %}
@@ -93,14 +157,13 @@ DEFAULT_TEMPLATES = {
     </div>
     {% endif %}
     <p>Si vous pensez qu'il s'agit d'une erreur, n'hésitez pas à nous répondre à cet email ou à nous contacter.</p>
-    <p style="font-size: 14px; color: #999;">— L'équipe {{ site_name }}</p>
 </div>""",
     },
 
     'enrollment_refunded': {
         'subject': 'Remboursement — {{ cohort_name }} — {{ site_name }}',
         'body_html': """
-<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+<div style="font-family: sans-serif; padding: 24px;">
     <h2 style="color: #333;">Bonjour {{ first_name }},</h2>
     <p>Nous vous informons que votre inscription à <strong>{{ cohort_name }}</strong> a été remboursée.</p>
     <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; margin: 16px 0;">
@@ -108,7 +171,6 @@ DEFAULT_TEMPLATES = {
         <p style="margin: 0;">Le remboursement sera effectué selon le même mode de paiement utilisé lors de votre inscription. Le délai peut varier selon votre banque.</p>
     </div>
     <p>Pour toute question, n'hésitez pas à nous répondre à cet email.</p>
-    <p style="font-size: 14px; color: #999;">— L'équipe {{ site_name }}</p>
 </div>""",
     },
 }
@@ -179,6 +241,7 @@ def send_notification(
     # Render
     subject = _render(template_data['subject'], context)
     html_body = _render(template_data['body_html'], context)
+    full_html = wrap_email_html(html_body)
     text_body = strip_html(html_body)
 
     # Build email
@@ -190,7 +253,7 @@ def send_notification(
         from_email=from_email,
         to=[recipient_email],
     )
-    msg.attach_alternative(html_body, 'text/html')
+    msg.attach_alternative(full_html, 'text/html')
 
     # Send
     status = NotificationLog.Status.SENT
@@ -209,7 +272,7 @@ def send_notification(
         recipient_email=recipient_email,
         recipient_name=recipient_name,
         subject=subject,
-        body_html=html_body,
+        body_html=full_html,
         related_model=related_model,
         related_id=related_id,
         status=status,
