@@ -235,6 +235,14 @@ class Cohort(models.Model):
         return f'{self.duration_value} {label}'
 
     @property
+    def hours_per_session_display(self):
+        """Ex: '2' au lieu de '2.0', mais '1.5' reste '1.5'."""
+        val = self.hours_per_session
+        if val is None:
+            return ''
+        return str(int(val)) if val == int(val) else str(val)
+
+    @property
     def is_registration_open(self):
         """True si les inscriptions en ligne sont actuellement ouvertes."""
         if not self.registration_open_date or not self.registration_close_date:
