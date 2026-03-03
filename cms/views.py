@@ -347,10 +347,21 @@ def enrollment_detail(request, pk):
         'rejected': cohort.enrollments.filter(status='rejected').count(),
         'refunded': cohort.enrollments.filter(status='refunded').count(),
     }
+    # Build protected receipt URL
+    receipt_url = None
+    if enrollment.payment_receipt:
+        from django.urls import reverse
+        # payment_receipt.name = 'receipts/2026/03/file.jpg' → path = '2026/03/file.jpg'
+        receipt_path = enrollment.payment_receipt.name
+        if receipt_path.startswith('receipts/'):
+            receipt_path = receipt_path[len('receipts/'):]
+        receipt_url = reverse('cms:serve_receipt', args=[receipt_path])
+
     return render(request, 'cms/enrollments/detail.html', {
         'enrollment': enrollment,
         'form': form,
         'stats': stats,
+        'receipt_url': receipt_url,
     })
 
 

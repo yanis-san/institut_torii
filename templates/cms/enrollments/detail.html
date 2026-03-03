@@ -84,14 +84,14 @@
 
             <!-- Payment receipt -->
             <c-cms-card title="Reçu de paiement">
-                {% if enrollment.payment_receipt %}
+                {% if receipt_url %}
                 <div class="rounded-lg overflow-hidden border border-zinc-700 max-w-lg">
-                    <img src="{{ enrollment.payment_receipt.url }}"
+                    <img src="{{ receipt_url }}"
                          alt="Reçu de paiement"
                          class="w-full h-auto" />
                 </div>
                 <p class="mt-2 text-xs text-zinc-500">
-                    <a href="{{ enrollment.payment_receipt.url }}" target="_blank" class="hover:text-red-400 transition-colors">
+                    <a href="{{ receipt_url }}" target="_blank" class="hover:text-red-400 transition-colors">
                         Ouvrir dans un nouvel onglet →
                     </a>
                 </p>
