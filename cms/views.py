@@ -626,6 +626,7 @@ def _analytics_inner(request):
     # ── Traffic over time (daily) ──
     daily_views = list(
         qs_no_bots
+        .filter(timestamp__isnull=False)
         .annotate(date=TruncDate('timestamp'))
         .values('date')
         .annotate(views=Count('id'), visitors=Count('visitor_hash', distinct=True))
@@ -753,13 +754,16 @@ def _analytics_inner(request):
     )
 
     # For the daily chart — prepare JSON-safe data for Alpine.js
-    chart_labels = json.dumps([d['date'].strftime('%d/%m') for d in daily_views])
-    chart_views = json.dumps([d['views'] for d in daily_views])
-    chart_visitors = json.dumps([d['visitors'] for d in daily_views])
+    # Filter out entries where date is None (can happen on MySQL with NULL timestamps)
+    valid_daily = [d for d in daily_views if d.get('date') is not None]
+    chart_labels = json.dumps([d['date'].strftime('%d/%m') for d in valid_daily])
+    chart_views = json.dumps([d['views'] for d in valid_daily])
+    chart_visitors = json.dumps([d['visitors'] for d in valid_daily])
 
     # Convert hourly_views to proper JSON (hour is int from ExtractHour)
     hourly_views_json = json.dumps([
-        {'hour': h['hour'], 'count': h['count']} for h in hourly_views
+        {'hour': int(h['hour']), 'count': h['count']}
+        for h in hourly_views if h.get('hour') is not None
     ])
 
     return render(request, 'cms/analytics.html', {
