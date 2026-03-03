@@ -1,7 +1,25 @@
 <!-- Inline rating cell — swapped by htmx -->
 <td class="px-5 py-3" id="rating-{{ prospect.pk }}">
-    <div x-data="{ open: false }" class="relative">
-        <button @click="open = !open" type="button"
+    <div x-data="{
+            open: false,
+            pos: { top: 0, left: 0 },
+            reposition() {
+                let rect = this.$refs.trigger.getBoundingClientRect();
+                let dropH = 220;
+                let spaceBelow = window.innerHeight - rect.bottom;
+                if (spaceBelow < dropH) {
+                    this.pos.top = rect.top - dropH + 'px';
+                } else {
+                    this.pos.top = rect.bottom + 4 + 'px';
+                }
+                this.pos.left = rect.left + 'px';
+            },
+            toggle() {
+                this.open = !this.open;
+                if (this.open) this.reposition();
+            }
+         }" class="relative">
+        <button x-ref="trigger" @click="toggle()" type="button"
                 class="flex items-center gap-1.5 text-xs group">
             {% if prospect.rating %}
                 <c-cms-badge label="{{ prospect.get_rating_display }}" color="{{ prospect.rating_color }}" />
@@ -14,7 +32,8 @@
             </svg>
         </button>
         <div x-show="open" @click.away="open = false" x-transition
-             class="absolute z-20 mt-1 w-40 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl py-1">
+             :style="'top:' + pos.top + ';left:' + pos.left"
+             class="fixed z-50 w-40 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl py-1">
             {% for value, label in rating_choices %}
             <form method="post" action="{% url 'cms:prospect_set_rating' prospect.pk %}"
                   hx-post="{% url 'cms:prospect_set_rating' prospect.pk %}"
