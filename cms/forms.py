@@ -116,12 +116,16 @@ class CategoryForm(forms.ModelForm):
 class LanguageForm(forms.ModelForm):
     class Meta:
         model = Language
-        fields = ['name', 'flag_emoji', 'flag_image_url', 'order']
+        fields = ['name', 'slug', 'flag_emoji', 'flag_image_url', 'order']
         widgets = {
             'name': forms.TextInput(attrs={'class': _INPUT}),
+            'slug': forms.TextInput(attrs={'class': _INPUT, 'placeholder': 'japanese'}),
             'flag_emoji': forms.TextInput(attrs={'class': _INPUT, 'placeholder': '🇯🇵'}),
             'flag_image_url': forms.URLInput(attrs={'class': _INPUT}),
             'order': forms.NumberInput(attrs={'class': _INPUT}),
+        }
+        help_texts = {
+            'slug': 'Identifiant URL (ex: japanese, chinese, korean). Laissez vide pour auto-générer.',
         }
 
 
