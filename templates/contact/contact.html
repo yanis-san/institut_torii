@@ -103,32 +103,41 @@
                               this.phoneError = '';
                           }
                       },
+
+                      filterCohortsUrl: '{% url "courses:api_cohorts" %}',
+
+                      filterCohorts() {
+                          let catEl = document.getElementById('id_interested_category');
+                          let langEl = document.getElementById('id_interested_language');
+                          let cohortEl = document.getElementById('id_interested_cohort');
+                          if (!cohortEl) return;
+                          let catVal = catEl ? catEl.value : '';
+                          let langVal = langEl ? langEl.value : '';
+                          let params = new URLSearchParams();
+                          if (catVal) params.set('category', catVal);
+                          if (langVal) params.set('language', langVal);
+                          fetch(this.filterCohortsUrl + '?' + params.toString())
+                              .then(r => r.json())
+                              .then(data => {
+                                  cohortEl.innerHTML = '';
+                                  let blank = document.createElement('option');
+                                  blank.value = '';
+                                  blank.textContent = '-- Choisissez une formation --';
+                                  cohortEl.appendChild(blank);
+                                  data.forEach(c => {
+                                      let opt = document.createElement('option');
+                                      opt.value = c.id;
+                                      opt.textContent = c.name;
+                                      cohortEl.appendChild(opt);
+                                  });
+                              });
+                      },
                   }"
                   x-effect="
                       showLanguage = category !== '';
                       showCohort = category !== '';
                   "
-                  @filter-cohorts.debounce.100ms="
-                      let catEl = document.getElementById('id_interested_category');
-                      let langEl = document.getElementById('id_interested_language');
-                      let cohortEl = document.getElementById('id_interested_cohort');
-                      let catVal = catEl ? catEl.value : '';
-                      let langVal = langEl ? langEl.value : '';
-                      let url = '{% url "courses:api_cohorts" %}?';
-                      if (catVal) url += 'category=' + catVal + '&';
-                      if (langVal) url += 'language=' + langVal;
-                      fetch(url)
-                          .then(r => r.json())
-                          .then(data => {
-                              cohortEl.innerHTML = '<option value=\"\">-- Choisissez une formation --</option>';
-                              data.forEach(c => {
-                                  let opt = document.createElement('option');
-                                  opt.value = c.id;
-                                  opt.textContent = c.name;
-                                  cohortEl.appendChild(opt);
-                              });
-                          });
-                  ">
+                  @filter-cohorts.debounce.100ms="filterCohorts()">
 
                 {% csrf_token %}
 
