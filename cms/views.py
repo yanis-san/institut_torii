@@ -1,3 +1,6 @@
+import json
+import logging
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -11,6 +14,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 from django_ratelimit.decorators import ratelimit
+
+logger = logging.getLogger(__name__)
 
 from .models import HomePage, PageView, SiteSettings
 from .forms import (
@@ -582,6 +587,14 @@ def edit_settings(request):
 @login_required(login_url=_LOGIN_URL)
 def analytics(request):
     """Server-side analytics dashboard with date range filtering."""
+    try:
+        return _analytics_inner(request)
+    except Exception:
+        logger.exception('Analytics view crashed')
+        raise
+
+
+def _analytics_inner(request):
     now = timezone.now()
 
     # Date range from query params (default: last 30 days)
@@ -739,10 +752,15 @@ def analytics(request):
         PageView.SOCIAL_MEDIA_DOMAINS, PageView.classify_social_media,
     )
 
-    # For the daily chart — prepare JSON-safe data
-    chart_labels = [d['date'].strftime('%d/%m') for d in daily_views]
-    chart_views = [d['views'] for d in daily_views]
-    chart_visitors = [d['visitors'] for d in daily_views]
+    # For the daily chart — prepare JSON-safe data for Alpine.js
+    chart_labels = json.dumps([d['date'].strftime('%d/%m') for d in daily_views])
+    chart_views = json.dumps([d['views'] for d in daily_views])
+    chart_visitors = json.dumps([d['visitors'] for d in daily_views])
+
+    # Convert hourly_views to proper JSON (hour is int from ExtractHour)
+    hourly_views_json = json.dumps([
+        {'hour': h['hour'], 'count': h['count']} for h in hourly_views
+    ])
 
     return render(request, 'cms/analytics.html', {
         'days': days,
@@ -765,7 +783,7 @@ def analytics(request):
         'funnel_courses': funnel_courses,
         'funnel_contact': funnel_contact,
         'funnel_register': funnel_register,
-        'hourly_views': hourly_views,
+        'hourly_views_json': hourly_views_json,
         'chart_labels': chart_labels,
         'chart_views': chart_views,
         'chart_visitors': chart_visitors,

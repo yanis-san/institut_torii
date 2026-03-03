@@ -455,10 +455,10 @@
         {% endif %}
 
         <!-- Peak hours -->
-        {% if hourly_views %}
+        {% if hourly_views_json != '[]' %}
         <c-cms-card title="Heures de pointe">
             <div x-data="{
-                hours: {{ hourly_views|safe }},
+                hours: {{ hourly_views_json|safe }},
                 get maxCount() {
                     return Math.max(...this.hours.map(h => h.count), 1)
                 }
