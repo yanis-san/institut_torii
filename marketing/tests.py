@@ -1531,3 +1531,248 @@ class NotificationDetailViewTestCase(MarketingTestMixin, TestCase):
         url = reverse('marketing:notification_detail', kwargs={'pk': failed.pk})
         response = self.client.get(url)
         self.assertContains(response, 'Connection refused')
+
+
+# ──────────────────────────────────────────────
+# NotificationTemplate model tests
+# ──────────────────────────────────────────────
+
+class NotificationTemplateModelTestCase(TestCase):
+    """Test NotificationTemplate model."""
+
+    def test_create_template(self):
+        from marketing.models import NotificationTemplate
+        tpl = NotificationTemplate.objects.create(
+            event_type='contact_received',
+            subject='Merci {{ first_name }} !',
+            body_html='<p>Merci {{ first_name }}</p>',
+        )
+        self.assertEqual(str(tpl), 'Contact — Accusé de réception')
+        self.assertTrue(tpl.is_active)
+
+    def test_event_type_unique(self):
+        from marketing.models import NotificationTemplate
+        from django.db import IntegrityError
+        NotificationTemplate.objects.create(
+            event_type='contact_received',
+            subject='Test', body_html='<p>Test</p>',
+        )
+        with self.assertRaises(IntegrityError):
+            NotificationTemplate.objects.create(
+                event_type='contact_received',
+                subject='Dupe', body_html='<p>Dupe</p>',
+            )
+
+    def test_get_template_returns_active(self):
+        from marketing.models import NotificationTemplate
+        NotificationTemplate.objects.create(
+            event_type='contact_received',
+            subject='Custom subject',
+            body_html='<p>Custom body</p>',
+            is_active=True,
+        )
+        result = NotificationTemplate.get_template('contact_received')
+        self.assertIsNotNone(result)
+        self.assertEqual(result['subject'], 'Custom subject')
+
+    def test_get_template_returns_none_if_inactive(self):
+        from marketing.models import NotificationTemplate
+        NotificationTemplate.objects.create(
+            event_type='contact_received',
+            subject='Inactive',
+            body_html='<p>Inactive</p>',
+            is_active=False,
+        )
+        result = NotificationTemplate.get_template('contact_received')
+        self.assertIsNone(result)
+
+    def test_get_template_returns_none_if_missing(self):
+        from marketing.models import NotificationTemplate
+        result = NotificationTemplate.get_template('enrollment_confirmed')
+        self.assertIsNone(result)
+
+    def test_ensure_defaults_creates_all(self):
+        from marketing.models import NotificationTemplate
+        from marketing.notifications import DEFAULT_TEMPLATES
+        NotificationTemplate.ensure_defaults()
+        self.assertEqual(
+            NotificationTemplate.objects.count(),
+            len(DEFAULT_TEMPLATES),
+        )
+        for event_type in DEFAULT_TEMPLATES:
+            self.assertTrue(
+                NotificationTemplate.objects.filter(event_type=event_type).exists()
+            )
+
+    def test_ensure_defaults_idempotent(self):
+        from marketing.models import NotificationTemplate
+        NotificationTemplate.ensure_defaults()
+        count1 = NotificationTemplate.objects.count()
+        NotificationTemplate.ensure_defaults()
+        count2 = NotificationTemplate.objects.count()
+        self.assertEqual(count1, count2)
+
+    def test_ensure_defaults_preserves_edits(self):
+        from marketing.models import NotificationTemplate
+        NotificationTemplate.objects.create(
+            event_type='contact_received',
+            subject='Mon sujet perso',
+            body_html='<p>Mon contenu perso</p>',
+        )
+        NotificationTemplate.ensure_defaults()
+        tpl = NotificationTemplate.objects.get(event_type='contact_received')
+        self.assertEqual(tpl.subject, 'Mon sujet perso')
+
+
+# ──────────────────────────────────────────────
+# Notification sender uses DB templates
+# ──────────────────────────────────────────────
+
+@override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+class NotificationSenderUsesDBTemplateTestCase(TestCase):
+    """Test that send_notification uses DB templates when available."""
+
+    def test_uses_db_template_over_default(self):
+        from marketing.models import NotificationTemplate
+        from marketing.notifications import send_notification
+        NotificationTemplate.objects.create(
+            event_type='contact_received',
+            subject='Sujet personnalisé {{ first_name }}',
+            body_html='<p>Contenu personnalisé pour {{ first_name }}</p>',
+            is_active=True,
+        )
+        log = send_notification(
+            event_type='contact_received',
+            recipient_email='test@example.com',
+            context={'first_name': 'Yuki'},
+        )
+        self.assertIn('Sujet personnalisé Yuki', log.subject)
+        self.assertIn('Contenu personnalisé pour Yuki', log.body_html)
+
+    def test_falls_back_to_default_when_inactive(self):
+        from marketing.models import NotificationTemplate
+        from marketing.notifications import send_notification, DEFAULT_TEMPLATES
+        NotificationTemplate.objects.create(
+            event_type='contact_received',
+            subject='Inactif',
+            body_html='<p>Inactif</p>',
+            is_active=False,
+        )
+        log = send_notification(
+            event_type='contact_received',
+            recipient_email='test@example.com',
+            context={'first_name': 'Test'},
+        )
+        # Should use default template, not the inactive DB one
+        self.assertNotIn('Inactif', log.subject)
+        self.assertIn('Institut Torii', log.subject)
+
+    def test_falls_back_to_default_when_no_db_entry(self):
+        from marketing.notifications import send_notification
+        log = send_notification(
+            event_type='contact_received',
+            recipient_email='test@example.com',
+            context={'first_name': 'Test'},
+        )
+        self.assertIn('Institut Torii', log.subject)
+
+
+# ──────────────────────────────────────────────
+# NotificationTemplate CMS views tests
+# ──────────────────────────────────────────────
+
+class NotificationTemplateListViewTestCase(MarketingTestMixin, TestCase):
+    """Test notification_template_list CMS view."""
+
+    def setUp(self):
+        super().setUp()
+        self.client.login(username='admin', password='testpass123')
+        self.url = reverse('marketing:notification_template_list')
+
+    def test_renders_200(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_requires_auth(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_auto_creates_defaults(self):
+        from marketing.models import NotificationTemplate
+        self.assertEqual(NotificationTemplate.objects.count(), 0)
+        self.client.get(self.url)
+        self.assertEqual(NotificationTemplate.objects.count(), 5)
+
+    def test_displays_all_templates(self):
+        response = self.client.get(self.url)
+        self.assertContains(response, 'Contact')
+        self.assertContains(response, 'Inscription')
+
+
+class NotificationTemplateEditViewTestCase(MarketingTestMixin, TestCase):
+    """Test notification_template_edit CMS view."""
+
+    def setUp(self):
+        super().setUp()
+        from marketing.models import NotificationTemplate
+        self.client.login(username='admin', password='testpass123')
+        NotificationTemplate.ensure_defaults()
+        self.tpl = NotificationTemplate.objects.get(event_type='contact_received')
+        self.url = reverse('marketing:notification_template_edit', kwargs={'pk': self.tpl.pk})
+
+    def test_renders_200(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_requires_auth(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_edit_saves_changes(self):
+        from marketing.models import NotificationTemplate
+        response = self.client.post(self.url, {
+            'subject': 'Nouveau sujet {{ first_name }}',
+            'body_html': '<p>Nouveau contenu</p>',
+            'is_active': True,
+        })
+        self.assertEqual(response.status_code, 302)
+        self.tpl.refresh_from_db()
+        self.assertEqual(self.tpl.subject, 'Nouveau sujet {{ first_name }}')
+        self.assertEqual(self.tpl.body_html, '<p>Nouveau contenu</p>')
+
+    def test_can_deactivate(self):
+        response = self.client.post(self.url, {
+            'subject': self.tpl.subject,
+            'body_html': self.tpl.body_html,
+            # is_active not sent = False
+        })
+        self.assertEqual(response.status_code, 302)
+        self.tpl.refresh_from_db()
+        self.assertFalse(self.tpl.is_active)
+
+    def test_404_nonexistent(self):
+        url = reverse('marketing:notification_template_edit', kwargs={'pk': 99999})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_reset_to_default(self):
+        from marketing.models import NotificationTemplate
+        from marketing.notifications import DEFAULT_TEMPLATES
+        # Modify first
+        self.tpl.subject = 'Modifié'
+        self.tpl.save()
+        # Reset
+        reset_url = reverse('marketing:notification_template_reset', kwargs={'pk': self.tpl.pk})
+        response = self.client.post(reset_url)
+        self.assertEqual(response.status_code, 302)
+        self.tpl.refresh_from_db()
+        default = DEFAULT_TEMPLATES['contact_received']
+        self.assertEqual(self.tpl.subject, default['subject'])
+        self.assertEqual(self.tpl.body_html, default['body_html'])
+
+    def test_preview(self):
+        preview_url = reverse('marketing:notification_template_preview', kwargs={'pk': self.tpl.pk})
+        response = self.client.get(preview_url)
+        self.assertEqual(response.status_code, 200)

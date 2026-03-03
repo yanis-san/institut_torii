@@ -288,6 +288,89 @@ class EmailSubscription(models.Model):
 
 
 # ──────────────────────────────────────────────
+# NotificationTemplate — editable transactional email templates
+# ──────────────────────────────────────────────
+
+class NotificationTemplate(models.Model):
+    """
+    Editable transactional email templates.
+    One per event_type. Falls back to code defaults if not in DB.
+    Editable from the CMS so admins can customise wording without code changes.
+    """
+
+    class EventType(models.TextChoices):
+        CONTACT_RECEIVED = 'contact_received', _('Contact — Accusé de réception')
+        ENROLLMENT_RECEIVED = 'enrollment_received', _('Inscription — Accusé de réception')
+        ENROLLMENT_CONFIRMED = 'enrollment_confirmed', _('Inscription — Confirmée')
+        ENROLLMENT_REJECTED = 'enrollment_rejected', _('Inscription — Rejetée')
+        ENROLLMENT_REFUNDED = 'enrollment_refunded', _('Inscription — Remboursée')
+
+    event_type = models.CharField(
+        _("type d'événement"), max_length=30,
+        choices=EventType.choices, unique=True,
+    )
+    subject = models.CharField(
+        _('objet'), max_length=300,
+        help_text=_(
+            'Variables disponibles : {{ first_name }}, {{ last_name }}, '
+            '{{ email }}, {{ site_name }}, {{ cohort_name }}, '
+            '{{ enrollment_code }}, {{ start_date }}, {{ rejection_reason }}'
+        ),
+    )
+    body_html = models.TextField(
+        _('contenu HTML'),
+        help_text=_(
+            'Corps du mail en HTML. Mêmes variables que l\'objet. '
+            'Le texte brut est auto-généré depuis le HTML.'
+        ),
+    )
+    is_active = models.BooleanField(
+        _('actif'), default=True,
+        help_text=_(
+            'Si désactivé, le template par défaut du code sera utilisé.'
+        ),
+    )
+    updated_at = models.DateTimeField(_('mis à jour le'), auto_now=True)
+
+    class Meta:
+        verbose_name = _('template de notification')
+        verbose_name_plural = _('templates de notification')
+        ordering = ['event_type']
+
+    def __str__(self):
+        return self.get_event_type_display()
+
+    @classmethod
+    def get_template(cls, event_type):
+        """
+        Return (subject, body_html) for the given event_type.
+        Returns the DB version if active, else None (caller falls back to default).
+        """
+        try:
+            tpl = cls.objects.get(event_type=event_type, is_active=True)
+            return {'subject': tpl.subject, 'body_html': tpl.body_html}
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
+    def ensure_defaults(cls):
+        """
+        Create DB entries from DEFAULT_TEMPLATES for any missing event types.
+        Called from the CMS list view so entries exist to edit.
+        """
+        from marketing.notifications import DEFAULT_TEMPLATES
+        for event_type, data in DEFAULT_TEMPLATES.items():
+            cls.objects.get_or_create(
+                event_type=event_type,
+                defaults={
+                    'subject': data['subject'],
+                    'body_html': data['body_html'],
+                    'is_active': True,
+                },
+            )
+
+
+# ──────────────────────────────────────────────
 # NotificationLog — tracks every transactional email sent
 # ──────────────────────────────────────────────
 

@@ -34,4 +34,10 @@ urlpatterns = [
     # Notification Log
     path('notifications/', views.notification_list, name='notification_list'),
     path('notifications/<int:pk>/', views.notification_detail, name='notification_detail'),
+
+    # Notification Templates (editable transactional emails)
+    path('notification-templates/', views.notification_template_list, name='notification_template_list'),
+    path('notification-templates/<int:pk>/', views.notification_template_edit, name='notification_template_edit'),
+    path('notification-templates/<int:pk>/reset/', views.notification_template_reset, name='notification_template_reset'),
+    path('notification-templates/<int:pk>/preview/', views.notification_template_preview, name='notification_template_preview'),
 ]

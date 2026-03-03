@@ -333,7 +333,7 @@ print('Email envoyé !')
 
 | # | Vérification | Commande / Action |
 |---|-------------|-------------------|
-| 1 | ✅ Tests passent (local) | `python manage.py test` → 296 OK |
+| 1 | ✅ Tests passent (local) | `python manage.py test` → 330 OK |
 | 2 | ✅ Tailwind buildé | `python manage.py tailwind build` |
 | 3 | ✅ Settings prod correct | `DJANGO_SETTINGS_MODULE=config.settings.prod` |
 | 4 | ✅ `SECRET_KEY` définie | Variable d'environnement non-vide |

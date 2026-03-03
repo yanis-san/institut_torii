@@ -4,7 +4,7 @@ Marketing forms — CMS management of email templates & campaigns.
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .models import EmailTemplate, EmailCampaign
+from .models import EmailTemplate, EmailCampaign, NotificationTemplate
 from contact.models import Prospect
 from courses.models import Language, Cohort
 
@@ -130,3 +130,22 @@ class EmailCampaignForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+
+class NotificationTemplateForm(forms.ModelForm):
+    """Form for editing transactional notification templates from the CMS."""
+
+    class Meta:
+        model = NotificationTemplate
+        fields = ['subject', 'body_html', 'is_active']
+        widgets = {
+            'subject': forms.TextInput(attrs={
+                'class': _INPUT,
+                'placeholder': 'Ex: Nous avons reçu votre message — {{ site_name }}',
+            }),
+            'body_html': forms.Textarea(attrs={
+                'class': _TEXTAREA + ' font-mono text-sm min-h-[400px]',
+                'rows': 20,
+            }),
+            'is_active': forms.CheckboxInput(attrs={'class': _CHECKBOX}),
+        }

@@ -13,13 +13,14 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from .forms import EmailCampaignForm, EmailTemplateForm
+from .forms import EmailCampaignForm, EmailTemplateForm, NotificationTemplateForm
 from .models import (
     CampaignRecipient,
     EmailCampaign,
     EmailSubscription,
     EmailTemplate,
     NotificationLog,
+    NotificationTemplate,
 )
 from .services import (
     build_recipient_list,
@@ -414,6 +415,91 @@ def notification_detail(request, pk):
     notification = get_object_or_404(NotificationLog.objects.select_related('sent_by'), pk=pk)
     return render(request, 'marketing/notification_detail.html', {
         'notification': notification,
+    })
+
+
+# ──────────────────────────────────────────────
+# NotificationTemplate — editable transactional email templates
+# ──────────────────────────────────────────────
+
+@login_required(login_url=_LOGIN_URL)
+def notification_template_list(request):
+    """List all editable notification templates. Auto-creates defaults."""
+    NotificationTemplate.ensure_defaults()
+    templates = NotificationTemplate.objects.all()
+    return render(request, 'marketing/notification_template_list.html', {
+        'templates': templates,
+    })
+
+
+@login_required(login_url=_LOGIN_URL)
+def notification_template_edit(request, pk):
+    """Edit a transactional email notification template."""
+    tpl = get_object_or_404(NotificationTemplate, pk=pk)
+
+    if request.method == 'POST':
+        form = NotificationTemplateForm(request.POST, instance=tpl)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Template « {tpl.get_event_type_display()} » mis à jour.')
+            return redirect('marketing:notification_template_list')
+    else:
+        form = NotificationTemplateForm(instance=tpl)
+
+    # Available variables per event type
+    variables = {
+        'contact_received': ['first_name', 'last_name', 'email', 'site_name', 'site_url'],
+        'enrollment_received': ['first_name', 'last_name', 'email', 'cohort_name', 'enrollment_code', 'site_name', 'site_url'],
+        'enrollment_confirmed': ['first_name', 'last_name', 'email', 'cohort_name', 'enrollment_code', 'start_date', 'site_name', 'site_url'],
+        'enrollment_rejected': ['first_name', 'last_name', 'email', 'cohort_name', 'rejection_reason', 'site_name', 'site_url'],
+        'enrollment_refunded': ['first_name', 'last_name', 'email', 'cohort_name', 'site_name', 'site_url'],
+    }
+
+    return render(request, 'marketing/notification_template_edit.html', {
+        'form': form,
+        'template': tpl,
+        'variables': variables.get(tpl.event_type, []),
+    })
+
+
+@login_required(login_url=_LOGIN_URL)
+@require_POST
+def notification_template_reset(request, pk):
+    """Reset a notification template to its code default."""
+    from .notifications import DEFAULT_TEMPLATES
+    tpl = get_object_or_404(NotificationTemplate, pk=pk)
+    default = DEFAULT_TEMPLATES.get(tpl.event_type)
+    if default:
+        tpl.subject = default['subject']
+        tpl.body_html = default['body_html']
+        tpl.is_active = True
+        tpl.save()
+        messages.success(request, f'Template « {tpl.get_event_type_display()} » réinitialisé.')
+    return redirect('marketing:notification_template_list')
+
+
+@login_required(login_url=_LOGIN_URL)
+def notification_template_preview(request, pk):
+    """Preview a notification template with sample data."""
+    from .notifications import _render
+    tpl = get_object_or_404(NotificationTemplate, pk=pk)
+    sample_context = {
+        'first_name': 'Yuki',
+        'last_name': 'TANAKA',
+        'email': 'yuki@exemple.com',
+        'site_name': 'Institut Torii',
+        'site_url': 'https://institut-torii.com',
+        'cohort_name': 'Japonais N5 — Été 2026',
+        'enrollment_code': 'ABC12345',
+        'start_date': '15/09/2026',
+        'rejection_reason': 'Reçu de paiement non lisible.',
+    }
+    rendered_subject = _render(tpl.subject, sample_context)
+    rendered_body = _render(tpl.body_html, sample_context)
+    return render(request, 'marketing/notification_template_preview.html', {
+        'template': tpl,
+        'rendered_subject': rendered_subject,
+        'rendered_body': rendered_body,
     })
 
 

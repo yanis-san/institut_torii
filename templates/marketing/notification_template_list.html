@@ -1,0 +1,60 @@
+<!-- templates/marketing/notification_template_list.html -->
+<c-cms-layout title="Emails automatiques">
+
+    <c-cms-page-header title="Emails automatiques" subtitle="Personnalisez les emails envoyés automatiquement après chaque action" />
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="mb-4 px-4 py-3 rounded-xl text-sm {% if message.tags == 'success' %}bg-emerald-500/10 border border-emerald-500/20 text-emerald-400{% else %}bg-red-500/10 border border-red-500/20 text-red-400{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="grid gap-4">
+        {% for tpl in templates %}
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 flex items-center justify-between gap-4 hover:border-zinc-700 transition-colors">
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 mb-1">
+                    <span class="text-lg">
+                        {% if tpl.event_type == 'contact_received' %}📬
+                        {% elif tpl.event_type == 'enrollment_received' %}📋
+                        {% elif tpl.event_type == 'enrollment_confirmed' %}✅
+                        {% elif tpl.event_type == 'enrollment_rejected' %}❌
+                        {% elif tpl.event_type == 'enrollment_refunded' %}💰
+                        {% endif %}
+                    </span>
+                    <h3 class="font-semibold text-white truncate">{{ tpl.get_event_type_display }}</h3>
+                    {% if not tpl.is_active %}
+                    <c-cms-badge label="Désactivé (défaut)" color="amber" />
+                    {% else %}
+                    <c-cms-badge label="Actif" color="emerald" />
+                    {% endif %}
+                </div>
+                <p class="text-sm text-zinc-400 truncate">Objet : {{ tpl.subject }}</p>
+                <p class="text-xs text-zinc-500 mt-1">
+                    Modifié le {{ tpl.updated_at|date:"d/m/Y H:i" }}
+                </p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <c-cms-btn href="{% url 'marketing:notification_template_preview' pk=tpl.pk %}" variant="ghost" size="sm">👁️ Aperçu</c-cms-btn>
+                <c-cms-btn href="{% url 'marketing:notification_template_edit' pk=tpl.pk %}" variant="secondary" size="sm">✏️ Modifier</c-cms-btn>
+                <form method="post" action="{% url 'marketing:notification_template_reset' pk=tpl.pk %}"
+                      x-data x-on:submit.prevent="if(confirm('Réinitialiser ce template aux valeurs par défaut ?')) $el.submit()">
+                    {% csrf_token %}
+                    <c-cms-btn type="submit" variant="ghost" size="sm">🔄 Défaut</c-cms-btn>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="mt-6 bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
+        <p class="text-xs text-zinc-500">
+            💡 Ces templates sont utilisés pour les emails envoyés automatiquement après un contact ou une inscription.
+            Si un template est <strong class="text-amber-400">désactivé</strong>, l'email par défaut du code sera utilisé.
+            Le bouton <strong class="text-zinc-300">🔄 Défaut</strong> réinitialise le contenu aux valeurs d'origine.
+        </p>
+    </div>
+
+</c-cms-layout>

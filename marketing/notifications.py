@@ -163,8 +163,11 @@ def send_notification(
     Returns:
         NotificationLog instance
     """
-    # Get template (default)
-    template_data = DEFAULT_TEMPLATES.get(event_type, {})
+    # Try DB template first (editable from CMS), fallback to code defaults
+    from .models import NotificationTemplate
+    template_data = NotificationTemplate.get_template(event_type)
+    if not template_data:
+        template_data = DEFAULT_TEMPLATES.get(event_type, {})
     if not template_data:
         logger.error('No template for event type: %s', event_type)
         return None
