@@ -85,6 +85,7 @@
                       emailError: '', phoneError: '',
 
                       fileName: '',
+                      fileError: '',
                       isDragging: false,
 
                       latinRegex: /^[a-zA-ZÀ-ÿœŒæÆçÇ\s\-']+$/,
@@ -115,7 +116,26 @@
 
                       handleFile(event) {
                           let file = event.target.files[0] || (event.dataTransfer && event.dataTransfer.files[0]);
+                          this.fileError = '';
                           if (file) {
+                              let maxSize = 10 * 1024 * 1024;
+                              let allowed = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+                              let allowedExt = ['.jpg', '.jpeg', '.png', '.webp', '.pdf'];
+                              let ext = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+                              if (file.size > maxSize) {
+                                  this.fileError = 'Le fichier est trop volumineux (' + (file.size / 1024 / 1024).toFixed(1) + ' Mo). Maximum : 10 Mo.';
+                                  this.fileName = '';
+                                  this.$refs.fileInput.value = '';
+                                  this.isDragging = false;
+                                  return;
+                              }
+                              if (!allowed.includes(file.type) && !allowedExt.includes(ext)) {
+                                  this.fileError = 'Format non autoris\u00e9. Formats accept\u00e9s : JPG, PNG, PDF.';
+                                  this.fileName = '';
+                                  this.$refs.fileInput.value = '';
+                                  this.isDragging = false;
+                                  return;
+                              }
                               this.fileName = file.name;
                               if (event.dataTransfer) {
                                   this.$refs.fileInput.files = event.dataTransfer.files;
@@ -235,6 +255,7 @@
                     {% if form.payment_receipt.errors %}
                     <p class="text-red-500 text-sm mt-2">{{ form.payment_receipt.errors.0 }}</p>
                     {% endif %}
+                    <p class="text-red-500 text-sm mt-2 font-medium" x-show="fileError" x-text="fileError" x-cloak></p>
                 </div>
 
                 <!-- Non-field errors -->
