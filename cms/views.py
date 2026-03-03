@@ -349,6 +349,7 @@ def enrollment_detail(request, pk):
     }
     # Build protected receipt URL
     receipt_url = None
+    receipt_is_pdf = False
     if enrollment.payment_receipt:
         from django.urls import reverse
         # payment_receipt.name = 'receipts/2026/03/file.jpg' → path = '2026/03/file.jpg'
@@ -356,12 +357,14 @@ def enrollment_detail(request, pk):
         if receipt_path.startswith('receipts/'):
             receipt_path = receipt_path[len('receipts/'):]
         receipt_url = reverse('cms:serve_receipt', args=[receipt_path])
+        receipt_is_pdf = enrollment.payment_receipt.name.lower().endswith('.pdf')
 
     return render(request, 'cms/enrollments/detail.html', {
         'enrollment': enrollment,
         'form': form,
         'stats': stats,
         'receipt_url': receipt_url,
+        'receipt_is_pdf': receipt_is_pdf,
     })
 
 
@@ -838,4 +841,6 @@ def serve_receipt(request, path):
     if not os.path.isfile(file_path):
         raise Http404
 
-    return FileResponse(open(file_path, 'rb'))
+    import mimetypes
+    content_type, _ = mimetypes.guess_type(file_path)
+    return FileResponse(open(file_path, 'rb'), content_type=content_type or 'application/octet-stream')

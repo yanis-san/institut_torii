@@ -213,7 +213,7 @@
                             <p class="text-sm text-gray-600 font-medium">
                                 Cliquez ou glissez-déposez votre reçu ici
                             </p>
-                            <p class="text-xs text-gray-400">JPG, PNG — max 5 Mo</p>
+                            <p class="text-xs text-gray-400">JPG, PNG, PDF — max 10 Mo</p>
                         </div>
 
                         <div x-show="fileName" x-cloak class="space-y-2">
@@ -227,7 +227,7 @@
                         <input type="file"
                                name="payment_receipt"
                                x-ref="fileInput"
-                               accept="image/jpeg,image/png,image/webp"
+                               accept="image/jpeg,image/png,image/webp,application/pdf"
                                class="hidden"
                                @change="handleFile($event)">
                     </div>

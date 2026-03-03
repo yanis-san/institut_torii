@@ -140,6 +140,26 @@ class EnrollmentModelTest(TestCase):
         finally:
             shutil.rmtree(tmpdir, ignore_errors=True)
 
+    @override_settings(MEDIA_ROOT=None)
+    def test_pdf_receipt_not_compressed(self):
+        """PDF receipts are stored as-is, not converted to WebP."""
+        import tempfile, shutil
+        tmpdir = tempfile.mkdtemp()
+        try:
+            with self.settings(MEDIA_ROOT=tmpdir):
+                pdf_content = b'%PDF-1.4 fake pdf content for testing'
+                receipt = SimpleUploadedFile('receipt.pdf', pdf_content, content_type='application/pdf')
+                e = Enrollment.objects.create(
+                    first_name='Test', last_name='Pdf',
+                    email='pdf@test.com', cohort=self.cohort,
+                    payment_receipt=receipt,
+                )
+                # Should remain PDF, not converted
+                self.assertTrue(e.payment_receipt.name.endswith('.pdf'))
+                e.payment_receipt.close()
+        finally:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+
 
 # ──────────────────────────────────────────────
 # Form Tests
@@ -195,6 +215,39 @@ class EnrollmentFormTest(TestCase):
         )
         self.assertTrue(form.is_valid(), form.errors)
         self.assertEqual(form.cleaned_data['phone'], '+213666123456')
+
+    def test_valid_pdf_receipt(self):
+        """PDF files are accepted as payment receipts."""
+        pdf_content = b'%PDF-1.4 fake pdf content for testing'
+        pdf_file = SimpleUploadedFile('receipt.pdf', pdf_content, content_type='application/pdf')
+        form = EnrollmentForm(
+            data=self._base_data(),
+            files={'payment_receipt': pdf_file},
+            cohort=self.cohort,
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_rejects_invalid_pdf(self):
+        """Files with .pdf extension but invalid content are rejected."""
+        fake_pdf = SimpleUploadedFile('receipt.pdf', b'not a real pdf', content_type='application/pdf')
+        form = EnrollmentForm(
+            data=self._base_data(),
+            files={'payment_receipt': fake_pdf},
+            cohort=self.cohort,
+        )
+        self.assertFalse(form.is_valid())
+        self.assertIn('payment_receipt', form.errors)
+
+    def test_rejects_disallowed_extension(self):
+        """Files with disallowed extensions (.exe etc.) are rejected."""
+        bad_file = SimpleUploadedFile('virus.exe', b'MZ bad content', content_type='application/octet-stream')
+        form = EnrollmentForm(
+            data=self._base_data(),
+            files={'payment_receipt': bad_file},
+            cohort=self.cohort,
+        )
+        self.assertFalse(form.is_valid())
+        self.assertIn('payment_receipt', form.errors)
 
 
 # ──────────────────────────────────────────────

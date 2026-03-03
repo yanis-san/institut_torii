@@ -88,7 +88,7 @@ class EnrollmentForm(forms.ModelForm):
             }),
             'payment_receipt': forms.ClearableFileInput(attrs={
                 'class': 'hidden',
-                'accept': 'image/jpeg,image/png,image/webp',
+                'accept': 'image/jpeg,image/png,image/webp,application/pdf',
             }),
         }
 
@@ -140,24 +140,34 @@ class EnrollmentForm(forms.ModelForm):
         f = self.cleaned_data.get('payment_receipt')
         if not f:
             raise forms.ValidationError(_('Le reçu de paiement est obligatoire.'))
-        # Max 5 MB
-        if f.size > 5 * 1024 * 1024:
-            raise forms.ValidationError(_('Le fichier est trop volumineux (max 5 Mo).'))
+        # Max 10 MB (PDFs can be larger)
+        if f.size > 10 * 1024 * 1024:
+            raise forms.ValidationError(_('Le fichier est trop volumineux (max 10 Mo).'))
         # Validate file extension
-        allowed_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp')
+        allowed_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.pdf')
         if not f.name.lower().endswith(allowed_extensions):
             raise forms.ValidationError(
-                _('Format non autorisé. Formats acceptés : JPG, PNG, GIF, WebP.')
+                _('Format non autorisé. Formats acceptés : JPG, PNG, PDF.')
             )
-        # Validate actual image content with Pillow
-        try:
-            img = PILImage.open(f)
-            img.verify()
-            f.seek(0)  # Reset file pointer after verify
-        except Exception:
-            raise forms.ValidationError(
-                _('Le fichier uploadé n\'est pas une image valide.')
-            )
+        # Validate content: PDF or image
+        if f.name.lower().endswith('.pdf'):
+            # Check PDF magic bytes
+            header = f.read(5)
+            f.seek(0)
+            if header != b'%PDF-':
+                raise forms.ValidationError(
+                    _('Le fichier PDF est invalide ou corrompu.')
+                )
+        else:
+            # Validate actual image content with Pillow
+            try:
+                img = PILImage.open(f)
+                img.verify()
+                f.seek(0)  # Reset file pointer after verify
+            except Exception:
+                raise forms.ValidationError(
+                    _('Le fichier uploadé n\'est pas une image valide.')
+                )
         return f
 
     def clean(self):

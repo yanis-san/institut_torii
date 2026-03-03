@@ -62,10 +62,10 @@ class Enrollment(models.Model):
     )
 
     # --- Paiement ---
-    payment_receipt = models.ImageField(
+    payment_receipt = models.FileField(
         _('reçu de paiement CCP'),
         upload_to='receipts/%Y/%m/',
-        help_text=_('Photo ou scan du reçu CCP (JPG, PNG)'),
+        help_text=_('Photo ou scan du reçu CCP (JPG, PNG, PDF)'),
     )
 
     # --- Statut ---
@@ -134,8 +134,10 @@ class Enrollment(models.Model):
             self.phone = phone
 
         # Compress payment receipt → WebP (no resize, preserve full resolution)
+        # Skip compression for PDFs
         if self.payment_receipt and hasattr(self.payment_receipt, 'file'):
-            self._compress_receipt()
+            if not self.payment_receipt.name.lower().endswith('.pdf'):
+                self._compress_receipt()
 
         super().save(*args, **kwargs)
 
