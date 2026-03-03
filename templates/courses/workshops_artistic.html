@@ -1,0 +1,99 @@
+<c-layout title="Ateliers Artistiques — Institut Torii" description="Découvrez nos ateliers d'art japonais à Alger. Calligraphie, origami, ikebana et plus encore.">
+
+    <!-- Hero -->
+    <section class="relative min-h-[60vh] flex items-center overflow-hidden bg-gradient-to-br from-amber-50 via-orange-100 to-rose-100">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none select-none">
+            <div class="absolute top-16 right-16 text-amber-200/30 text-8xl font-bold" style="font-family: 'Noto Sans JP', serif;">芸</div>
+            <div class="absolute bottom-24 left-16 text-rose-200/25 text-7xl font-bold" style="font-family: 'Noto Sans JP', serif;">美</div>
+        </div>
+
+        <div class="absolute bottom-0 left-0 right-0">
+            <svg viewBox="0 0 1440 120" fill="none" class="w-full">
+                <path d="M0 120L48 110C96 100 192 80 288 75C384 70 480 80 576 85C672 90 768 90 864 82C960 75 1056 60 1152 58C1248 55 1344 65 1392 70L1440 75V120H0Z" fill="white"/>
+            </svg>
+        </div>
+
+        <div class="relative z-10 max-w-5xl mx-auto px-6 py-20 text-center">
+            <div class="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm text-amber-700 px-5 py-2 rounded-full text-sm font-medium mb-8">
+                <i class="bx bx-palette"></i> Arts & Traditions
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
+                Ateliers <span class="text-amber-600">Artistiques</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-10">
+                Explorez les arts traditionnels d'Asie de l'Est. Calligraphie, origami, ikebana…
+                Des ateliers pour découvrir la beauté du geste.
+            </p>
+            <c-btn href="{% url 'contact:contact' %}">
+                <i class="bx bx-pencil"></i> Réserver un atelier
+            </c-btn>
+        </div>
+    </section>
+
+    <!-- Disciplines -->
+    <c-section bg="bg-white">
+        <c-section-heading title="Nos Disciplines" subtitle="Des ateliers pour tous les niveaux, encadrés par des artisans passionnés" />
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="group bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-lg hover:border-amber-200 transition-all duration-300">
+                <div class="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">🖌️</div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">Calligraphie</h3>
+                <p class="text-sm text-gray-500 leading-relaxed">Maîtrisez l'art du pinceau et de l'encre. Shodo japonais et calligraphie chinoise.</p>
+            </div>
+            <div class="group bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-lg hover:border-amber-200 transition-all duration-300">
+                <div class="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">🦢</div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">Origami</h3>
+                <p class="text-sm text-gray-500 leading-relaxed">L'art du pliage de papier. Créez des figures élégantes avec précision et patience.</p>
+            </div>
+            <div class="group bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-lg hover:border-amber-200 transition-all duration-300">
+                <div class="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">🌸</div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">Ikebana</h3>
+                <p class="text-sm text-gray-500 leading-relaxed">Arrangement floral japonais. Créez l'harmonie entre nature, forme et espace.</p>
+            </div>
+            <div class="group bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-lg hover:border-amber-200 transition-all duration-300">
+                <div class="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">🎨</div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">Peinture à l'encre</h3>
+                <p class="text-sm text-gray-500 leading-relaxed">Sumi-e et peinture chinoise. Capturez l'essence des paysages avec simplicité.</p>
+            </div>
+            <div class="group bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-lg hover:border-amber-200 transition-all duration-300">
+                <div class="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">🎎</div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">Culture & traditions</h3>
+                <p class="text-sm text-gray-500 leading-relaxed">Cérémonie du thé, kimono, festivals… Vivez les traditions asiatiques.</p>
+            </div>
+            <div class="group bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-lg hover:border-amber-200 transition-all duration-300">
+                <div class="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">✨</div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">Et plus encore…</h3>
+                <p class="text-sm text-gray-500 leading-relaxed">De nouvelles disciplines sont régulièrement ajoutées. Suivez-nous pour les découvrir.</p>
+            </div>
+        </div>
+    </c-section>
+
+    <!-- Cohorts -->
+    <c-section bg="bg-gray-50" id="sessions">
+        <c-section-heading title="Sessions Disponibles" subtitle="Réservez votre place dans nos prochains ateliers" />
+
+        {% if cohorts %}
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for cohort in cohorts %}
+                <c-cohort-card :cohort="cohort" accent="amber" />
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <p class="text-gray-500 text-lg mb-2">De nouvelles sessions seront annoncées prochainement.</p>
+            <p class="text-gray-400">Inscrivez-vous pour être notifié.</p>
+            <c-btn href="{% url 'contact:contact' %}" class="mt-6">Me notifier</c-btn>
+        </div>
+        {% endif %}
+    </c-section>
+
+    <!-- CTA -->
+    <c-section bg="bg-white">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Envie d'explorer les arts asiatiques ?</h2>
+            <p class="text-gray-500 mb-8">Contactez-nous pour réserver votre place ou en savoir plus.</p>
+            <c-btn href="{% url 'contact:contact' %}">Réserver un atelier</c-btn>
+        </div>
+    </c-section>
+
+</c-layout>

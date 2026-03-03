@@ -1,0 +1,62 @@
+<c-vars 
+    native_title=""
+    subtitle=""
+    description=""
+    gradient_from="red-500"
+    gradient_to="red-700"
+    accent_color="red"
+    characters=""
+    stats_html=""
+/>
+
+<section class="relative min-h-[70vh] flex items-center overflow-hidden bg-gradient-to-br from-{{ gradient_from }} to-{{ gradient_to }}">
+    <!-- Decorative characters -->
+    {% if characters %}
+    <div class="absolute inset-0 overflow-hidden pointer-events-none select-none opacity-10">
+        {{ characters }}
+    </div>
+    {% endif %}
+
+    <!-- Wave pattern -->
+    <div class="absolute bottom-0 left-0 right-0">
+        <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full">
+            <path d="M0 120L48 110C96 100 192 80 288 75C384 70 480 80 576 85C672 90 768 90 864 82C960 75 1056 60 1152 58C1248 55 1344 65 1392 70L1440 75V120H0Z" fill="white"/>
+        </svg>
+    </div>
+
+    <div class="relative z-10 max-w-5xl mx-auto px-6 py-20 text-center">
+        <!-- Native title -->
+        <h1 class="text-7xl md:text-9xl font-bold text-white/90 mb-6" style="font-family: 'Noto Sans JP', serif;">
+            {{ native_title }}
+        </h1>
+
+        <!-- Subtitle -->
+        <h2 class="text-3xl md:text-5xl text-white font-light mb-6">
+            {{ subtitle }}
+        </h2>
+
+        <!-- Description -->
+        <p class="text-lg md:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed mb-10">
+            {{ description }}
+        </p>
+
+        <!-- CTA -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <a href="{% url 'contact:contact' %}"
+               class="inline-flex items-center justify-center gap-2 px-10 py-4 bg-white text-gray-800 font-medium rounded-full hover:bg-gray-50 transition-all duration-300 hover:scale-105 shadow-lg">
+                <i class="bx bx-pencil"></i> Commencer mon parcours
+            </a>
+            <a href="#formations"
+               class="inline-flex items-center justify-center gap-2 px-10 py-4 bg-white/15 text-white font-medium rounded-full hover:bg-white/25 transition-all duration-300 border border-white/30 backdrop-blur-sm">
+                <i class="bx bx-book-open"></i> Voir les formations
+            </a>
+        </div>
+
+        <!-- Stats -->
+        {% if stats_html %}
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+            {{ stats_html }}
+        </div>
+        {% endif %}
+    </div>
+</section>

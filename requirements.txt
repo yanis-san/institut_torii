@@ -1,0 +1,11 @@
+Django>=5.2
+django-cotton
+django-htmx
+django-tailwind[reload]
+django-browser-reload
+django-ratelimit
+whitenoise[brotli]
+Pillow
+# Database Prod (MySQL)
+PyMySQL
+cryptography

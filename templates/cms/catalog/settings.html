@@ -1,0 +1,71 @@
+<c-cms-layout title="Catalogue">
+
+    <c-cms-page-header title="Configuration du catalogue" subtitle="Catégories, langues et formats de cours" />
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Categories -->
+        <c-cms-card title="Catégories">
+            <div class="divide-y divide-zinc-800 -my-1 mb-4">
+                {% for cat in categories %}
+                <div class="flex items-center justify-between py-3">
+                    <div>
+                        <p class="text-sm text-zinc-200">
+                            {% if cat.icon %}{{ cat.icon }} {% endif %}{{ cat.name }}
+                        </p>
+                        <p class="text-xs text-zinc-500">{{ cat.get_type_display }} · {{ cat.cohort_count }} cohorte{{ cat.cohort_count|pluralize:'s' }}</p>
+                    </div>
+                    <a href="{% url 'cms:category_edit' cat.pk %}" class="text-xs text-zinc-400 hover:text-red-400 transition-colors">Modifier</a>
+                </div>
+                {% empty %}
+                <p class="py-3 text-sm text-zinc-500">Aucune catégorie.</p>
+                {% endfor %}
+            </div>
+            <c-cms-btn href="{% url 'cms:category_create' %}" variant="secondary" size="sm">+ Ajouter</c-cms-btn>
+        </c-cms-card>
+
+        <!-- Languages -->
+        <c-cms-card title="Langues">
+            <div class="divide-y divide-zinc-800 -my-1 mb-4">
+                {% for lang in languages %}
+                <div class="flex items-center justify-between py-3">
+                    <div>
+                        <p class="text-sm text-zinc-200">
+                            {% if lang.flag_emoji %}{{ lang.flag_emoji }} {% endif %}{{ lang.name }}
+                        </p>
+                        <p class="text-xs text-zinc-500">{{ lang.cohort_count }} cohorte{{ lang.cohort_count|pluralize:'s' }}</p>
+                    </div>
+                    <a href="{% url 'cms:language_edit' lang.pk %}" class="text-xs text-zinc-400 hover:text-red-400 transition-colors">Modifier</a>
+                </div>
+                {% empty %}
+                <p class="py-3 text-sm text-zinc-500">Aucune langue.</p>
+                {% endfor %}
+            </div>
+            <c-cms-btn href="{% url 'cms:language_create' %}" variant="secondary" size="sm">+ Ajouter</c-cms-btn>
+        </c-cms-card>
+
+        <!-- Formats -->
+        <c-cms-card title="Formats de cours">
+            <div class="divide-y divide-zinc-800 -my-1 mb-4">
+                {% for fmt in formats %}
+                <div class="flex items-center justify-between py-3">
+                    <div>
+                        <p class="text-sm text-zinc-200">{{ fmt.name }}</p>
+                        <p class="text-xs text-zinc-500">
+                            {% if fmt.is_online %}En ligne{% else %}Présentiel{% endif %}
+                            {% if fmt.is_individual %} · Individuel{% endif %}
+                            · {{ fmt.cohort_count }} cohorte{{ fmt.cohort_count|pluralize:'s' }}
+                        </p>
+                    </div>
+                    <a href="{% url 'cms:format_edit' fmt.pk %}" class="text-xs text-zinc-400 hover:text-red-400 transition-colors">Modifier</a>
+                </div>
+                {% empty %}
+                <p class="py-3 text-sm text-zinc-500">Aucun format.</p>
+                {% endfor %}
+            </div>
+            <c-cms-btn href="{% url 'cms:format_create' %}" variant="secondary" size="sm">+ Ajouter</c-cms-btn>
+        </c-cms-card>
+
+    </div>
+
+</c-cms-layout>

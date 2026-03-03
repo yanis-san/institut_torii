@@ -1,0 +1,374 @@
+{% load static %}
+<c-layout title="Institut Torii — Centre culturel et linguistique asiatique" description="Découvrez les langues et cultures asiatiques à Alger : japonais, chinois, coréen. Formations, ateliers artistiques et culinaires.">
+
+    <!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+    <section class="relative min-h-screen flex items-center px-6 py-20 overflow-hidden bg-gradient-to-br from-gray-50 to-white">
+        <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+
+            <!-- Content -->
+            <div class="space-y-8">
+                <div class="inline-flex items-center gap-2 bg-red-50 text-red-500 px-5 py-2.5 rounded-full border border-red-100 text-sm">
+                    <span>⛩</span> Centre culturel et linguistique
+                </div>
+
+                <div>
+                    <h1 class="text-4xl md:text-6xl font-bold leading-tight text-gray-800 mb-6">
+                        Explorez l'Asie au<br>
+                        <span class="text-red-500 relative">
+                            cœur d'Alger
+                            <svg class="absolute -bottom-2 left-0 w-full h-3" viewBox="0 0 300 12">
+                                <path d="M5,6 Q150,1 295,6" stroke="#EF4444" stroke-width="2" fill="none" opacity="0.3"/>
+                            </svg>
+                        </span>
+                    </h1>
+                    <p class="text-xl text-gray-500 leading-relaxed max-w-lg">
+                        Découvrez les langues et cultures asiatiques dans un environnement moderne et authentique.
+                        <span class="text-red-500">Une expérience unique depuis 2018.</span>
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <c-btn href="{% url 'contact:contact' %}">Commencer mon parcours</c-btn>
+                    <c-btn href="#formations" variant="outline">Découvrir nos cours</c-btn>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-3 gap-6 pt-8 border-t border-gray-200">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-red-500 mb-1">1000+</div>
+                        <div class="text-sm text-gray-500">Étudiants</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-red-500 mb-1">6+</div>
+                        <div class="text-sm text-gray-500">Années</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-red-500 mb-1">3</div>
+                        <div class="text-sm text-gray-500">Langues</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual grid -->
+            <div class="relative hidden lg:block">
+                <div class="grid grid-cols-2 gap-5 h-[500px]">
+                    <div class="space-y-5">
+                        <div class="h-[240px] rounded-2xl overflow-hidden shadow-lg">
+                            <img src="{% static 'img/photos/formation-4.webp' %}"
+                                 alt="Cours de japonais à l'Institut Torii" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
+                        </div>
+                        <div class="h-[240px] rounded-2xl overflow-hidden shadow-lg">
+                            <img src="{% static 'img/photos/formation-1.webp' %}"
+                                 alt="Formation linguistique à l'Institut Torii" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
+                        </div>
+                    </div>
+                    <div class="space-y-5 pt-8">
+                        <div class="h-[240px] rounded-2xl overflow-hidden shadow-lg">
+                            <img src="{% static 'img/unsplash/hero-temple.webp' %}"
+                                 alt="Temple japonais" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
+                        </div>
+                        <div class="h-[240px] rounded-2xl overflow-hidden shadow-lg">
+                            <img src="{% static 'img/photos/formation-3.webp' %}"
+                                 alt="Étudiants en formation à l'Institut Torii" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════ FORMATIONS (Langue Cards) ═══════════════════════════════ -->
+    <c-section bg="bg-gray-50" id="formations">
+        <c-section-heading title="Nos Formations" subtitle="Choisissez votre parcours d'apprentissage" />
+
+        <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <!-- Japonais -->
+            <a href="{% url 'courses:japanese' %}" class="group block">
+                <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="{% static 'img/unsplash/hero-temple.webp' %}"
+                             alt="Formation Japonais" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <div class="absolute top-4 left-4 bg-white rounded-full w-11 h-11 flex items-center justify-center shadow-md"><img src="{% static 'img/flags/jp.svg' %}" alt="Japon" class="w-6 h-4 rounded-sm"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <h3 class="text-2xl font-bold mb-1">Japonais</h3>
+                            <p class="text-sm text-white/80">日本語 — La beauté de la langue japonaise</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm text-gray-500">Hiragana • Katakana • Kanji • JLPT</div>
+                            <div class="text-red-500 font-semibold text-sm text-right">
+                                À partir de<br>16 000 DA
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Chinois -->
+            <a href="{% url 'courses:chinese' %}" class="group block">
+                <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="{% static 'img/unsplash/course-chinese.webp' %}"
+                             alt="Formation Chinois" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <div class="absolute top-4 left-4 bg-white rounded-full w-11 h-11 flex items-center justify-center shadow-md"><img src="{% static 'img/flags/cn.svg' %}" alt="Chine" class="w-6 h-4 rounded-sm"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <h3 class="text-2xl font-bold mb-1">Chinois</h3>
+                            <p class="text-sm text-white/80">中文 — Maîtrisez le mandarin</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm text-gray-500">Mandarin • HSK</div>
+                            <div class="text-red-500 font-semibold text-sm text-right">
+                                À partir de<br>20 000 DA
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Coréen -->
+            <a href="{% url 'courses:korean' %}" class="group block">
+                <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="{% static 'img/unsplash/course-korean.webp' %}"
+                             alt="Formation Coréen" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <div class="absolute top-4 left-4 bg-white rounded-full w-11 h-11 flex items-center justify-center shadow-md"><img src="{% static 'img/flags/kr.svg' %}" alt="Corée" class="w-6 h-4 rounded-sm"></div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <h3 class="text-2xl font-bold mb-1">Coréen</h3>
+                            <p class="text-sm text-white/80">한국어 — Hallyu & K-culture</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm text-gray-500">Hangul • K-Culture • TOPIK</div>
+                            <div class="text-red-500 font-semibold text-sm text-right">
+                                À partir de<br>15 000 DA
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Ateliers -->
+            <div class="group">
+                <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="{% static 'img/unsplash/workshop-culture.webp' %}"
+                             alt="Ateliers Culturels" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        <div class="absolute top-4 left-4 bg-white rounded-full w-11 h-11 flex items-center justify-center shadow-md text-xl">✨</div>
+                        <div class="absolute bottom-4 left-4 text-white">
+                            <h3 class="text-2xl font-bold mb-1">Ateliers</h3>
+                            <p class="text-sm text-white/80">Expériences culturelles immersives</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="text-sm text-gray-500">Calligraphie, cuisine, origami…</div>
+                            <div class="text-red-500 font-semibold text-sm text-right">
+                                À partir de<br>5 000 DA
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="{% url 'courses:workshops_artistic' %}"
+                               class="flex-1 flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg hover:border-red-300 hover:bg-red-50/50 transition-all duration-200 text-sm">
+                                <span class="flex items-center gap-1.5"><span>🎨</span><span class="font-medium">Artistiques</span></span>
+                                <i class="bx bx-chevron-right text-gray-400"></i>
+                            </a>
+                            <a href="{% url 'courses:workshops_culinary' %}"
+                               class="flex-1 flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg hover:border-red-300 hover:bg-red-50/50 transition-all duration-200 text-sm">
+                                <span class="flex items-center gap-1.5"><span>🍜</span><span class="font-medium">Culinaires</span></span>
+                                <i class="bx bx-chevron-right text-gray-400"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </c-section>
+
+
+    <!-- ═══════════════════════════════ JLPT EXCLUSIF ═══════════════════════════════ -->
+    <c-section bg="bg-white">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 bg-red-500 text-white px-5 py-2 rounded-full text-sm font-medium mb-8">
+                <img src="{% static 'img/flags/jp.svg' %}" alt="Japon" class="w-5 h-3.5 rounded-sm inline-block"> Exclusif en Algérie
+            </div>
+
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6 flex items-center justify-center flex-wrap gap-4">
+                Seul centre à proposer le
+                <span class="inline-flex items-center bg-white rounded-lg px-4 py-2 shadow-lg border border-red-100 hover:scale-105 transition-transform duration-300">
+                    <img src="{% static 'img/logos/jlpt.svg' %}"
+                         alt="JLPT" class="h-12 md:h-16 w-auto" />
+                </span>
+            </h2>
+
+            <p class="text-xl text-gray-500 mb-10 leading-relaxed max-w-3xl mx-auto">
+                Examen officiel de japonais reconnu internationalement.
+                Certifiez votre niveau et ouvrez-vous de nouvelles opportunités.
+            </p>
+
+            <c-btn href="{% url 'courses:japanese' %}">En savoir plus sur le JLPT</c-btn>
+        </div>
+    </c-section>
+
+
+    <!-- ═══════════════════════════════ CULTURE & EXPÉRIENCES ═══════════════════════════════ -->
+    <c-section bg="bg-gray-50">
+        <c-section-heading title="Culture & Expériences" subtitle="Immergez-vous dans l'authenticité asiatique" />
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <c-feature-card icon="📖" title="Histoire"
+                            image_url="{% static 'img/unsplash/culture-history.webp' %}"
+                            image_alt="Histoire asiatique">
+                Découvrez les récits fascinants des civilisations asiatiques
+            </c-feature-card>
+
+            <c-feature-card icon="🎨" title="Art & Manga"
+                            image_url="{% static 'img/unsplash/culture-art-manga.webp' %}"
+                            image_alt="Art et Manga">
+                Explorez l'art traditionnel et la culture pop contemporaine
+            </c-feature-card>
+
+            <c-feature-card icon="🍜" title="Cuisine"
+                            image_url="{% static 'img/unsplash/culture-cuisine.webp' %}"
+                            image_alt="Cuisine asiatique">
+                Savourez l'authentique en partenariat avec Aji Torii
+            </c-feature-card>
+
+            <c-feature-card icon="✨" title="Workshops"
+                            image_url="{% static 'img/unsplash/culture-workshops.webp' %}"
+                            image_alt="Workshops culturels">
+                Origami, ikigai, calligraphie — expériences immersives
+            </c-feature-card>
+        </div>
+    </c-section>
+
+
+    <!-- ═══════════════════════════════ FEATURED COHORTS ═══════════════════════════════ -->
+    {% if featured_cohorts %}
+    <c-section bg="bg-white">
+        <c-section-heading title="Nos formations du moment" subtitle="Les sessions actuellement disponibles" />
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for cohort in featured_cohorts %}
+                <c-cohort-card :cohort="cohort" />
+            {% endfor %}
+        </div>
+    </c-section>
+    {% endif %}
+
+
+    <!-- ═══════════════════════════════ FORMATS ═══════════════════════════════ -->
+    <c-section bg="bg-gray-50">
+        <div class="text-center">
+            <h3 class="text-2xl font-bold text-gray-800 mb-8">Formats disponibles</h3>
+            <div class="flex flex-wrap justify-center gap-3">
+                <div class="bg-white text-gray-600 hover:bg-red-500 hover:text-white px-6 py-2.5 text-sm rounded-full transition-all duration-300 border border-gray-100 cursor-default shadow-sm">
+                    Cours en groupe
+                </div>
+                <div class="bg-white text-gray-600 hover:bg-red-500 hover:text-white px-6 py-2.5 text-sm rounded-full transition-all duration-300 border border-gray-100 cursor-default shadow-sm">
+                    Cours individuels
+                </div>
+                <div class="bg-white text-gray-600 hover:bg-red-500 hover:text-white px-6 py-2.5 text-sm rounded-full transition-all duration-300 border border-gray-100 cursor-default shadow-sm">
+                    Cours du soir
+                </div>
+                <div class="bg-white text-gray-600 hover:bg-red-500 hover:text-white px-6 py-2.5 text-sm rounded-full transition-all duration-300 border border-gray-100 cursor-default shadow-sm">
+                    Cours en ligne
+                </div>
+                <div class="bg-white text-gray-600 hover:bg-red-500 hover:text-white px-6 py-2.5 text-sm rounded-full transition-all duration-300 border border-gray-100 cursor-default shadow-sm">
+                    Horaires flexibles
+                </div>
+            </div>
+        </div>
+    </c-section>
+
+
+    <!-- ═══════════════════════════════ VOYAGE / IMMERSION ═══════════════════════════════ -->
+    <c-section bg="bg-gradient-to-br from-gray-50 to-white">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6 leading-tight">
+                    Vivez l'Asie de<br>
+                    <span class="text-red-500">l'intérieur</span>
+                </h2>
+                <p class="text-xl text-gray-500 mb-8 leading-relaxed">
+                    Créez des souvenirs inoubliables grâce à nos programmes d'immersion culturelle et linguistique en Asie.
+                </p>
+
+                <div class="space-y-4 mb-10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-2.5 h-2.5 bg-red-500 rounded-full"></div>
+                        <span class="text-gray-600">Séjours culturels et linguistiques au Japon, Corée, Chine</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-2.5 h-2.5 bg-red-500 rounded-full"></div>
+                        <span class="text-gray-600">Accompagnement personnalisé</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-2.5 h-2.5 bg-red-500 rounded-full"></div>
+                        <span class="text-gray-600">Activités culturelles authentiques</span>
+                    </div>
+                </div>
+
+                <c-btn href="{% url 'contact:contact' %}">Découvrir nos programmes</c-btn>
+            </div>
+
+            <div class="relative hidden lg:block">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-4">
+                        <div class="aspect-square rounded-2xl overflow-hidden shadow-lg">
+                            <img src="{% static 'img/unsplash/voyage-temple.webp' %}"
+                                 alt="Temple japonais" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" loading="lazy" />
+                        </div>
+                        <div class="aspect-[4/3] rounded-2xl overflow-hidden shadow-lg">
+                            <img src="{% static 'img/unsplash/voyage-culture.webp' %}"
+                                 alt="Culture asiatique" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" loading="lazy" />
+                        </div>
+                    </div>
+                    <div class="space-y-4 pt-8">
+                        <div class="aspect-[4/3] rounded-2xl overflow-hidden shadow-lg">
+                            <img src="{% static 'img/unsplash/voyage-zen.webp' %}"
+                                 alt="Jardin zen" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" loading="lazy" />
+                        </div>
+                        <div class="aspect-square rounded-2xl overflow-hidden shadow-lg">
+                            <img src="{% static 'img/unsplash/voyage-origami.webp' %}"
+                                 alt="Origami" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" loading="lazy" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </c-section>
+
+
+    <!-- ═══════════════════════════════ TÉMOIGNAGES ═══════════════════════════════ -->
+    <c-section bg="bg-white">
+        <c-section-heading title="Témoignages & Communauté">
+            <p class="text-xl text-gray-500 max-w-3xl mx-auto leading-relaxed mt-4">
+                Nous sommes avant tout des <span class="text-red-500 italic">passionnés</span>.
+                Rejoignez notre communauté.
+            </p>
+        </c-section-heading>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <c-testimonial initials="AK" name="Amina K." role="Étudiante en japonais">
+                "L'Institut Torii a transformé ma vision de l'apprentissage. L'approche culturelle rend chaque cours passionnant !"
+            </c-testimonial>
+
+            <c-testimonial initials="MR" name="Mohamed R." role="Professionnel">
+                "Une équipe de passionnés. ありがとうございます！"
+            </c-testimonial>
+
+            <c-testimonial initials="SL" name="Sarah L." role="Maman de Yasmine, 8 ans">
+                "Ma fille adore ses cours de japonais. Elle rentre toujours avec de nouvelles histoires et créations d'origami."
+            </c-testimonial>
+        </div>
+    </c-section>
+
+</c-layout>

@@ -1,0 +1,116 @@
+<c-layout title="Ateliers Culinaires — Institut Torii" description="Découvrez nos ateliers de cuisine asiatique à Alger. Sushi, ramen, cuisine coréenne, dim sum et plus.">
+
+    <!-- Hero -->
+    <section class="relative min-h-[60vh] flex items-center overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-100 to-green-100">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none select-none">
+            <div class="absolute top-16 right-16 text-emerald-200/30 text-8xl font-bold" style="font-family: 'Noto Sans JP', serif;">食</div>
+            <div class="absolute bottom-24 left-16 text-teal-200/25 text-7xl font-bold" style="font-family: 'Noto Sans JP', serif;">味</div>
+        </div>
+
+        <div class="absolute bottom-0 left-0 right-0">
+            <svg viewBox="0 0 1440 120" fill="none" class="w-full">
+                <path d="M0 120L48 110C96 100 192 80 288 75C384 70 480 80 576 85C672 90 768 90 864 82C960 75 1056 60 1152 58C1248 55 1344 65 1392 70L1440 75V120H0Z" fill="white"/>
+            </svg>
+        </div>
+
+        <div class="relative z-10 max-w-5xl mx-auto px-6 py-20 text-center">
+            <div class="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm text-emerald-700 px-5 py-2 rounded-full text-sm font-medium mb-8">
+                <i class="bx bx-restaurant"></i> Gastronomie Asiatique
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
+                Ateliers <span class="text-emerald-600">Culinaires</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-10">
+                Apprenez à préparer les grands classiques de la cuisine japonaise, chinoise et coréenne.
+                Des ateliers pratiques, gourmands et conviviaux.
+            </p>
+            <c-btn href="{% url 'contact:contact' %}">
+                <i class="bx bx-pencil"></i> Réserver un atelier
+            </c-btn>
+        </div>
+    </section>
+
+    <!-- Cuisines -->
+    <c-section bg="bg-white">
+        <c-section-heading title="Nos Spécialités" subtitle="Voyagez par les saveurs à travers l'Asie de l'Est" />
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Japonaise -->
+            <div class="group bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg hover:border-emerald-200 transition-all duration-300">
+                <div class="h-48 bg-gradient-to-br from-pink-100 to-rose-100 flex items-center justify-center">
+                    <span class="text-7xl group-hover:scale-110 transition-transform">🍣</span>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Cuisine Japonaise</h3>
+                    <p class="text-sm text-gray-500 leading-relaxed mb-4">Sushi, sashimi, ramen, tempura, onigiri, mochi… Découvrez la précision et l'élégance de la cuisine nippone.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-pink-50 text-pink-600 px-3 py-1 rounded-full">Sushi</span>
+                        <span class="text-xs bg-pink-50 text-pink-600 px-3 py-1 rounded-full">Ramen</span>
+                        <span class="text-xs bg-pink-50 text-pink-600 px-3 py-1 rounded-full">Mochi</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chinoise -->
+            <div class="group bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg hover:border-emerald-200 transition-all duration-300">
+                <div class="h-48 bg-gradient-to-br from-red-100 to-amber-100 flex items-center justify-center">
+                    <span class="text-7xl group-hover:scale-110 transition-transform">🥟</span>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Cuisine Chinoise</h3>
+                    <p class="text-sm text-gray-500 leading-relaxed mb-4">Dim sum, baozi, nouilles sautées, canard laqué… Des recettes authentiques des quatre coins de la Chine.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-red-50 text-red-600 px-3 py-1 rounded-full">Dim Sum</span>
+                        <span class="text-xs bg-red-50 text-red-600 px-3 py-1 rounded-full">Baozi</span>
+                        <span class="text-xs bg-red-50 text-red-600 px-3 py-1 rounded-full">Nouilles</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coréenne -->
+            <div class="group bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg hover:border-emerald-200 transition-all duration-300">
+                <div class="h-48 bg-gradient-to-br from-sky-100 to-indigo-100 flex items-center justify-center">
+                    <span class="text-7xl group-hover:scale-110 transition-transform">🍜</span>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Cuisine Coréenne</h3>
+                    <p class="text-sm text-gray-500 leading-relaxed mb-4">Bibimbap, kimchi, tteokbokki, bulgogi… Découvrez les saveurs épicées et fermentées de la Corée.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-xs bg-sky-50 text-sky-600 px-3 py-1 rounded-full">Kimchi</span>
+                        <span class="text-xs bg-sky-50 text-sky-600 px-3 py-1 rounded-full">Bibimbap</span>
+                        <span class="text-xs bg-sky-50 text-sky-600 px-3 py-1 rounded-full">Bulgogi</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </c-section>
+
+    <!-- Cohorts -->
+    <c-section bg="bg-gray-50" id="sessions">
+        <c-section-heading title="Sessions Disponibles" subtitle="Réservez votre place dans nos prochains ateliers culinaires" />
+
+        {% if cohorts %}
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for cohort in cohorts %}
+                <c-cohort-card :cohort="cohort" accent="emerald" />
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <p class="text-gray-500 text-lg mb-2">De nouvelles sessions culinaires seront annoncées prochainement.</p>
+            <p class="text-gray-400">Inscrivez-vous pour être notifié.</p>
+            <c-btn href="{% url 'contact:contact' %}" class="mt-6">Me notifier</c-btn>
+        </div>
+        {% endif %}
+    </c-section>
+
+    <!-- CTA -->
+    <c-section bg="bg-white">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Envie de cuisiner asiatique ?</h2>
+            <p class="text-gray-500 mb-8">Réservez votre place et mettez la main à la pâte.</p>
+            <c-btn href="{% url 'contact:contact' %}">Réserver un atelier</c-btn>
+        </div>
+    </c-section>
+
+</c-layout>

@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+/* Scanner les templates Django pour les classes utilisées */
+@source "../../../templates/**/*.html";
+@source "../../templates/**/*.html";
+
+/* Tokens custom */
+@theme {
+    --color-deep-black: #050505;
+    --font-noto: "Noto Sans JP", sans-serif;
+    --font-inter: Inter, sans-serif;
+}
+
+/* Alpine.js cloak — hide elements until Alpine is ready */
+@layer base {
+    [x-cloak] {
+        display: none !important;
+    }
+
+    /* Pointer cursor on all interactive elements */
+    a, button, select, [role="button"], label[for],
+    input[type="checkbox"], input[type="radio"],
+    [x-on\:click], [\@click], [hx-get], [hx-post] {
+        cursor: pointer;
+    }
+}

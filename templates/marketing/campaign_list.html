@@ -1,0 +1,82 @@
+<!-- templates/marketing/campaign_list.html -->
+<c-cms-layout title="Campagnes Email">
+
+    <c-cms-page-header title="Campagnes Email" subtitle="Gérez vos envois d'emails marketing">
+        <c-cms-btn href="{% url 'marketing:campaign_create' %}">+ Nouvelle campagne</c-cms-btn>
+    </c-cms-page-header>
+
+    <!-- Filters -->
+    <div class="mb-6 flex flex-col sm:flex-row gap-3">
+        <form method="get" class="flex-1 flex gap-3">
+            <input type="text" name="q" value="{{ search_query }}"
+                   placeholder="Rechercher une campagne..."
+                   class="flex-1 bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
+            <select name="status"
+                    class="bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-xl px-4 py-2.5 text-sm cursor-pointer focus:ring-2 focus:ring-red-500 outline-none"
+                    onchange="this.form.submit()">
+                <option value="">Tous les statuts</option>
+                {% for value, label in statuses %}
+                <option value="{{ value }}" {% if value == current_status %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <c-cms-btn type="submit" variant="secondary" size="sm">Filtrer</c-cms-btn>
+        </form>
+    </div>
+
+    <!-- Campaign list -->
+    {% if campaigns %}
+    <div class="grid gap-4">
+        {% for c in campaigns %}
+        <a href="{% url 'marketing:campaign_detail' pk=c.pk %}"
+           class="block bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-colors">
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-3 mb-1">
+                        <h3 class="font-semibold text-white truncate">{{ c.name }}</h3>
+                        <c-cms-badge label="{{ c.get_status_display }}"
+                                     color="{% if c.status == 'draft' %}zinc{% elif c.status == 'scheduled' %}blue{% elif c.status == 'sending' %}amber{% elif c.status == 'sent' %}emerald{% elif c.status == 'cancelled' %}red{% endif %}" />
+                    </div>
+                    <p class="text-sm text-zinc-400">
+                        Template : {{ c.template.name }}
+                        · {{ c.get_segment_type_display }}
+                    </p>
+                    <p class="text-xs text-zinc-500 mt-1">
+                        Créée le {{ c.created_at|date:"d/m/Y H:i" }}
+                        {% if c.completed_at %} · Envoyée le {{ c.completed_at|date:"d/m/Y H:i" }}{% endif %}
+                    </p>
+                </div>
+                <div class="text-right shrink-0">
+                    {% if c.status == 'sent' %}
+                    <div class="flex items-center gap-4 text-sm">
+                        <div>
+                            <span class="text-zinc-500">Envoyés</span>
+                            <p class="text-white font-semibold">{{ c.sent_count }}</p>
+                        </div>
+                        <div>
+                            <span class="text-zinc-500">Ouverts</span>
+                            <p class="text-emerald-400 font-semibold">{{ c.open_rate }}%</p>
+                        </div>
+                        <div>
+                            <span class="text-zinc-500">Clics</span>
+                            <p class="text-blue-400 font-semibold">{{ c.click_rate }}%</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-sm text-zinc-500">{{ c.total_recipients }} destinataire{{ c.total_recipients|pluralize }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <c-cms-card>
+        <div class="text-center py-8">
+            <p class="text-zinc-400 text-lg mb-2">Aucune campagne trouvée</p>
+            <p class="text-zinc-500 text-sm mb-4">Créez votre première campagne email.</p>
+            <c-cms-btn href="{% url 'marketing:campaign_create' %}">+ Nouvelle campagne</c-cms-btn>
+        </div>
+    </c-cms-card>
+    {% endif %}
+
+</c-cms-layout>

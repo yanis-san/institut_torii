@@ -1,0 +1,54 @@
+<!-- templates/marketing/template_form.html -->
+<c-cms-layout title="{% if editing %}Modifier le template{% else %}Nouveau template{% endif %}">
+
+    <c-cms-page-header
+        title="{% if editing %}Modifier le template{% else %}Nouveau template email{% endif %}"
+        subtitle="{% if editing %}{{ template_obj.name }}{% else %}Créez un modèle réutilisable pour vos campagnes{% endif %}">
+        <c-cms-btn href="{% url 'marketing:template_list' %}" variant="secondary" size="sm">← Retour</c-cms-btn>
+    </c-cms-page-header>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="space-y-6">
+            <!-- Basic info -->
+            <c-cms-card title="Informations générales">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <c-cms-field :field="form.name" label="Nom interne" />
+                    <c-cms-field :field="form.category" label="Catégorie" />
+                </div>
+                <div class="mt-4">
+                    <c-cms-field :field="form.subject" label="Objet de l'email"
+                                 help="Variables : {{ first_name }}, {{ last_name }}, {{ site_name }}" />
+                </div>
+            </c-cms-card>
+
+            <!-- Content -->
+            <c-cms-card title="Contenu de l'email">
+                <div class="space-y-4">
+                    <c-cms-field :field="form.body_html" label="Corps HTML"
+                                 help="Variables : {{ first_name }}, {{ last_name }}, {{ email }}, {{ unsubscribe_url }}, {{ site_name }}, {{ campaign_name }}" />
+                    <c-cms-field :field="form.body_text" label="Version texte brut (optionnel)"
+                                 help="Auto-générée depuis le HTML si laissée vide." />
+                </div>
+            </c-cms-card>
+
+            <!-- Status -->
+            <c-cms-card title="Options">
+                <div class="flex items-center gap-3">
+                    {{ form.is_active }}
+                    <label for="{{ form.is_active.id_for_label }}" class="text-sm text-zinc-300 cursor-pointer">
+                        Template actif (disponible pour les campagnes)
+                    </label>
+                </div>
+            </c-cms-card>
+        </div>
+
+        <!-- Sticky save bar -->
+        <div class="sticky bottom-0 mt-6 -mx-4 px-4 py-4 bg-zinc-900/95 backdrop-blur-sm border-t border-zinc-800 flex justify-end gap-3 lg:-mx-8 lg:px-8">
+            <c-cms-btn href="{% url 'marketing:template_list' %}" variant="secondary">Annuler</c-cms-btn>
+            <c-cms-btn type="submit">{% if editing %}Enregistrer{% else %}Créer le template{% endif %}</c-cms-btn>
+        </div>
+    </form>
+
+</c-cms-layout>

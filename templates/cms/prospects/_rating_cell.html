@@ -1,0 +1,45 @@
+<!-- Inline rating cell — swapped by htmx -->
+<td class="px-5 py-3" id="rating-{{ prospect.pk }}">
+    <div x-data="{ open: false }" class="relative">
+        <button @click="open = !open" type="button"
+                class="flex items-center gap-1.5 text-xs group">
+            {% if prospect.rating %}
+                <c-cms-badge label="{{ prospect.get_rating_display }}" color="{{ prospect.rating_color }}" />
+            {% else %}
+                <span class="text-zinc-500 group-hover:text-zinc-300 transition-colors">Non évalué</span>
+            {% endif %}
+            <svg class="w-3 h-3 text-zinc-500 group-hover:text-zinc-300 transition-colors"
+                 :class="open && 'rotate-180'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
+        <div x-show="open" @click.away="open = false" x-transition
+             class="absolute z-20 mt-1 w-40 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl py-1">
+            {% for value, label in rating_choices %}
+            <form method="post" action="{% url 'cms:prospect_set_rating' prospect.pk %}"
+                  hx-post="{% url 'cms:prospect_set_rating' prospect.pk %}"
+                  hx-target="#rating-{{ prospect.pk }}"
+                  hx-swap="outerHTML">
+                {% csrf_token %}
+                <input type="hidden" name="rating" value="{{ value }}" />
+                <button type="submit" @click="open = false"
+                        class="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-700 transition-colors text-zinc-200">
+                    {{ label }}
+                </button>
+            </form>
+            {% endfor %}
+            <!-- Clear rating -->
+            <form method="post" action="{% url 'cms:prospect_set_rating' prospect.pk %}"
+                  hx-post="{% url 'cms:prospect_set_rating' prospect.pk %}"
+                  hx-target="#rating-{{ prospect.pk }}"
+                  hx-swap="outerHTML">
+                {% csrf_token %}
+                <input type="hidden" name="rating" value="" />
+                <button type="submit" @click="open = false"
+                        class="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-700 transition-colors text-zinc-400 border-t border-zinc-700 mt-1 pt-1.5">
+                    Retirer la note
+                </button>
+            </form>
+        </div>
+    </div>
+</td>

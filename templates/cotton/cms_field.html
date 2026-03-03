@@ -1,0 +1,24 @@
+<!-- templates/cotton/cms_field.html -->
+<c-vars field="" label="" help="" />
+
+<div class="space-y-1.5" {{ attrs }}>
+    {% if label %}
+    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-zinc-300">{{ label }}</label>
+    {% elif field.label %}
+    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-zinc-300">{{ field.label }}</label>
+    {% endif %}
+
+    {{ field }}
+
+    {% if help %}
+    <p class="text-xs text-zinc-500">{{ help }}</p>
+    {% elif field.help_text %}
+    <p class="text-xs text-zinc-500">{{ field.help_text }}</p>
+    {% endif %}
+
+    {% if field.errors %}
+    {% for error in field.errors %}
+    <p class="text-xs text-red-400">{{ error }}</p>
+    {% endfor %}
+    {% endif %}
+</div>

@@ -1,0 +1,114 @@
+<!-- templates/cotton/cms_layout.html -->
+<c-vars title="CMS — Institut Torii" />
+
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+{% load static %}
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }} — CMS Institut Torii</title>
+    <link rel="stylesheet" href="{% static 'css/dist/styles.css' %}" />
+    <script src="{% static 'js/alpine.min.js' %}" defer></script>
+    <script src="{% static 'js/htmx.min.js' %}" defer></script>
+</head>
+<body class="h-full bg-zinc-950 text-zinc-100 antialiased"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      x-data="{ sidebarOpen: false }">
+
+    <!-- Mobile overlay -->
+    <div x-show="sidebarOpen"
+         x-transition:enter="transition-opacity ease-linear duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-linear duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-40 bg-black/60 lg:hidden"
+         @click="sidebarOpen = false"
+         x-cloak></div>
+
+    <!-- Sidebar -->
+    <aside class="fixed inset-y-0 left-0 z-50 w-64 bg-zinc-900 border-r border-zinc-800 transform transition-transform duration-300 lg:translate-x-0"
+           :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+           @click.outside="sidebarOpen = false">
+        <!-- Logo -->
+        <div class="px-6 py-5 border-b border-zinc-800">
+            <img src="{% static 'img/logo/logo_horizontal.webp' %}" alt="Institut Torii" class="h-8 w-auto brightness-0 invert">
+            <span class="block text-xs text-zinc-500 mt-1">Tableau de bord</span>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="px-3 py-4 space-y-1 overflow-y-auto h-[calc(100vh-5rem)]">
+            <c-cms-nav-item href="{% url 'cms:dashboard' %}" icon="📊" label="Dashboard" />
+            <c-cms-nav-item href="{% url 'cms:analytics' %}" icon="📈" label="Analytics" />
+
+            <p class="px-3 pt-5 pb-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase">Gestion</p>
+            <c-cms-nav-item href="{% url 'cms:prospect_list' %}" icon="📬" label="Prospects" />
+            <c-cms-nav-item href="{% url 'cms:enrollment_list' %}" icon="📋" label="Inscriptions" />
+            <c-cms-nav-item href="{% url 'cms:cohort_list' %}" icon="👥" label="Cohortes" />
+
+            <p class="px-3 pt-5 pb-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase">Marketing</p>
+            <c-cms-nav-item href="{% url 'marketing:campaign_list' %}" icon="📧" label="Campagnes" />
+            <c-cms-nav-item href="{% url 'marketing:template_list' %}" icon="📝" label="Templates" />
+            <c-cms-nav-item href="{% url 'marketing:subscriber_list' %}" icon="👤" label="Abonnés" />
+            <c-cms-nav-item href="{% url 'marketing:notification_list' %}" icon="🔔" label="Notifications" />
+
+            <p class="px-3 pt-5 pb-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase">Configuration</p>
+            <c-cms-nav-item href="{% url 'cms:catalog_settings' %}" icon="📚" label="Catalogue" />
+
+            <p class="px-3 pt-5 pb-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase">Contenu</p>
+            <c-cms-nav-item href="{% url 'cms:edit_homepage' %}" icon="🏠" label="Page d'accueil" />
+            <c-cms-nav-item href="{% url 'cms:edit_settings' %}" icon="⚙️" label="Paramètres site" />
+
+            <div class="border-t border-zinc-800 mt-6 pt-4">
+                <form method="post" action="{% url 'cms:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-zinc-400 hover:bg-zinc-800/60 hover:text-red-400 transition-colors w-full">
+                        <span class="text-lg">🚪</span>
+                        <span class="text-sm font-medium">Déconnexion</span>
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main content -->
+    <div class="lg:pl-64 min-h-full">
+        <!-- Topbar mobile -->
+        <header class="sticky top-0 z-30 flex items-center gap-4 px-4 py-3 bg-zinc-900/95 backdrop-blur-sm border-b border-zinc-800 lg:hidden">
+            <button @click="sidebarOpen = !sidebarOpen"
+                    class="p-2 rounded-lg text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <img src="{% static 'img/logo/logo_horizontal.webp' %}" alt="Institut Torii" class="h-7 w-auto brightness-0 invert">
+        </header>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="px-4 pt-4 lg:px-8 space-y-2">
+            {% for message in messages %}
+            <div x-data="{ show: true }" x-show="show" x-transition
+                 class="flex items-center justify-between px-4 py-3 rounded-lg border
+                        {% if message.tags == 'success' %}bg-emerald-500/10 border-emerald-500/30 text-emerald-400
+                        {% elif message.tags == 'error' %}bg-red-500/10 border-red-500/30 text-red-400
+                        {% elif message.tags == 'warning' %}bg-amber-500/10 border-amber-500/30 text-amber-400
+                        {% else %}bg-blue-500/10 border-blue-500/30 text-blue-400{% endif %}">
+                <span class="text-sm">{{ message }}</span>
+                <button @click="show = false" class="ml-4 opacity-60 hover:opacity-100 transition-opacity">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Content -->
+        <main class="px-4 py-6 lg:px-8 lg:py-8">
+            {{ slot }}
+        </main>
+    </div>
+
+</body>
+</html>

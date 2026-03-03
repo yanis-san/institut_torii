@@ -1,0 +1,74 @@
+<!-- templates/marketing/subscriber_list.html -->
+<c-cms-layout title="Abonnés Email">
+
+    <c-cms-page-header title="Abonnés Email" subtitle="Gestion des préférences d'abonnement">
+    </c-cms-page-header>
+
+    <!-- KPIs -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <c-cms-stat-card label="Total abonnés" value="{{ total_subscribed }}" />
+        <c-cms-stat-card label="Désabonnés" value="{{ total_unsubscribed }}" />
+        <c-cms-stat-card label="Total" value="{{ total_subscribed|add:total_unsubscribed }}" />
+    </div>
+
+    <!-- Filters -->
+    <div class="mb-6 flex flex-col sm:flex-row gap-3">
+        <form method="get" class="flex-1 flex gap-3">
+            <input type="text" name="q" value="{{ search_query }}"
+                   placeholder="Rechercher un email..."
+                   class="flex-1 bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
+            <select name="status"
+                    class="bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-xl px-4 py-2.5 text-sm cursor-pointer focus:ring-2 focus:ring-red-500 outline-none"
+                    onchange="this.form.submit()">
+                <option value="">Tous</option>
+                <option value="subscribed" {% if current_status == 'subscribed' %}selected{% endif %}>Abonnés</option>
+                <option value="unsubscribed" {% if current_status == 'unsubscribed' %}selected{% endif %}>Désabonnés</option>
+            </select>
+            <c-cms-btn type="submit" variant="secondary" size="sm">Filtrer</c-cms-btn>
+        </form>
+    </div>
+
+    <!-- Subscriber table -->
+    {% if subscribers %}
+    <c-cms-card>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-left text-zinc-400 border-b border-zinc-800">
+                        <th class="pb-3 pr-4">Email</th>
+                        <th class="pb-3 pr-4">Statut</th>
+                        <th class="pb-3 pr-4">Inscrit le</th>
+                        <th class="pb-3">Désinscrit le</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-800/50">
+                    {% for sub in subscribers %}
+                    <tr class="text-zinc-300">
+                        <td class="py-2.5 pr-4">{{ sub.email }}</td>
+                        <td class="py-2.5 pr-4">
+                            {% if sub.is_subscribed %}
+                            <c-cms-badge label="Abonné" color="emerald" />
+                            {% else %}
+                            <c-cms-badge label="Désabonné" color="red" />
+                            {% endif %}
+                        </td>
+                        <td class="py-2.5 pr-4 text-zinc-500">{{ sub.created_at|date:"d/m/Y" }}</td>
+                        <td class="py-2.5 text-zinc-500">
+                            {% if sub.unsubscribed_at %}{{ sub.unsubscribed_at|date:"d/m/Y H:i" }}{% else %}—{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </c-cms-card>
+    {% else %}
+    <c-cms-card>
+        <div class="text-center py-8">
+            <p class="text-zinc-400">Aucun abonnement trouvé.</p>
+            <p class="text-zinc-500 text-sm mt-1">Les abonnements sont créés automatiquement lors de l'envoi de campagnes.</p>
+        </div>
+    </c-cms-card>
+    {% endif %}
+
+</c-cms-layout>

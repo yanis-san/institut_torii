@@ -1,0 +1,56 @@
+<c-layout title="Inscription confirmée — Institut Torii" description="Votre inscription a été soumise avec succès.">
+
+    <c-section bg="bg-white">
+        <div class="max-w-2xl mx-auto text-center py-8">
+
+            <!-- Success icon -->
+            <div class="w-20 h-20 bg-green-50 rounded-3xl flex items-center justify-center text-4xl text-green-500 mx-auto mb-6">
+                <i class="bx bx-check-circle"></i>
+            </div>
+
+            <h1 class="text-3xl font-bold text-gray-800 mb-3">Inscription soumise !</h1>
+            <p class="text-gray-500 mb-8 max-w-md mx-auto">
+                Votre demande d'inscription à <strong class="text-gray-700">{{ enrollment.cohort.name }}</strong>
+                a bien été reçue. Notre équipe va vérifier votre paiement.
+            </p>
+
+            <!-- Code box -->
+            <div class="bg-gray-50 border border-gray-200 rounded-2xl p-8 mb-8 inline-block">
+                <p class="text-xs uppercase tracking-widest text-gray-400 font-bold mb-3">
+                    Votre code d'inscription
+                </p>
+                <div class="text-4xl font-mono font-bold text-red-500 tracking-[0.3em] select-all">
+                    {{ enrollment.enrollment_code }}
+                </div>
+                <p class="text-sm text-gray-500 mt-4 max-w-sm">
+                    <i class="bx bx-info-circle text-red-400"></i>
+                    <strong>Conservez ce code précieusement.</strong>
+                    Il vous permettra de suivre l'état de votre inscription
+                    et le nombre d'inscrits dans votre groupe.
+                </p>
+            </div>
+
+            <!-- Status info -->
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 max-w-md mx-auto mb-8">
+                <p class="text-sm text-amber-700">
+                    <i class="bx bx-time-five"></i>
+                    <strong>Statut actuel :</strong> En attente de validation.
+                    Vous serez informé une fois le paiement vérifié.
+                </p>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="{% url 'registration:check_status' %}"
+                   class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-500 text-white font-medium rounded-xl hover:from-red-500 hover:to-red-600 transition-all duration-300 shadow-lg shadow-red-600/20">
+                    <i class="bx bx-search-alt"></i> Suivre mon inscription
+                </a>
+                <a href="{% url 'registration:cohort_list' %}"
+                   class="inline-flex items-center justify-center gap-2 px-6 py-3 border border-gray-200 text-gray-600 font-medium rounded-xl hover:bg-gray-50 transition-all duration-300">
+                    <i class="bx bx-arrow-back"></i> Retour aux formations
+                </a>
+            </div>
+        </div>
+    </c-section>
+
+</c-layout>

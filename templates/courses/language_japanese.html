@@ -1,0 +1,147 @@
+{% load static %}
+<c-layout title="Japonais — Institut Torii" description="Apprenez le japonais à Alger. Formations JLPT, cours en groupe et individuels. Hiragana, Katakana, Kanji.">
+
+    <!-- Hero -->
+    <section class="relative min-h-[70vh] flex items-center overflow-hidden bg-gradient-to-br from-stone-100 via-neutral-200 to-stone-300">
+        <!-- Decorative kanji -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none select-none">
+            <div class="absolute top-16 left-16 text-stone-400/20 text-9xl font-bold" style="font-family: 'Noto Sans JP', serif;">桜</div>
+            <div class="absolute top-32 right-24 text-stone-300/15 text-7xl font-bold" style="font-family: 'Noto Sans JP', serif;">和</div>
+            <div class="absolute bottom-32 left-24 text-stone-400/15 text-8xl font-bold" style="font-family: 'Noto Sans JP', serif;">道</div>
+            <div class="absolute bottom-16 right-16 text-stone-300/20 text-6xl font-bold" style="font-family: 'Noto Sans JP', serif;">禅</div>
+        </div>
+
+        <!-- Wave transition -->
+        <div class="absolute bottom-0 left-0 right-0">
+            <svg viewBox="0 0 1440 120" fill="none" class="w-full">
+                <path d="M0 120L48 110C96 100 192 80 288 75C384 70 480 80 576 85C672 90 768 90 864 82C960 75 1056 60 1152 58C1248 55 1344 65 1392 70L1440 75V120H0Z" fill="white"/>
+            </svg>
+        </div>
+
+        <div class="relative z-10 max-w-5xl mx-auto px-6 py-20 text-center">
+            <h1 class="text-7xl md:text-9xl font-bold text-stone-800 mb-6 drop-shadow-sm" style="font-family: 'Noto Sans JP', serif;">
+                日本語
+            </h1>
+            <h2 class="text-3xl md:text-5xl text-stone-700 font-light mb-6">
+                La Langue du <span class="font-semibold text-red-800">Soleil Levant</span>
+            </h2>
+            <p class="text-lg md:text-xl text-stone-600 max-w-3xl mx-auto leading-relaxed mb-10">
+                Plongez dans l'univers fascinant du Japon et maîtrisez sa langue millénaire
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <c-btn href="{% url 'contact:contact' %}" variant="white">
+                    <i class="bx bx-pencil"></i> Commencer mon parcours
+                </c-btn>
+                <c-btn href="#formations" variant="outline">
+                    <i class="bx bx-book-open"></i> Voir les formations
+                </c-btn>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 max-w-xl mx-auto">
+                <c-stat-card value="JLPT" label="Préparation officielle" variant="light" />
+                <c-stat-card value="N5 → N1" label="Tous niveaux" variant="light" />
+                <c-stat-card value="+200" label="Étudiants formés" variant="light" />
+            </div>
+        </div>
+    </section>
+
+    <!-- JLPT Section -->
+    <c-section bg="bg-gray-50">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <div class="inline-flex items-center gap-2 bg-red-50 text-red-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
+                    <img src="{% static 'img/flags/jp.svg' %}" alt="Japon" class="w-5 h-3.5 rounded-sm object-cover"> Exclusif en Algérie
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                    Centre <span class="text-red-700">JLPT</span> agréé
+                </h2>
+                <p class="text-gray-500 leading-relaxed mb-6">
+                    L'Institut Torii est le seul centre en Algérie à proposer la préparation au JLPT
+                    (Japanese Language Proficiency Test), l'examen officiel reconnu internationalement.
+                </p>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 text-sm text-gray-600">
+                        <i class="bx bx-check-circle text-red-700 text-lg"></i>
+                        5 niveaux : N5 (débutant) à N1 (avancé)
+                    </div>
+                    <div class="flex items-center gap-3 text-sm text-gray-600">
+                        <i class="bx bx-check-circle text-red-700 text-lg"></i>
+                        Reconnaissance internationale
+                    </div>
+                    <div class="flex items-center gap-3 text-sm text-gray-600">
+                        <i class="bx bx-check-circle text-red-700 text-lg"></i>
+                        Préparation à l'examen possible
+                    </div>
+                </div>
+                <a href="https://jlpt.institut-torii.com/" target="_blank" rel="noopener"
+                   class="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-red-700 text-white font-medium rounded-xl hover:bg-red-800 transition-all duration-300 shadow-md">
+                    <i class="bx bx-link-external"></i> S'inscrire au JLPT
+                </a>
+            </div>
+            <div class="flex items-center justify-center">
+                <a href="https://jlpt.institut-torii.com/" target="_blank" rel="noopener"
+                   class="block bg-white rounded-2xl shadow-lg border border-gray-100 p-10 text-center hover:shadow-xl hover:border-red-200 transition-all duration-300 group">
+                    <img src="{% static 'img/logos/jlpt.svg' %}"
+                         alt="JLPT Logo" class="h-24 mx-auto mb-4" />
+                    <p class="text-sm text-gray-500 mb-3">Japanese Language Proficiency Test</p>
+                    <span class="inline-flex items-center gap-1 text-sm font-medium text-red-700 group-hover:text-red-800">
+                        <i class="bx bx-link-external"></i> jlpt.institut-torii.com
+                    </span>
+                </a>
+            </div>
+        </div>
+    </c-section>
+
+    <!-- Cohorts -->
+    <c-section bg="bg-white" id="formations">
+        <c-section-heading title="Nos Formations Japonais" subtitle="Apprenez le japonais avec des méthodes éprouvées" />
+
+        {% if cohorts %}
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for cohort in cohorts %}
+                <c-cohort-card :cohort="cohort" accent="red" />
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <p class="text-gray-500 text-lg mb-2">Nos formations japonais sont en cours de mise à jour.</p>
+            <p class="text-gray-400">Contactez-nous pour plus d'informations.</p>
+            <c-btn href="{% url 'contact:contact' %}" class="mt-6">Nous contacter</c-btn>
+        </div>
+        {% endif %}
+    </c-section>
+
+    <!-- Pourquoi le japonais -->
+    <c-section bg="bg-gray-50">
+        <c-section-heading title="Pourquoi apprendre le japonais ?" />
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+                <div class="w-14 h-14 bg-stone-100 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">💼</div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Opportunités pro</h3>
+                <p class="text-sm text-gray-500 leading-relaxed">3ème économie mondiale. Le japonais ouvre les portes de Toyota, Sony, Nintendo et des milliers d'entreprises.</p>
+            </div>
+            <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+                <div class="w-14 h-14 bg-stone-100 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">🎌</div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Culture unique</h3>
+                <p class="text-sm text-gray-500 leading-relaxed">Manga, anime, cinéma, gastronomie… Comprenez le Japon dans sa langue pour une immersion complète.</p>
+            </div>
+            <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+                <div class="w-14 h-14 bg-stone-100 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">🎓</div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Études au Japon</h3>
+                <p class="text-sm text-gray-500 leading-relaxed">Accédez aux bourses MEXT et aux universités japonaises grâce à votre certification JLPT.</p>
+            </div>
+        </div>
+    </c-section>
+
+    <!-- CTA -->
+    <c-section bg="bg-white">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Prêt à découvrir le japonais ?</h2>
+            <p class="text-gray-500 mb-8">Contactez-nous pour rejoindre la prochaine session.</p>
+            <c-btn href="{% url 'contact:contact' %}">S'inscrire maintenant</c-btn>
+        </div>
+    </c-section>
+
+</c-layout>

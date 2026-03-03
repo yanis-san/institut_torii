@@ -1,0 +1,72 @@
+<!-- templates/marketing/template_list.html -->
+<c-cms-layout title="Templates Email">
+
+    <c-cms-page-header title="Templates Email" subtitle="Modèles réutilisables pour vos campagnes">
+        <c-cms-btn href="{% url 'marketing:template_create' %}">+ Nouveau template</c-cms-btn>
+    </c-cms-page-header>
+
+    <!-- Filters -->
+    <div class="mb-6 flex flex-col sm:flex-row gap-3">
+        <form method="get" class="flex-1 flex gap-3">
+            <input type="text" name="q" value="{{ search_query }}"
+                   placeholder="Rechercher un template..."
+                   class="flex-1 bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
+            <select name="category"
+                    class="bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-xl px-4 py-2.5 text-sm cursor-pointer focus:ring-2 focus:ring-red-500 outline-none"
+                    onchange="this.form.submit()">
+                <option value="">Toutes catégories</option>
+                {% for value, label in categories %}
+                <option value="{{ value }}" {% if value == current_category %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <c-cms-btn type="submit" variant="secondary" size="sm">Filtrer</c-cms-btn>
+        </form>
+    </div>
+
+    <!-- Template list -->
+    {% if templates %}
+    <div class="grid gap-4">
+        {% for tpl in templates %}
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 flex items-center justify-between gap-4 hover:border-zinc-700 transition-colors">
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 mb-1">
+                    <h3 class="font-semibold text-white truncate">{{ tpl.name }}</h3>
+                    <c-cms-badge label="{{ tpl.get_category_display }}"
+                                 color="{% if tpl.category == 'welcome' %}emerald{% elif tpl.category == 'newsletter' %}blue{% elif tpl.category == 'promotional' %}purple{% elif tpl.category == 'transactional' %}amber{% else %}zinc{% endif %}" />
+                    {% if not tpl.is_active %}
+                    <c-cms-badge label="Inactif" color="red" />
+                    {% endif %}
+                </div>
+                <p class="text-sm text-zinc-400 truncate">Objet : {{ tpl.subject }}</p>
+                <p class="text-xs text-zinc-500 mt-1">
+                    Modifié le {{ tpl.updated_at|date:"d/m/Y H:i" }}
+                    {% if tpl.campaigns.count > 0 %}
+                    · Utilisé dans {{ tpl.campaigns.count }} campagne{{ tpl.campaigns.count|pluralize }}
+                    {% endif %}
+                </p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <c-cms-btn href="{% url 'marketing:template_preview' pk=tpl.pk %}" variant="ghost" size="sm">👁️ Aperçu</c-cms-btn>
+                <c-cms-btn href="{% url 'marketing:template_edit' pk=tpl.pk %}" variant="secondary" size="sm">✏️ Modifier</c-cms-btn>
+                {% if not tpl.campaigns.exists %}
+                <form method="post" action="{% url 'marketing:template_delete' pk=tpl.pk %}"
+                      x-data x-on:submit.prevent="if(confirm('Supprimer ce template ?')) $el.submit()">
+                    {% csrf_token %}
+                    <c-cms-btn type="submit" variant="danger" size="sm">🗑️</c-cms-btn>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <c-cms-card>
+        <div class="text-center py-8">
+            <p class="text-zinc-400 text-lg mb-2">Aucun template trouvé</p>
+            <p class="text-zinc-500 text-sm mb-4">Créez votre premier template email pour démarrer.</p>
+            <c-cms-btn href="{% url 'marketing:template_create' %}">+ Nouveau template</c-cms-btn>
+        </div>
+    </c-cms-card>
+    {% endif %}
+
+</c-cms-layout>

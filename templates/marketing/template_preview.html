@@ -1,0 +1,26 @@
+<!-- templates/marketing/template_preview.html -->
+<c-cms-layout title="Aperçu — {{ template_obj.name }}">
+
+    <c-cms-page-header title="Aperçu du template" subtitle="{{ template_obj.name }}">
+        <c-cms-btn href="{% url 'marketing:template_edit' pk=template_obj.pk %}" variant="secondary" size="sm">✏️ Modifier</c-cms-btn>
+        <c-cms-btn href="{% url 'marketing:template_list' %}" variant="ghost" size="sm">← Retour</c-cms-btn>
+    </c-cms-page-header>
+
+    <!-- Subject preview -->
+    <div class="mb-6 bg-zinc-900 border border-zinc-800 rounded-xl p-5">
+        <p class="text-xs text-zinc-500 mb-1">Objet :</p>
+        <p class="text-white font-medium">{{ rendered_subject }}</p>
+    </div>
+
+    <!-- Email body preview -->
+    <c-cms-card title="Contenu (données factices)">
+        <div class="bg-white rounded-lg p-6 text-gray-800">
+            {{ rendered_body|safe }}
+        </div>
+    </c-cms-card>
+
+    <p class="mt-4 text-xs text-zinc-500 text-center">
+        ⚠️ Cet aperçu utilise des données factices : Yuki TANAKA (yuki@example.com)
+    </p>
+
+</c-cms-layout>

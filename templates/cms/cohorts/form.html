@@ -1,0 +1,169 @@
+<c-cms-layout title="{{ title }}">
+
+    <c-cms-page-header title="{{ title }}">
+        <c-cms-btn href="{% url 'cms:cohort_list' %}" variant="secondary" size="sm">← Retour</c-cms-btn>
+    </c-cms-page-header>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main form -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- General info -->
+                <c-cms-card title="Informations générales">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="sm:col-span-2">
+                            <c-cms-field :field="form.name" />
+                        </div>
+                        <c-cms-field :field="form.category" />
+                        <c-cms-field :field="form.language" />
+                        <c-cms-field :field="form.format" />
+                        <c-cms-field :field="form.slug" />
+                        <div class="sm:col-span-2">
+                            <c-cms-field :field="form.description" />
+                        </div>
+                        <c-cms-field :field="form.image" />
+                    </div>
+                </c-cms-card>
+
+                <!-- Pricing -->
+                <c-cms-card title="Tarification">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <c-cms-field :field="form.price" />
+                        <c-cms-field :field="form.registration_fee" />
+                    </div>
+                </c-cms-card>
+
+                <!-- Duration & schedule -->
+                <c-cms-card title="Durée & planning">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <c-cms-field :field="form.duration_value" />
+                        <c-cms-field :field="form.duration_unit" />
+                        <c-cms-field :field="form.hours_per_session" />
+                        <c-cms-field :field="form.sessions_per_week" />
+                        <c-cms-field :field="form.start_date" />
+                        <c-cms-field :field="form.end_date" />
+                        <c-cms-field :field="form.max_capacity" />
+                    </div>
+                    <div class="mt-4">
+                        <c-cms-field :field="form.ramadan_schedule_note" />
+                    </div>
+                </c-cms-card>
+
+                <!-- Inline schedules (edit mode only) -->
+                {% if formset %}
+                <c-cms-card title="Horaires hebdomadaires">
+                    {{ formset.management_form }}
+                    <div class="space-y-4" x-data>
+                        {% for schedule_form in formset %}
+                        <div class="flex flex-wrap items-end gap-3 p-3 bg-zinc-800/50 rounded-lg">
+                            {% if schedule_form.instance.pk %}
+                                <input type="hidden" name="{{ schedule_form.prefix }}-id" value="{{ schedule_form.instance.pk }}" />
+                            {% endif %}
+                            <div class="flex-1 min-w-[120px]">
+                                <label class="block text-xs text-zinc-400 mb-1">Jour</label>
+                                {{ schedule_form.day }}
+                            </div>
+                            <div class="flex-1 min-w-[100px]">
+                                <label class="block text-xs text-zinc-400 mb-1">Début</label>
+                                {{ schedule_form.start_time }}
+                            </div>
+                            <div class="flex-1 min-w-[100px]">
+                                <label class="block text-xs text-zinc-400 mb-1">Fin</label>
+                                {{ schedule_form.end_time }}
+                            </div>
+                            {% if schedule_form.instance.pk %}
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs text-red-400 flex items-center gap-1">
+                                    {{ schedule_form.DELETE }}
+                                    <span>Suppr.</span>
+                                </label>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </c-cms-card>
+                {% endif %}
+
+                <!-- Registration online -->
+                <c-cms-card title="Inscription en ligne">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <c-cms-field :field="form.registration_open_date" />
+                        <c-cms-field :field="form.registration_close_date" />
+                        <c-cms-field :field="form.min_students" />
+                    </div>
+                    <div class="mt-4">
+                        <c-cms-field :field="form.payment_instructions" />
+                    </div>
+                </c-cms-card>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Publish settings -->
+                <c-cms-card title="Publication">
+                    <div class="space-y-4">
+                        <label class="flex items-center gap-3">
+                            {{ form.is_active }}
+                            <span class="text-sm text-zinc-300">Cohorte active</span>
+                        </label>
+                        <label class="flex items-center gap-3">
+                            {{ form.is_featured }}
+                            <span class="text-sm text-zinc-300">Mise en avant (page d'accueil)</span>
+                        </label>
+                        <c-cms-field :field="form.order" />
+                    </div>
+                </c-cms-card>
+
+                <!-- Stats (edit mode only) -->
+                {% if stats %}
+                <c-cms-card title="Statistiques">
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-zinc-400">Confirmés</span>
+                            <span class="text-emerald-400 font-medium">{{ stats.confirmed }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-zinc-400">En attente</span>
+                            <span class="text-amber-400 font-medium">{{ stats.pending }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm border-t border-zinc-800 pt-2 mt-2">
+                            <span class="text-zinc-300 font-medium">Total</span>
+                            <span class="text-white font-bold">{{ stats.total }}</span>
+                        </div>
+                    </div>
+                </c-cms-card>
+                {% endif %}
+
+                <!-- Save button -->
+                <div class="sticky bottom-4">
+                    <c-cms-btn type="submit" variant="primary" size="lg">
+                        {% if is_new %}Créer la cohorte{% else %}Enregistrer{% endif %}
+                    </c-cms-btn>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Danger zone (edit mode) — outside the main form to avoid nesting -->
+    {% if not is_new %}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+        <div class="lg:col-start-3">
+            <c-cms-card title="Zone dangereuse">
+                <form method="post" action="{% url 'cms:cohort_delete' cohort.pk %}"
+                      x-data
+                      @submit.prevent="if (confirm('Supprimer cette cohorte ? Cette action est irréversible.')) $el.submit()">
+                    {% csrf_token %}
+                    <c-cms-btn type="submit" variant="danger" size="sm">
+                        Supprimer la cohorte
+                    </c-cms-btn>
+                </form>
+            </c-cms-card>
+        </div>
+    </div>
+    {% endif %}
+
+</c-cms-layout>

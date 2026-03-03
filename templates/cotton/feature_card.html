@@ -1,0 +1,22 @@
+<c-vars icon="" title="" image_url="" image_alt="" />
+
+<div class="group bg-white rounded-xl border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+    {% if image_url %}
+    <div class="relative h-48 overflow-hidden">
+        <img src="{{ image_url }}"
+             alt="{{ image_alt }}"
+             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+             loading="lazy" />
+        <div class="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300"></div>
+        {% if icon %}
+        <div class="absolute top-4 left-4 text-2xl bg-white rounded-full w-11 h-11 flex items-center justify-center shadow-md">
+            {{ icon }}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    <div class="p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ title }}</h3>
+        <p class="text-sm text-gray-500 leading-relaxed">{{ slot }}</p>
+    </div>
+</div>

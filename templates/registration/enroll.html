@@ -1,0 +1,263 @@
+<c-layout title="Inscription — {{ cohort.name }} — Institut Torii" description="Inscrivez-vous à {{ cohort.name }} à l'Institut Torii.">
+    {% load static %}
+
+    <!-- Hero -->
+    <section class="relative bg-gradient-to-br from-gray-50 to-white py-12">
+        <div class="max-w-3xl mx-auto px-6">
+            <a href="{% url 'registration:cohort_list' %}" class="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-red-500 transition-colors mb-6">
+                <i class="bx bx-arrow-back"></i> Retour aux formations
+            </a>
+            <div class="flex items-center gap-3 mb-4">
+                {% if cohort.language %}
+                <span class="text-xs font-medium px-3 py-1 bg-red-50 text-red-600 rounded-full">
+                    {{ cohort.language.flag_emoji }} {{ cohort.language.name }}
+                </span>
+                {% endif %}
+                <span class="text-xs font-medium px-3 py-1 bg-gray-100 text-gray-600 rounded-full">
+                    {{ cohort.format.name }}
+                </span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-3">
+                Inscription : <span class="text-red-500">{{ cohort.name }}</span>
+            </h1>
+            <div class="flex flex-wrap gap-4 text-sm text-gray-500">
+                <span class="flex items-center gap-1"><i class="bx bx-time"></i> {{ cohort.duration_display }}</span>
+                {% if cohort.start_date %}
+                <span class="flex items-center gap-1"><i class="bx bx-calendar"></i> Début : {{ cohort.start_date|date:"d/m/Y" }}</span>
+                {% endif %}
+                <span class="flex items-center gap-1"><i class="bx bx-money"></i> {{ cohort.price|floatformat:0 }} DA</span>
+            </div>
+        </div>
+    </section>
+
+    {% if is_full %}
+    <!-- Full banner -->
+    <c-section bg="bg-amber-50">
+        <div class="max-w-3xl mx-auto text-center py-8">
+            <div class="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center text-2xl text-amber-600 mx-auto mb-4">
+                <i class="bx bx-error"></i>
+            </div>
+            <h2 class="text-xl font-semibold text-amber-800 mb-2">Groupe complet</h2>
+            <p class="text-amber-600">Cette formation a atteint sa capacité maximale. Vous ne pouvez plus vous inscrire.</p>
+        </div>
+    </c-section>
+    {% else %}
+
+    <!-- Payment Instructions -->
+    {% if cohort.payment_instructions %}
+    <c-section bg="bg-blue-50">
+        <div class="max-w-3xl mx-auto">
+            <div class="bg-white border border-blue-100 rounded-2xl p-6 shadow-sm">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-lg text-blue-600 flex-shrink-0">
+                        <i class="bx bx-info-circle"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-800 mb-2">Instructions de paiement</h3>
+                        <div class="text-sm text-gray-600 whitespace-pre-line">{{ cohort.payment_instructions }}</div>
+                        <p class="text-sm text-red-500 font-medium mt-3">
+                            <i class="bx bx-camera"></i>
+                            Après le paiement, prenez une photo / scan du reçu CCP et uploadez-la ci-dessous.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </c-section>
+    {% endif %}
+
+    <!-- Form -->
+    <c-section bg="bg-white">
+        <div class="max-w-3xl mx-auto">
+            <form method="post"
+                  action="{% url 'registration:enroll' cohort.slug %}"
+                  enctype="multipart/form-data"
+                  class="space-y-8"
+                  x-data="{
+                      lastName: '{{ form.last_name.value|default_if_none:"" }}',
+                      firstName: '{{ form.first_name.value|default_if_none:"" }}',
+                      email: '{{ form.email.value|default_if_none:"" }}',
+                      phone: '{{ form.phone.value|default_if_none:"" }}',
+
+                      lastNameValid: null, firstNameValid: null,
+                      emailValid: null, phoneValid: null,
+                      lastNameError: '', firstNameError: '',
+                      emailError: '', phoneError: '',
+
+                      fileName: '',
+                      isDragging: false,
+
+                      latinRegex: /^[a-zA-ZÀ-ÿœŒæÆçÇ\s\-']+$/,
+                      emailRegex: /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/,
+
+                      validateLastName() {
+                          if (!this.lastName.trim()) { this.lastNameValid = false; this.lastNameError = 'Le nom est obligatoire.'; }
+                          else if (!this.latinRegex.test(this.lastName)) { this.lastNameValid = false; this.lastNameError = 'Caractères latins uniquement.'; }
+                          else { this.lastNameValid = true; this.lastNameError = ''; }
+                      },
+                      validateFirstName() {
+                          if (!this.firstName.trim()) { this.firstNameValid = false; this.firstNameError = 'Le prénom est obligatoire.'; }
+                          else if (!this.latinRegex.test(this.firstName)) { this.firstNameValid = false; this.firstNameError = 'Caractères latins uniquement.'; }
+                          else { this.firstNameValid = true; this.firstNameError = ''; }
+                      },
+                      validateEmail() {
+                          if (!this.email.trim()) { this.emailValid = false; this.emailError = 'L\'email est obligatoire.'; }
+                          else if (!this.emailRegex.test(this.email)) { this.emailValid = false; this.emailError = 'Format d\'email invalide.'; }
+                          else { this.emailValid = true; this.emailError = ''; }
+                      },
+                      validatePhone() {
+                          if (!this.phone.trim()) { this.phoneValid = null; this.phoneError = ''; return; }
+                          let digits = this.phone.replace(/\D/g, '');
+                          if (digits.length < 6) { this.phoneValid = false; this.phoneError = 'Numéro trop court.'; }
+                          else if (digits.length > 15) { this.phoneValid = false; this.phoneError = 'Numéro trop long.'; }
+                          else { this.phoneValid = true; this.phoneError = ''; }
+                      },
+
+                      handleFile(event) {
+                          let file = event.target.files[0] || (event.dataTransfer && event.dataTransfer.files[0]);
+                          if (file) {
+                              this.fileName = file.name;
+                              if (event.dataTransfer) {
+                                  this.$refs.fileInput.files = event.dataTransfer.files;
+                              }
+                          }
+                          this.isDragging = false;
+                      },
+                  }">
+
+                {% csrf_token %}
+
+                <!-- Identité -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
+                        <i class="bx bx-user text-red-500"></i> Vos informations
+                    </h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Nom -->
+                        <c-form-field label="Nom" required="true">
+                            <div class="relative">
+                                {{ form.last_name }}
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <i class="bx bx-check-circle text-green-500 text-lg" x-show="lastNameValid === true" x-cloak></i>
+                                    <i class="bx bx-error-circle text-red-400 text-lg" x-show="lastNameValid === false" x-cloak></i>
+                                </div>
+                            </div>
+                            <p class="text-red-400 text-sm mt-1" x-show="lastNameValid === false" x-text="lastNameError" x-cloak></p>
+                            {% if form.last_name.errors %}<p class="text-red-500 text-sm mt-1">{{ form.last_name.errors.0 }}</p>{% endif %}
+                        </c-form-field>
+
+                        <!-- Prénom -->
+                        <c-form-field label="Prénom" required="true">
+                            <div class="relative">
+                                {{ form.first_name }}
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <i class="bx bx-check-circle text-green-500 text-lg" x-show="firstNameValid === true" x-cloak></i>
+                                    <i class="bx bx-error-circle text-red-400 text-lg" x-show="firstNameValid === false" x-cloak></i>
+                                </div>
+                            </div>
+                            <p class="text-red-400 text-sm mt-1" x-show="firstNameValid === false" x-text="firstNameError" x-cloak></p>
+                            {% if form.first_name.errors %}<p class="text-red-500 text-sm mt-1">{{ form.first_name.errors.0 }}</p>{% endif %}
+                        </c-form-field>
+
+                        <!-- Email -->
+                        <c-form-field label="Email" required="true">
+                            <div class="relative">
+                                {{ form.email }}
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <i class="bx bx-check-circle text-green-500 text-lg" x-show="emailValid === true" x-cloak></i>
+                                    <i class="bx bx-error-circle text-red-400 text-lg" x-show="emailValid === false" x-cloak></i>
+                                </div>
+                            </div>
+                            <p class="text-red-400 text-sm mt-1" x-show="emailValid === false" x-text="emailError" x-cloak></p>
+                            {% if form.email.errors %}<p class="text-red-500 text-sm mt-1">{{ form.email.errors.0 }}</p>{% endif %}
+                        </c-form-field>
+
+                        <!-- Téléphone -->
+                        <c-form-field label="Téléphone">
+                            <div class="flex">
+                                {{ form.country_code }}
+                                <div class="relative flex-1">
+                                    {{ form.phone }}
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                        <i class="bx bx-check-circle text-green-500 text-lg" x-show="phoneValid === true" x-cloak></i>
+                                        <i class="bx bx-error-circle text-red-400 text-lg" x-show="phoneValid === false" x-cloak></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-red-400 text-sm mt-1" x-show="phoneValid === false" x-text="phoneError" x-cloak></p>
+                            {% if form.phone.errors %}<p class="text-red-500 text-sm mt-1">{{ form.phone.errors.0 }}</p>{% endif %}
+                        </c-form-field>
+                    </div>
+                </div>
+
+                <!-- Séparateur -->
+                <div class="border-t border-gray-100"></div>
+
+                <!-- Upload reçu CCP -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
+                        <i class="bx bx-receipt text-red-500"></i> Reçu de paiement CCP
+                    </h2>
+
+                    <div class="border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-300"
+                         :class="isDragging ? 'border-red-400 bg-red-50' : 'border-gray-200 hover:border-red-300 hover:bg-red-50/50'"
+                         @dragover.prevent="isDragging = true"
+                         @dragleave.prevent="isDragging = false"
+                         @drop.prevent="handleFile($event)"
+                         @click="$refs.fileInput.click()">
+
+                        <div x-show="!fileName" class="space-y-3">
+                            <div class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center text-2xl text-gray-400 mx-auto">
+                                <i class="bx bx-cloud-upload"></i>
+                            </div>
+                            <p class="text-sm text-gray-600 font-medium">
+                                Cliquez ou glissez-déposez votre reçu ici
+                            </p>
+                            <p class="text-xs text-gray-400">JPG, PNG — max 5 Mo</p>
+                        </div>
+
+                        <div x-show="fileName" x-cloak class="space-y-2">
+                            <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-2xl text-green-500 mx-auto">
+                                <i class="bx bx-check-circle"></i>
+                            </div>
+                            <p class="text-sm text-green-600 font-medium" x-text="fileName"></p>
+                            <p class="text-xs text-gray-400">Cliquez pour changer de fichier</p>
+                        </div>
+
+                        <input type="file"
+                               name="payment_receipt"
+                               x-ref="fileInput"
+                               accept="image/jpeg,image/png,image/webp"
+                               class="hidden"
+                               @change="handleFile($event)">
+                    </div>
+
+                    {% if form.payment_receipt.errors %}
+                    <p class="text-red-500 text-sm mt-2">{{ form.payment_receipt.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Non-field errors -->
+                {% if form.non_field_errors %}
+                <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+                    {% for error in form.non_field_errors %}
+                        <p class="text-red-600 text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Submit -->
+                <div class="pt-4">
+                    <c-btn type="submit">
+                        <i class="bx bx-send"></i> Soumettre mon inscription
+                    </c-btn>
+                    <p class="text-xs text-gray-400 mt-3">
+                        Votre inscription sera confirmée après validation de votre paiement par notre équipe.
+                    </p>
+                </div>
+            </form>
+        </div>
+    </c-section>
+    {% endif %}
+
+</c-layout>

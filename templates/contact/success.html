@@ -1,0 +1,29 @@
+<c-layout title="Message envoyé — Institut Torii" description="Votre demande a bien été envoyée. L'équipe de l'Institut Torii vous contactera rapidement.">
+
+    <section class="min-h-[70vh] flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
+        <div class="max-w-lg mx-auto px-6 text-center py-20">
+            <!-- Success icon -->
+            <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-8">
+                <i class="bx bx-check text-4xl text-emerald-600"></i>
+            </div>
+
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                Merci pour votre message !
+            </h1>
+            <p class="text-lg text-gray-500 leading-relaxed mb-8">
+                Votre demande a bien été envoyée. Notre équipe vous contactera
+                dans les plus brefs délais pour vous accompagner dans votre parcours.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <c-btn href="{% url 'home:home' %}">
+                    <i class="bx bx-home"></i> Retour à l'accueil
+                </c-btn>
+                <c-btn href="{% url 'contact:contact' %}" variant="outline">
+                    <i class="bx bx-envelope"></i> Envoyer un autre message
+                </c-btn>
+            </div>
+        </div>
+    </section>
+
+</c-layout>

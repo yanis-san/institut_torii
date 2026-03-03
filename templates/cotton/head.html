@@ -1,0 +1,30 @@
+<c-vars title="Institut Torii" description="Centre culturel et linguistique asiatique à Alger" />
+{% load static %}
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>{{ title }}</title>
+<meta name="description" content="{{ description }}">
+
+<!-- Open Graph -->
+<meta property="og:title" content="{{ title }}">
+<meta property="og:description" content="{{ description }}">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+
+<!-- Fonts (local) -->
+<link rel="stylesheet" href="{% static 'fonts/fonts.css' %}">
+
+<!-- Boxicons (local) -->
+<link rel="stylesheet" href="{% static 'css/boxicons/boxicons.min.css' %}">
+
+<!-- Tailwind CSS -->
+{% load tailwind_tags %}
+{% tailwind_css %}
+
+<!-- JS -->
+<script src="{% static 'js/htmx.min.js' %}" defer></script>
+<script src="{% static 'js/alpine.min.js' %}" defer></script>
+{% load django_htmx %}
+{% django_htmx_script %}

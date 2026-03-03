@@ -1,0 +1,122 @@
+<!-- templates/marketing/notification_list.html -->
+<c-cms-layout title="Notifications automatiques">
+
+    <c-cms-page-header title="Notifications automatiques" subtitle="{{ total_count }} email{{ total_count|pluralize:'s' }} transactionnel{{ total_count|pluralize:'s' }}">
+    </c-cms-page-header>
+
+    <!-- KPIs -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <c-cms-stat-card label="Total envoyés" value="{{ total_sent }}" />
+        <c-cms-stat-card label="Échoués" value="{{ total_failed }}" />
+        <c-cms-stat-card label="Total" value="{{ total_count }}" />
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-6">
+        <form method="get" class="flex flex-wrap gap-3 items-end">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-xs text-zinc-500 mb-1">Rechercher</label>
+                <input type="text" name="q" value="{{ search_query }}"
+                       placeholder="Email, nom, objet..."
+                       class="w-full bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none">
+            </div>
+            <div class="min-w-[180px]">
+                <label class="block text-xs text-zinc-500 mb-1">Type</label>
+                <select name="event"
+                        class="w-full bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-lg px-3 py-2 text-sm cursor-pointer focus:ring-2 focus:ring-red-500 outline-none">
+                    <option value="">Tous les types</option>
+                    {% for value, label in event_types %}
+                    <option value="{{ value }}" {% if current_event == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="min-w-[140px]">
+                <label class="block text-xs text-zinc-500 mb-1">Statut</label>
+                <select name="status"
+                        class="w-full bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-lg px-3 py-2 text-sm cursor-pointer focus:ring-2 focus:ring-red-500 outline-none">
+                    <option value="">Tous</option>
+                    <option value="sent" {% if current_status == 'sent' %}selected{% endif %}>Envoyé</option>
+                    <option value="failed" {% if current_status == 'failed' %}selected{% endif %}>Échoué</option>
+                </select>
+            </div>
+            <c-cms-btn type="submit" variant="secondary" size="sm">Filtrer</c-cms-btn>
+            {% if search_query or current_event or current_status %}
+            <a href="{% url 'marketing:notification_list' %}" class="text-xs text-zinc-500 hover:text-white transition-colors self-center">Réinitialiser</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-left text-xs text-zinc-500 uppercase tracking-wider border-b border-zinc-800">
+                        <th class="px-5 py-3">Date</th>
+                        <th class="px-5 py-3">Type</th>
+                        <th class="px-5 py-3">Destinataire</th>
+                        <th class="px-5 py-3">Objet</th>
+                        <th class="px-5 py-3">Statut</th>
+                        <th class="px-5 py-3">Déclenché par</th>
+                        <th class="px-5 py-3"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-800">
+                    {% for n in notifications %}
+                    <tr class="hover:bg-zinc-800/30 transition-colors">
+                        <td class="px-5 py-3 text-zinc-400 text-xs whitespace-nowrap">
+                            {{ n.sent_at|date:"d/m/Y H:i" }}
+                        </td>
+                        <td class="px-5 py-3">
+                            {% if n.event_type == 'contact_received' %}
+                                <c-cms-badge label="Contact" color="blue" />
+                            {% elif n.event_type == 'enrollment_received' %}
+                                <c-cms-badge label="Inscription" color="amber" />
+                            {% elif n.event_type == 'enrollment_confirmed' %}
+                                <c-cms-badge label="Confirmée" color="emerald" />
+                            {% elif n.event_type == 'enrollment_rejected' %}
+                                <c-cms-badge label="Rejetée" color="red" />
+                            {% elif n.event_type == 'enrollment_refunded' %}
+                                <c-cms-badge label="Remboursée" color="amber" />
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-3">
+                            <span class="text-white">{{ n.recipient_email }}</span>
+                            {% if n.recipient_name %}
+                            <span class="text-xs text-zinc-500 block">{{ n.recipient_name }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-3 text-zinc-300 max-w-xs truncate">{{ n.subject }}</td>
+                        <td class="px-5 py-3">
+                            {% if n.status == 'sent' %}
+                                <c-cms-badge label="Envoyé" color="emerald" />
+                            {% else %}
+                                <c-cms-badge label="Échoué" color="red" />
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-3 text-zinc-500 text-xs">
+                            {% if n.sent_by %}{{ n.sent_by.username }}{% else %}Auto{% endif %}
+                        </td>
+                        <td class="px-5 py-3">
+                            <a href="{% url 'marketing:notification_detail' pk=n.pk %}"
+                               class="text-zinc-400 hover:text-white transition-colors text-xs">Voir</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-5 py-8 text-center text-zinc-500">
+                            Aucune notification envoyée pour le moment.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if total_count > 200 %}
+        <p class="px-5 py-3 text-xs text-zinc-500 text-center border-t border-zinc-800">
+            Affichage des 200 plus récentes sur {{ total_count }} notifications.
+        </p>
+        {% endif %}
+    </div>
+
+</c-cms-layout>

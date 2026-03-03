@@ -1,0 +1,87 @@
+<c-cms-layout title="Cohortes">
+
+    <c-cms-page-header title="Cohortes" subtitle="{{ cohorts|length }} cohorte{{ cohorts|length|pluralize:'s' }}">
+        <c-cms-btn href="{% url 'cms:cohort_create' %}" variant="primary" size="md">+ Nouvelle cohorte</c-cms-btn>
+    </c-cms-page-header>
+
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-left text-xs text-zinc-500 uppercase tracking-wider border-b border-zinc-800">
+                        <th class="px-5 py-3">Cohorte</th>
+                        <th class="px-5 py-3">Format</th>
+                        <th class="px-5 py-3 text-center">Inscrits</th>
+                        <th class="px-5 py-3">Prix</th>
+                        <th class="px-5 py-3">Dates</th>
+                        <th class="px-5 py-3">Statut</th>
+                        <th class="px-5 py-3"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-800">
+                    {% for c in cohorts %}
+                    <tr class="hover:bg-zinc-800/30 transition-colors {% if not c.is_active %}opacity-50{% endif %}">
+                        <td class="px-5 py-3">
+                            <a href="{% url 'cms:cohort_edit' c.pk %}" class="font-medium text-white hover:text-red-400 transition-colors">
+                                {{ c.name }}
+                            </a>
+                            <p class="text-xs text-zinc-500">
+                                {{ c.category.name }}
+                                {% if c.language %} · {{ c.language.name }}{% endif %}
+                            </p>
+                        </td>
+                        <td class="px-5 py-3 text-zinc-300 text-xs">{{ c.format.name }}</td>
+                        <td class="px-5 py-3 text-center">
+                            <span class="text-emerald-400 font-medium">{{ c.confirmed_count }}</span>
+                            <span class="text-zinc-600">/</span>
+                            <span class="text-zinc-400">{% if c.max_capacity %}{{ c.max_capacity }}{% else %}∞{% endif %}</span>
+                            {% if c.min_students %}
+                            <span class="text-xs text-zinc-600 block">min {{ c.min_students }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-3 text-zinc-300">{{ c.price|floatformat:0 }} DA</td>
+                        <td class="px-5 py-3 text-xs text-zinc-400 whitespace-nowrap">
+                            {% if c.start_date %}
+                            {{ c.start_date|date:"d/m/Y" }}
+                            {% if c.end_date %} → {{ c.end_date|date:"d/m/Y" }}{% endif %}
+                            {% else %}
+                            —
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-3">
+                            {% if c.is_active %}
+                                {% if c.is_registration_open %}
+                                    <c-cms-badge label="Inscriptions ouvertes" color="emerald" />
+                                {% else %}
+                                    <c-cms-badge label="Active" color="blue" />
+                                {% endif %}
+                            {% else %}
+                                <c-cms-badge label="Inactive" color="zinc" />
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-3">
+                            <div class="flex items-center gap-2">
+                                <a href="{% url 'cms:cohort_edit' c.pk %}"
+                                   class="text-zinc-400 hover:text-white transition-colors text-xs">Modifier</a>
+                                <form method="post" action="{% url 'cms:cohort_toggle' c.pk %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-xs {% if c.is_active %}text-amber-400 hover:text-amber-300{% else %}text-emerald-400 hover:text-emerald-300{% endif %} transition-colors">
+                                        {% if c.is_active %}Désactiver{% else %}Activer{% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-5 py-8 text-center text-zinc-500">
+                            Aucune cohorte. <a href="{% url 'cms:cohort_create' %}" class="text-red-400 hover:text-red-300">Créer la première →</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</c-cms-layout>

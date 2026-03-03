@@ -1,0 +1,19 @@
+<c-vars title="Institut Torii" description="Centre culturel et linguistique asiatique à Alger" />
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <c-head title="{{ title }}" description="{{ description }}" />
+</head>
+<body class="min-h-screen bg-white text-gray-800 font-sans antialiased"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    
+    <c-navbar />
+
+    <main>
+        {{ slot }}
+    </main>
+
+    <c-footer />
+</body>
+</html>

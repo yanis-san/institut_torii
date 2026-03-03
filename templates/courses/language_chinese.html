@@ -1,0 +1,139 @@
+{% load static %}
+<c-layout title="Chinois — Institut Torii" description="Apprenez le chinois mandarin à Alger. Formations HSK, cours en groupe et individuels.">
+
+    <!-- Hero -->
+    <section class="relative min-h-[70vh] flex items-center overflow-hidden bg-gradient-to-br from-red-800 via-red-900 to-yellow-600">
+        <!-- Decorative hanzi -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none select-none">
+            <div class="absolute top-16 left-16 text-yellow-400/10 text-9xl font-bold" style="font-family: 'Noto Sans JP', serif;">龍</div>
+            <div class="absolute top-32 right-24 text-yellow-300/10 text-7xl font-bold" style="font-family: 'Noto Sans JP', serif;">福</div>
+            <div class="absolute bottom-32 left-24 text-red-400/10 text-8xl font-bold" style="font-family: 'Noto Sans JP', serif;">学</div>
+            <div class="absolute bottom-16 right-16 text-yellow-400/10 text-6xl font-bold" style="font-family: 'Noto Sans JP', serif;">中</div>
+        </div>
+
+        <!-- Wave transition -->
+        <div class="absolute bottom-0 left-0 right-0">
+            <svg viewBox="0 0 1440 120" fill="none" class="w-full">
+                <path d="M0 120L48 110C96 100 192 80 288 75C384 70 480 80 576 85C672 90 768 90 864 82C960 75 1056 60 1152 58C1248 55 1344 65 1392 70L1440 75V120H0Z" fill="white"/>
+            </svg>
+        </div>
+
+        <div class="relative z-10 max-w-5xl mx-auto px-6 py-20 text-center">
+            <h1 class="text-7xl md:text-9xl font-bold text-white mb-6 drop-shadow-lg" style="font-family: 'Noto Sans JP', serif;">
+                中文
+            </h1>
+            <h2 class="text-3xl md:text-5xl text-white/90 font-light mb-6">
+                La Langue de <span class="font-semibold text-amber-300">l'Empire du Milieu</span>
+            </h2>
+            <p class="text-lg md:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed mb-10">
+                Maîtrisez la langue la plus parlée au monde et ouvrez les portes de la Chine
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <c-btn href="{% url 'contact:contact' %}" variant="white">
+                    <i class="bx bx-pencil"></i> Commencer mon parcours
+                </c-btn>
+                <c-btn href="#formations" variant="outline">
+                    <i class="bx bx-book-open"></i> Voir les formations
+                </c-btn>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 max-w-xl mx-auto">
+                <c-stat-card value="HSK" label="Préparation officielle" />
+                <c-stat-card value="HSK 1→6" label="Tous niveaux" />
+                <c-stat-card value="Bourses" label="CSC & universités" />
+            </div>
+        </div>
+    </section>
+
+    <!-- HSK Section -->
+    <c-section bg="bg-gray-50">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <div class="inline-flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-full text-sm font-medium mb-6">
+                    <img src="{% static 'img/flags/cn.svg' %}" alt="Chine" class="w-5 h-3.5 rounded-sm object-cover"> Certification internationale
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                    Préparation <span class="text-red-500">HSK</span>
+                </h2>
+                <p class="text-gray-500 leading-relaxed mb-6">
+                    Le HSK (Hanyu Shuiping Kaoshi) est l'examen officiel de compétence en chinois mandarin,
+                    reconnu par les universités et entreprises chinoises dans le monde entier.
+                </p>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 text-sm text-gray-600">
+                        <i class="bx bx-check-circle text-red-500 text-lg"></i>
+                        6 niveaux : HSK 1 (débutant) à HSK 6 (avancé)
+                    </div>
+                    <div class="flex items-center gap-3 text-sm text-gray-600">
+                        <i class="bx bx-check-circle text-red-500 text-lg"></i>
+                        Indispensable pour les bourses CSC
+                    </div>
+                    <div class="flex items-center gap-3 text-sm text-gray-600">
+                        <i class="bx bx-check-circle text-red-500 text-lg"></i>
+                        Programme Confucius certifié
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-center">
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-10 text-center">
+                    <div class="text-6xl mb-4">🏮</div>
+                    <p class="text-lg font-semibold text-gray-800 mb-1">HSK — 汉语水平考试</p>
+                    <p class="text-sm text-gray-500">Hanyu Shuiping Kaoshi</p>
+                </div>
+            </div>
+        </div>
+    </c-section>
+
+    <!-- Cohorts -->
+    <c-section bg="bg-white" id="formations">
+        <c-section-heading title="Nos Formations Chinois" subtitle="Du mandarin débutant au chinois des affaires" />
+
+        {% if cohorts %}
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for cohort in cohorts %}
+                <c-cohort-card :cohort="cohort" accent="red" />
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <p class="text-gray-500 text-lg mb-2">Nos formations chinois sont en cours de mise à jour.</p>
+            <p class="text-gray-400">Contactez-nous pour plus d'informations.</p>
+            <c-btn href="{% url 'contact:contact' %}" class="mt-6">Nous contacter</c-btn>
+        </div>
+        {% endif %}
+    </c-section>
+
+    <!-- Pourquoi le chinois -->
+    <c-section bg="bg-gray-50">
+        <c-section-heading title="Pourquoi apprendre le chinois ?" />
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+                <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">🌍</div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Langue mondiale</h3>
+                <p class="text-sm text-gray-500 leading-relaxed">Avec plus d'un milliard de locuteurs, le mandarin est la langue la plus parlée au monde.</p>
+            </div>
+            <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+                <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">📈</div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Commerce & affaires</h3>
+                <p class="text-sm text-gray-500 leading-relaxed">La Chine est le premier partenaire commercial de l'Algérie. Le chinois est un atout majeur.</p>
+            </div>
+            <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+                <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">🎓</div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Bourses CSC</h3>
+                <p class="text-sm text-gray-500 leading-relaxed">Accédez aux bourses du gouvernement chinois pour étudier dans les meilleures universités.</p>
+            </div>
+        </div>
+    </c-section>
+
+    <!-- CTA -->
+    <c-section bg="bg-white">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Prêt à explorer le chinois ?</h2>
+            <p class="text-gray-500 mb-8">Rejoignez nos formations et maîtrisez le mandarin.</p>
+            <c-btn href="{% url 'contact:contact' %}">S'inscrire maintenant</c-btn>
+        </div>
+    </c-section>
+
+</c-layout>

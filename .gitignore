@@ -1,0 +1,39 @@
+.vscode/
+
+# Virtual env
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django
+*.log
+logs/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Tailwind / Node
+node_modules/
+theme/static_src/node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test output
+test_*.txt
+tailwind_build.txt
+
+# Environment
+.env
+*.env
+
+# Unused logo size variants
+static/img/logo/logo_horizontal_nav.webp
+static/img/logo/logo_horizontal_footer.webp
+static/img/logo/logo_horizontal_cms.webp

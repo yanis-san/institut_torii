@@ -1,0 +1,27 @@
+<!-- templates/marketing/unsubscribe_confirm.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Désabonné — Institut Torii</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/dist/styles.css' %}" />
+</head>
+<body class="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center px-4">
+    <div class="w-full max-w-md">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 text-center">
+            <span class="text-4xl mb-4 block">✅</span>
+            <h1 class="text-xl font-bold text-white mb-2">Désabonnement confirmé</h1>
+            <p class="text-zinc-400 text-sm mb-4">
+                L'adresse <strong class="text-white">{{ email }}</strong> a été retirée de notre liste.
+            </p>
+            <p class="text-zinc-500 text-xs">
+                Vous ne recevrez plus d'emails marketing de notre part.<br />
+                Si c'est une erreur, contactez-nous à <a href="mailto:contact@institut-torii.com" class="text-red-400 hover:text-red-300">contact@institut-torii.com</a>.
+            </p>
+        </div>
+        <p class="text-center text-xs text-zinc-600 mt-4">Institut Torii — Cours de japonais, chinois et coréen</p>
+    </div>
+</body>
+</html>

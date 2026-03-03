@@ -1,0 +1,13 @@
+<c-vars value="" label="" variant="dark" />
+
+<div class="rounded-2xl p-5 border
+    {% if variant == 'light' %}
+        bg-white/70 backdrop-blur-sm border-gray-200 shadow-sm
+    {% else %}
+        bg-white/15 backdrop-blur-sm border-white/20
+    {% endif %}">
+    <div class="text-2xl font-bold mb-1
+        {% if variant == 'light' %}text-gray-800{% else %}text-white{% endif %}">{{ value }}</div>
+    <div class="text-sm
+        {% if variant == 'light' %}text-gray-500{% else %}text-white/80{% endif %}">{{ label }}</div>
+</div>

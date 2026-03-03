@@ -1,0 +1,13 @@
+<!-- templates/cotton/cms_badge.html -->
+<c-vars label="" color="zinc" />
+
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+             {% if color == 'emerald' %}bg-emerald-500/15 text-emerald-400
+             {% elif color == 'amber' %}bg-amber-500/15 text-amber-400
+             {% elif color == 'red' %}bg-red-500/15 text-red-400
+             {% elif color == 'blue' %}bg-blue-500/15 text-blue-400
+             {% elif color == 'purple' %}bg-purple-500/15 text-purple-400
+             {% else %}bg-zinc-700/50 text-zinc-400{% endif %}"
+      {{ attrs }}>
+    {{ label }}
+</span>

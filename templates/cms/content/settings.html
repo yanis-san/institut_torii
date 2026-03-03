@@ -1,0 +1,67 @@
+<c-cms-layout title="Paramètres du site">
+
+    <c-cms-page-header title="Paramètres du site" subtitle="Coordonnées, réseaux sociaux et SEO" />
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="space-y-6 max-w-4xl">
+
+            <!-- Contact info -->
+            <c-cms-card title="Coordonnées">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <c-cms-field :field="form.phone" />
+                    <c-cms-field :field="form.email" />
+                    <div class="sm:col-span-2">
+                        <c-cms-field :field="form.address" />
+                    </div>
+                    <div class="sm:col-span-2">
+                        <c-cms-field :field="form.google_maps_url" />
+                    </div>
+                </div>
+            </c-cms-card>
+
+            <!-- Social media -->
+            <c-cms-card title="Réseaux sociaux">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <c-cms-field :field="form.facebook_url" />
+                    <c-cms-field :field="form.instagram_url" />
+                    <c-cms-field :field="form.tiktok_url" />
+                    <c-cms-field :field="form.youtube_url" />
+                    <c-cms-field :field="form.whatsapp_number" />
+                </div>
+            </c-cms-card>
+
+            <!-- SEO -->
+            <c-cms-card title="SEO & métadonnées">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2">
+                        <c-cms-field :field="form.site_name" />
+                    </div>
+                    <div class="sm:col-span-2">
+                        <c-cms-field :field="form.meta_description" />
+                    </div>
+                    <c-cms-field :field="form.og_image" />
+                    {% if form.instance.og_image %}
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-2">Image OG actuelle :</p>
+                        <img src="{{ form.instance.og_image.url }}" alt="OG Image" class="w-32 h-20 object-cover rounded-lg border border-zinc-700" />
+                    </div>
+                    {% endif %}
+                </div>
+            </c-cms-card>
+
+            <!-- Opening hours -->
+            <c-cms-card title="Horaires d'ouverture">
+                <c-cms-field :field="form.opening_hours" help="Format libre. Exemple : Lun-Ven : 9h-18h / Sam : 9h-13h" />
+            </c-cms-card>
+
+            <!-- Save -->
+            <div class="sticky bottom-4 bg-zinc-900/95 backdrop-blur-sm border border-zinc-800 rounded-xl p-4 flex items-center justify-between">
+                <p class="text-sm text-zinc-400">Modifié en dernier le {{ form.instance.updated_at|date:"d/m/Y à H:i"|default:"—" }}</p>
+                <c-cms-btn type="submit" variant="primary" size="md">Enregistrer les modifications</c-cms-btn>
+            </div>
+        </div>
+    </form>
+
+</c-cms-layout>

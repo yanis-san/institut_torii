@@ -1,0 +1,26 @@
+<c-cms-layout title="{{ title }}">
+
+    <c-cms-page-header title="{{ title }}">
+        <c-cms-btn href="{% url 'cms:catalog_settings' %}" variant="secondary" size="sm">← Retour</c-cms-btn>
+    </c-cms-page-header>
+
+    <div class="max-w-lg">
+        <c-cms-card>
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+
+                {% for field in form %}
+                <c-cms-field :field="field" />
+                {% endfor %}
+
+                <div class="flex items-center gap-3 pt-3 border-t border-zinc-800">
+                    <c-cms-btn type="submit" variant="primary" size="md">
+                        {% if instance %}Enregistrer{% else %}Créer{% endif %}
+                    </c-cms-btn>
+                    <c-cms-btn href="{% url 'cms:catalog_settings' %}" variant="ghost" size="md">Annuler</c-cms-btn>
+                </div>
+            </form>
+        </c-cms-card>
+    </div>
+
+</c-cms-layout>

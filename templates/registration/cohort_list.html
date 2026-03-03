@@ -1,0 +1,109 @@
+<c-layout title="Inscriptions — Institut Torii" description="Inscrivez-vous en ligne aux formations de l'Institut Torii. Japonais, Chinois, Coréen et ateliers culturels.">
+
+    <!-- Hero -->
+    <section class="relative bg-gradient-to-br from-gray-50 to-white py-16">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <div class="inline-flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <i class="bx bx-edit"></i> Inscriptions en ligne
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                Nos <span class="text-red-500">formations</span> ouvertes
+            </h1>
+            <p class="text-lg text-gray-500 max-w-2xl mx-auto">
+                Choisissez votre formation et inscrivez-vous en ligne.
+                Votre place sera confirmée après validation de votre paiement.
+            </p>
+        </div>
+    </section>
+
+    <c-section bg="bg-white">
+        <div class="max-w-4xl mx-auto">
+
+            {% if cohorts %}
+            <div class="grid md:grid-cols-2 gap-6">
+                {% for cohort in cohorts %}
+                <div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                    <!-- Badge language/category -->
+                    <div class="flex items-center gap-2 mb-4">
+                        {% if cohort.language %}
+                        <span class="text-xs font-medium px-3 py-1 bg-red-50 text-red-600 rounded-full">
+                            {{ cohort.language.flag_emoji }} {{ cohort.language.name }}
+                        </span>
+                        {% endif %}
+                        <span class="text-xs font-medium px-3 py-1 bg-gray-100 text-gray-600 rounded-full">
+                            {{ cohort.category.name }}
+                        </span>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ cohort.name }}</h3>
+
+                    {% if cohort.description %}
+                    <p class="text-sm text-gray-500 mb-4 line-clamp-2">{{ cohort.description }}</p>
+                    {% endif %}
+
+                    <!-- Info pills -->
+                    <div class="flex flex-wrap gap-2 mb-4 text-xs text-gray-500">
+                        <span class="flex items-center gap-1">
+                            <i class="bx bx-time"></i> {{ cohort.duration_display }}
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <i class="bx bx-calendar"></i> {{ cohort.format.name }}
+                        </span>
+                        {% if cohort.start_date %}
+                        <span class="flex items-center gap-1">
+                            <i class="bx bx-play-circle"></i> {{ cohort.start_date|date:"d/m/Y" }}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Price -->
+                    <div class="flex items-end justify-between mb-5">
+                        <div>
+                            <span class="text-2xl font-bold text-gray-800">{{ cohort.price|floatformat:0 }}</span>
+                            <span class="text-sm text-gray-400 ml-1">DA</span>
+                        </div>
+                        {% if cohort.is_registration_open %}
+                        <span class="text-xs text-green-600 font-medium flex items-center gap-1">
+                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Ouvert
+                        </span>
+                        {% else %}
+                        <span class="text-xs text-gray-400 font-medium">Fermé</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- CTA -->
+                    {% if cohort.is_registration_open %}
+                    <a href="{% url 'registration:enroll' cohort.slug %}"
+                       class="block w-full text-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-500 text-white font-medium rounded-xl hover:from-red-500 hover:to-red-600 transition-all duration-300 shadow-lg shadow-red-600/20">
+                        S'inscrire
+                    </a>
+                    {% else %}
+                    <div class="block w-full text-center px-6 py-3 bg-gray-100 text-gray-400 font-medium rounded-xl">
+                        Inscriptions fermées
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-16">
+                <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center text-2xl text-gray-300 mx-auto mb-4">
+                    <i class="bx bx-calendar-x"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-600 mb-2">Aucune formation ouverte</h3>
+                <p class="text-gray-400">Les inscriptions ne sont pas encore ouvertes. Revenez bientôt !</p>
+            </div>
+            {% endif %}
+
+            <!-- Check status link -->
+            <div class="mt-12 text-center border-t border-gray-100 pt-8">
+                <p class="text-sm text-gray-500 mb-3">Déjà inscrit ?</p>
+                <a href="{% url 'registration:check_status' %}"
+                   class="inline-flex items-center gap-2 text-red-500 hover:text-red-600 font-medium transition-colors">
+                    <i class="bx bx-search-alt"></i> Consulter le statut de mon inscription
+                </a>
+            </div>
+        </div>
+    </c-section>
+
+</c-layout>

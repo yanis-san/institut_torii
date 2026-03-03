@@ -1,0 +1,112 @@
+<!-- templates/marketing/campaign_form.html -->
+<c-cms-layout title="{% if editing %}Modifier la campagne{% else %}Nouvelle campagne{% endif %}">
+
+    <c-cms-page-header
+        title="{% if editing %}Modifier la campagne{% else %}Nouvelle campagne email{% endif %}"
+        subtitle="{% if editing %}{{ campaign.name }}{% else %}Configurez votre envoi d'email{% endif %}">
+        <c-cms-btn href="{% url 'marketing:campaign_list' %}" variant="secondary" size="sm">← Retour</c-cms-btn>
+    </c-cms-page-header>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="space-y-6">
+            <!-- Basic info -->
+            <c-cms-card title="Campagne">
+                <div class="space-y-4">
+                    <c-cms-field :field="form.name" label="Nom de la campagne" />
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <c-cms-field :field="form.template" label="Template" />
+                        <c-cms-field :field="form.subject" label="Objet (optionnel)"
+                                     help="Laissez vide pour utiliser l'objet du template" />
+                    </div>
+                </div>
+            </c-cms-card>
+
+            <!-- Sender config -->
+            <c-cms-card title="Expéditeur">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <c-cms-field :field="form.from_email_type" label="Adresse d'envoi" />
+                    <c-cms-field :field="form.reply_to" label="Répondre à (optionnel)"
+                                 help="Pour recevoir les réponses sur une adresse différente" />
+                </div>
+            </c-cms-card>
+
+            <!-- Targeting -->
+            <c-cms-card title="Ciblage">
+                <div class="space-y-4"
+                     x-data="{ segment: '{{ form.segment_type.value|default:'all_prospects' }}' }"
+                     x-init="$watch('segment', v => {
+                         if (!['prospects_lang', 'enrolled_lang'].includes(v)) $el.querySelector('#id_filter_language').value = '';
+                         if (v !== 'enrolled_cohort') $el.querySelector('#id_filter_cohort').value = '';
+                         if (v !== 'prospects_rating') $el.querySelector('#id_filter_rating').value = '';
+                     })">
+
+                    <c-cms-field :field="form.segment_type" label="Segment cible"
+                                 x-on:change="segment = $event.target.value" />
+
+                    <!-- Description dynamique du segment -->
+                    <p class="text-xs text-zinc-500 -mt-2" x-cloak>
+                        <span x-show="segment === 'all_prospects'">Cible tous les contacts ayant rempli le formulaire de contact.</span>
+                        <span x-show="segment === 'all_enrolled'">Cible tous les étudiants inscrits (tous statuts confondus).</span>
+                        <span x-show="segment === 'all_confirmed'">Cible seulement les inscriptions au statut « confirmé ».</span>
+                        <span x-show="segment === 'prospects_lang'">Cible les prospects intéressés par une langue spécifique.</span>
+                        <span x-show="segment === 'prospects_rating'">Cible les prospects selon leur note qualité (sérieux, intéressé, etc.).</span>
+                        <span x-show="segment === 'enrolled_cohort'">Cible les étudiants inscrits à une cohorte précise.</span>
+                        <span x-show="segment === 'enrolled_lang'">Cible les étudiants dont la cohorte est dans cette langue.</span>
+                        <span x-show="segment === 'custom'">Liste personnalisée — les destinataires sont ajoutés manuellement.</span>
+                    </p>
+
+                    <!-- Filtre par langue — visible si segment = prospects_lang ou enrolled_lang -->
+                    <div x-show="segment === 'prospects_lang' || segment === 'enrolled_lang'"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 -translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 -translate-y-2"
+                         x-cloak>
+                        <c-cms-field :field="form.filter_language" label="Filtrer par langue" />
+                    </div>
+
+                    <!-- Filtre par cohorte — visible si segment = enrolled_cohort -->
+                    <div x-show="segment === 'enrolled_cohort'"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 -translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 -translate-y-2"
+                         x-cloak>
+                        <c-cms-field :field="form.filter_cohort" label="Filtrer par cohorte" />
+                    </div>
+
+                    <!-- Filtre par note qualité — visible si segment = prospects_rating -->
+                    <div x-show="segment === 'prospects_rating'"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 -translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 -translate-y-2"
+                         x-cloak>
+                        <c-cms-field :field="form.filter_rating" label="Filtrer par note qualité" />
+                    </div>
+                </div>
+            </c-cms-card>
+
+            <!-- Scheduling -->
+            <c-cms-card title="Programmation (optionnel)">
+                <c-cms-field :field="form.scheduled_at" label="Envoyer le"
+                             help="Laissez vide pour déclencher l'envoi manuellement." />
+            </c-cms-card>
+        </div>
+
+        <!-- Sticky save bar -->
+        <div class="sticky bottom-0 mt-6 -mx-4 px-4 py-4 bg-zinc-900/95 backdrop-blur-sm border-t border-zinc-800 flex justify-end gap-3 lg:-mx-8 lg:px-8">
+            <c-cms-btn href="{% url 'marketing:campaign_list' %}" variant="secondary">Annuler</c-cms-btn>
+            <c-cms-btn type="submit">{% if editing %}Enregistrer{% else %}Créer la campagne{% endif %}</c-cms-btn>
+        </div>
+    </form>
+
+</c-cms-layout>

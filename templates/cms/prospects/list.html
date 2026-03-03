@@ -1,0 +1,113 @@
+<c-cms-layout title="Prospects">
+
+    <c-cms-page-header title="Prospects" subtitle="{{ prospects|length }} contact{{ prospects|length|pluralize:'s' }}">
+        <!-- Export placeholder -->
+    </c-cms-page-header>
+
+    <!-- Filters -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-6">
+        <form method="get" class="flex flex-col sm:flex-row gap-3 flex-wrap">
+            <!-- Search -->
+            <div class="flex-1 min-w-[200px]">
+                <input type="text" name="q" value="{{ search_query }}"
+                       placeholder="Rechercher (nom, email, tél)..."
+                       class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 placeholder:text-zinc-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
+            </div>
+            <!-- Language filter -->
+            <select name="language"
+                    class="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none">
+                <option value="">Toutes les langues</option>
+                {% for l in languages %}
+                <option value="{{ l.pk }}" {% if current_lang == l.pk|stringformat:"d" %}selected{% endif %}>{{ l.name }}</option>
+                {% endfor %}
+            </select>
+            <!-- Status filter -->
+            <select name="status"
+                    class="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none">
+                <option value="">Tous les statuts</option>
+                <option value="unread" {% if current_status == 'unread' %}selected{% endif %}>Non traités</option>
+                <option value="new" {% if current_status == 'new' %}selected{% endif %}>Nouveaux (7j)</option>
+                <option value="converted" {% if current_status == 'converted' %}selected{% endif %}>Convertis</option>
+            </select>
+            <!-- Rating filter -->
+            <select name="rating"
+                    class="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none">
+                <option value="">Toutes les notes</option>
+                {% for value, label in rating_choices %}
+                <option value="{{ value }}" {% if current_rating == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <c-cms-btn type="submit" variant="secondary" size="md">Filtrer</c-cms-btn>
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-left text-xs text-zinc-500 uppercase tracking-wider border-b border-zinc-800">
+                        <th class="px-5 py-3">Nom</th>
+                        <th class="px-5 py-3">Contact</th>
+                        <th class="px-5 py-3">Intérêt</th>
+                        <th class="px-5 py-3">Note</th>
+                        <th class="px-5 py-3">Statut</th>
+                        <th class="px-5 py-3">Date</th>
+                        <th class="px-5 py-3"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-800">
+                    {% for p in prospects %}
+                    <tr class="hover:bg-zinc-800/30 transition-colors">
+                        <td class="px-5 py-3">
+                            <a href="{% url 'cms:prospect_detail' p.pk %}" class="font-medium text-white hover:text-red-400 transition-colors">
+                                {{ p.first_name }} {{ p.last_name }}
+                            </a>
+                        </td>
+                        <td class="px-5 py-3">
+                            <p class="text-zinc-300">{{ p.email }}</p>
+                            {% if p.phone %}
+                            <p class="text-xs text-zinc-500">{{ p.phone }}</p>
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-3">
+                            {% if p.interested_language %}
+                            <span class="text-zinc-300">{{ p.interested_language.name }}</span>
+                            {% endif %}
+                            {% if p.interested_category %}
+                            <span class="text-xs text-zinc-500 block">{{ p.interested_category.name }}</span>
+                            {% endif %}
+                        </td>
+                        {% include "cms/prospects/_rating_cell.html" with prospect=p %}
+                        <td class="px-5 py-3">
+                            {% if p.converted %}
+                                <c-cms-badge label="Converti" color="emerald" />
+                            {% elif not p.notes %}
+                                <c-cms-badge label="Non traité" color="amber" />
+                            {% else %}
+                                <c-cms-badge label="Traité" color="blue" />
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-3 text-zinc-400 text-xs whitespace-nowrap">
+                            {{ p.created_at|date:"d/m/Y H:i" }}
+                        </td>
+                        <td class="px-5 py-3">
+                            <a href="{% url 'cms:prospect_detail' p.pk %}"
+                               class="text-zinc-400 hover:text-white transition-colors text-xs">
+                                Voir →
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-5 py-8 text-center text-zinc-500">
+                            Aucun prospect trouvé.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</c-cms-layout>

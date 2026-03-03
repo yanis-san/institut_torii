@@ -1,0 +1,205 @@
+<!-- templates/marketing/campaign_detail.html -->
+<c-cms-layout title="Campagne — {{ campaign.name }}">
+
+    <c-cms-page-header title="{{ campaign.name }}" subtitle="Campagne email — {{ campaign.get_status_display }}">
+        {% if campaign.status == 'draft' %}
+        <c-cms-btn href="{% url 'marketing:campaign_edit' pk=campaign.pk %}" variant="secondary" size="sm">✏️ Modifier</c-cms-btn>
+        <c-cms-btn href="{% url 'marketing:campaign_preview' pk=campaign.pk %}" variant="ghost" size="sm">👁️ Aperçu</c-cms-btn>
+        {% endif %}
+        <c-cms-btn href="{% url 'marketing:campaign_list' %}" variant="ghost" size="sm">← Retour</c-cms-btn>
+    </c-cms-page-header>
+
+    <!-- Status & actions -->
+    <div class="mb-6 flex flex-wrap gap-3">
+        <!-- Status badge -->
+        <c-cms-badge label="{{ campaign.get_status_display }}"
+                     color="{% if campaign.status == 'draft' %}zinc{% elif campaign.status == 'scheduled' %}blue{% elif campaign.status == 'sending' %}amber{% elif campaign.status == 'sent' %}emerald{% elif campaign.status == 'cancelled' %}red{% endif %}" />
+
+        {% if campaign.status == 'draft' %}
+        <!-- Populate recipients -->
+        <form method="post" action="{% url 'marketing:campaign_populate' pk=campaign.pk %}" class="inline">
+            {% csrf_token %}
+            <c-cms-btn type="submit" variant="secondary" size="sm">📋 Préparer destinataires</c-cms-btn>
+        </form>
+
+        {% if campaign.total_recipients > 0 %}
+        <!-- Send -->
+        <form method="post" action="{% url 'marketing:campaign_send' pk=campaign.pk %}" class="inline"
+              x-data x-on:submit.prevent="if(confirm('Envoyer {{ campaign.total_recipients }} emails maintenant ?')) $el.submit()">
+            {% csrf_token %}
+            <c-cms-btn type="submit" size="sm">🚀 Envoyer maintenant</c-cms-btn>
+        </form>
+        {% endif %}
+
+        <!-- Cancel -->
+        <form method="post" action="{% url 'marketing:campaign_cancel' pk=campaign.pk %}" class="inline"
+              x-data x-on:submit.prevent="if(confirm('Annuler cette campagne ?')) $el.submit()">
+            {% csrf_token %}
+            <c-cms-btn type="submit" variant="danger" size="sm">❌ Annuler</c-cms-btn>
+        </form>
+
+        <!-- Delete -->
+        <form method="post" action="{% url 'marketing:campaign_delete' pk=campaign.pk %}" class="inline"
+              x-data x-on:submit.prevent="if(confirm('Supprimer définitivement cette campagne ?')) $el.submit()">
+            {% csrf_token %}
+            <c-cms-btn type="submit" variant="danger" size="sm">🗑️ Supprimer</c-cms-btn>
+        </form>
+        {% endif %}
+
+        {% if campaign.status == 'scheduled' %}
+        <form method="post" action="{% url 'marketing:campaign_send' pk=campaign.pk %}" class="inline"
+              x-data x-on:submit.prevent="if(confirm('Envoyer maintenant (sans attendre la programmation) ?')) $el.submit()">
+            {% csrf_token %}
+            <c-cms-btn type="submit" size="sm">🚀 Envoyer maintenant</c-cms-btn>
+        </form>
+        <form method="post" action="{% url 'marketing:campaign_cancel' pk=campaign.pk %}" class="inline"
+              x-data x-on:submit.prevent="if(confirm('Annuler cette campagne ?')) $el.submit()">
+            {% csrf_token %}
+            <c-cms-btn type="submit" variant="danger" size="sm">❌ Annuler</c-cms-btn>
+        </form>
+        {% endif %}
+    </div>
+
+    <!-- KPIs -->
+    {% if campaign.status == 'sent' or campaign.status == 'sending' %}
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <c-cms-stat-card label="Total" value="{{ campaign.total_recipients }}" />
+        <c-cms-stat-card label="Envoyés" value="{{ campaign.sent_count }}" />
+        <c-cms-stat-card label="Échoués" value="{{ campaign.failed_count }}" />
+        <c-cms-stat-card label="Taux ouverture" value="{{ campaign.open_rate }}%" />
+        <c-cms-stat-card label="Taux clic" value="{{ campaign.click_rate }}%" />
+    </div>
+    {% endif %}
+
+    <!-- Campaign info -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <c-cms-card title="Détails">
+            <dl class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                    <dt class="text-zinc-400">Template</dt>
+                    <dd class="text-white">{{ campaign.template.name }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-zinc-400">Objet</dt>
+                    <dd class="text-white">{{ campaign.effective_subject }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-zinc-400">Expéditeur</dt>
+                    <dd class="text-white">{{ campaign.get_from_email_type_display }}</dd>
+                </div>
+                {% if campaign.reply_to %}
+                <div class="flex justify-between">
+                    <dt class="text-zinc-400">Répondre à</dt>
+                    <dd class="text-white">{{ campaign.reply_to }}</dd>
+                </div>
+                {% endif %}
+                <div class="flex justify-between">
+                    <dt class="text-zinc-400">Segment</dt>
+                    <dd class="text-white">{{ campaign.get_segment_type_display }}</dd>
+                </div>
+                {% if campaign.scheduled_at %}
+                <div class="flex justify-between">
+                    <dt class="text-zinc-400">Programmée</dt>
+                    <dd class="text-white">{{ campaign.scheduled_at|date:"d/m/Y H:i" }}</dd>
+                </div>
+                {% endif %}
+                {% if campaign.started_at %}
+                <div class="flex justify-between">
+                    <dt class="text-zinc-400">Début envoi</dt>
+                    <dd class="text-white">{{ campaign.started_at|date:"d/m/Y H:i" }}</dd>
+                </div>
+                {% endif %}
+                {% if campaign.completed_at %}
+                <div class="flex justify-between">
+                    <dt class="text-zinc-400">Fin envoi</dt>
+                    <dd class="text-white">{{ campaign.completed_at|date:"d/m/Y H:i" }}</dd>
+                </div>
+                {% endif %}
+            </dl>
+        </c-cms-card>
+
+        <!-- Segment estimation -->
+        <c-cms-card title="Destinataires">
+            {% if estimated_count is not None and campaign.total_recipients == 0 %}
+            <div class="text-center py-4">
+                <p class="text-3xl font-bold text-white mb-1">~{{ estimated_count }}</p>
+                <p class="text-sm text-zinc-400 mb-4">destinataires estimés pour ce segment</p>
+                <p class="text-xs text-zinc-500">Les désabonnés sont exclus automatiquement.</p>
+            </div>
+            {% elif campaign.total_recipients > 0 %}
+            <div class="space-y-3">
+                <div class="flex justify-between text-sm">
+                    <span class="text-zinc-400">Total</span>
+                    <span class="text-white font-semibold">{{ total_recipients }}</span>
+                </div>
+                {% if pending_count > 0 %}
+                <div class="flex justify-between text-sm">
+                    <span class="text-zinc-400">En attente</span>
+                    <span class="text-amber-400">{{ pending_count }}</span>
+                </div>
+                {% endif %}
+                {% if sent_count > 0 %}
+                <div class="flex justify-between text-sm">
+                    <span class="text-zinc-400">Envoyés</span>
+                    <span class="text-emerald-400">{{ sent_count }}</span>
+                </div>
+                {% endif %}
+                {% if failed_count > 0 %}
+                <div class="flex justify-between text-sm">
+                    <span class="text-zinc-400">Échoués</span>
+                    <span class="text-red-400">{{ failed_count }}</span>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <p class="text-zinc-400">Aucun destinataire préparé.</p>
+                <p class="text-xs text-zinc-500 mt-1">Cliquez sur « Préparer destinataires » pour générer la liste.</p>
+            </div>
+            {% endif %}
+        </c-cms-card>
+    </div>
+
+    <!-- Recipient list -->
+    {% if recipients %}
+    <c-cms-card title="Liste des destinataires ({{ total_recipients }} au total)">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-left text-zinc-400 border-b border-zinc-800">
+                        <th class="pb-3 pr-4">Email</th>
+                        <th class="pb-3 pr-4">Nom</th>
+                        <th class="pb-3 pr-4">Source</th>
+                        <th class="pb-3 pr-4">Statut</th>
+                        <th class="pb-3">Envoyé le</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-800/50">
+                    {% for r in recipients %}
+                    <tr class="text-zinc-300">
+                        <td class="py-2.5 pr-4">{{ r.email }}</td>
+                        <td class="py-2.5 pr-4">{{ r.first_name }} {{ r.last_name }}</td>
+                        <td class="py-2.5 pr-4">
+                            <span class="text-xs text-zinc-500">{{ r.source_type }}</span>
+                        </td>
+                        <td class="py-2.5 pr-4">
+                            <c-cms-badge label="{{ r.get_status_display }}"
+                                         color="{% if r.status == 'sent' %}emerald{% elif r.status == 'failed' %}red{% elif r.status == 'bounced' %}amber{% else %}zinc{% endif %}" />
+                        </td>
+                        <td class="py-2.5 text-zinc-500">
+                            {% if r.sent_at %}{{ r.sent_at|date:"d/m H:i" }}{% else %}—{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if total_recipients > 100 %}
+        <p class="mt-4 text-xs text-zinc-500 text-center">
+            Affichage des 100 premiers sur {{ total_recipients }} destinataires.
+        </p>
+        {% endif %}
+    </c-cms-card>
+    {% endif %}
+
+</c-cms-layout>

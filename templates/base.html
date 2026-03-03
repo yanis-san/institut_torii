@@ -1,0 +1,29 @@
+{% load static tailwind_tags django_htmx %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>institut-torii</title>
+
+    
+    {% tailwind_css %}
+    
+    <script src="{% static 'js/alpine.min.js' %}" defer></script>
+    <script src="{% static 'js/htmx.min.js' %}" defer></script>
+    
+</head>
+<body class="bg-background text-slate-800 font-sans antialiased"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    
+    
+    {% django_htmx_script %}
+
+    <main class="min-h-screen">
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+
+</body>
+</html>

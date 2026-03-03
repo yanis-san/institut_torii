@@ -1,0 +1,33 @@
+<c-vars href="" type="button" variant="primary" />
+
+{% if href %}
+<a href="{{ href }}"
+   class="inline-flex items-center justify-center gap-2 px-8 py-4 font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg
+          {% if variant == 'primary' %}
+              bg-red-500 hover:bg-red-600 text-white shadow-red-500/20
+          {% elif variant == 'outline' %}
+              border-2 border-red-400 text-red-500 hover:bg-red-500 hover:text-white shadow-none
+          {% elif variant == 'ghost' %}
+              text-gray-600 hover:text-red-500 shadow-none hover:bg-red-50
+          {% elif variant == 'white' %}
+              bg-white text-gray-800 hover:bg-gray-50 shadow-md
+          {% endif %}"
+   {{ attrs }}>
+    {{ slot }}
+</a>
+{% else %}
+<button type="{{ type }}"
+        class="inline-flex items-center justify-center gap-2 px-8 py-4 font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg cursor-pointer
+               {% if variant == 'primary' %}
+                   bg-red-500 hover:bg-red-600 text-white shadow-red-500/20
+               {% elif variant == 'outline' %}
+                   border-2 border-red-400 text-red-500 hover:bg-red-500 hover:text-white shadow-none
+               {% elif variant == 'ghost' %}
+                   text-gray-600 hover:text-red-500 shadow-none hover:bg-red-50
+               {% elif variant == 'white' %}
+                   bg-white text-gray-800 hover:bg-gray-50 shadow-md
+               {% endif %}"
+        {{ attrs }}>
+    {{ slot }}
+</button>
+{% endif %}

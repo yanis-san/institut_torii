@@ -1,0 +1,121 @@
+<c-cms-layout title="Page d'accueil">
+
+    <c-cms-page-header title="Modifier la page d'accueil" subtitle="Contenu éditable du site public" />
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="space-y-6 max-w-4xl">
+
+            <!-- Hero section -->
+            <c-cms-card title="Section Hero">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2">
+                        <c-cms-field :field="form.hero_title" />
+                    </div>
+                    <div class="sm:col-span-2">
+                        <c-cms-field :field="form.hero_subtitle" />
+                    </div>
+                    <c-cms-field :field="form.hero_image" />
+                    {% if form.instance.hero_image %}
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-2">Image actuelle :</p>
+                        <img src="{{ form.instance.hero_image.url }}" alt="Hero" class="w-32 h-20 object-cover rounded-lg border border-zinc-700" />
+                    </div>
+                    {% endif %}
+                    <div class="sm:col-span-2">
+                        <c-cms-field :field="form.hero_cta_text" />
+                    </div>
+                </div>
+            </c-cms-card>
+
+            <!-- About section -->
+            <c-cms-card title="Section À propos">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2">
+                        <c-cms-field :field="form.about_title" />
+                    </div>
+                    <div class="sm:col-span-2">
+                        <c-cms-field :field="form.about_text" />
+                    </div>
+                    <c-cms-field :field="form.about_image" />
+                    {% if form.instance.about_image %}
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-2">Image actuelle :</p>
+                        <img src="{{ form.instance.about_image.url }}" alt="About" class="w-32 h-20 object-cover rounded-lg border border-zinc-700" />
+                    </div>
+                    {% endif %}
+                </div>
+            </c-cms-card>
+
+            <!-- Stats -->
+            <c-cms-card title="Statistiques affichées">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <c-cms-field :field="form.stat_students" label="Étudiants — Valeur" />
+                    <c-cms-field :field="form.stat_students_label" label="Étudiants — Libellé" />
+                    <c-cms-field :field="form.stat_teachers" label="Enseignants — Valeur" />
+                    <c-cms-field :field="form.stat_teachers_label" label="Enseignants — Libellé" />
+                    <c-cms-field :field="form.stat_languages" label="Langues — Valeur" />
+                    <c-cms-field :field="form.stat_languages_label" label="Langues — Libellé" />
+                    <c-cms-field :field="form.stat_years" label="Années — Valeur" />
+                    <c-cms-field :field="form.stat_years_label" label="Années — Libellé" />
+                </div>
+            </c-cms-card>
+
+            <!-- Testimonials -->
+            <c-cms-card title="Témoignages">
+                <div class="space-y-6">
+                    <div class="p-4 bg-zinc-800/50 rounded-lg">
+                        <p class="text-xs text-zinc-500 mb-3 font-semibold uppercase tracking-wider">Témoignage 1</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="sm:col-span-2">
+                                <c-cms-field :field="form.testimonial_1_text" label="Texte" />
+                            </div>
+                            <c-cms-field :field="form.testimonial_1_author" label="Auteur" />
+                            <c-cms-field :field="form.testimonial_1_role" label="Rôle" />
+                        </div>
+                    </div>
+                    <div class="p-4 bg-zinc-800/50 rounded-lg">
+                        <p class="text-xs text-zinc-500 mb-3 font-semibold uppercase tracking-wider">Témoignage 2</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="sm:col-span-2">
+                                <c-cms-field :field="form.testimonial_2_text" label="Texte" />
+                            </div>
+                            <c-cms-field :field="form.testimonial_2_author" label="Auteur" />
+                            <c-cms-field :field="form.testimonial_2_role" label="Rôle" />
+                        </div>
+                    </div>
+                    <div class="p-4 bg-zinc-800/50 rounded-lg">
+                        <p class="text-xs text-zinc-500 mb-3 font-semibold uppercase tracking-wider">Témoignage 3</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="sm:col-span-2">
+                                <c-cms-field :field="form.testimonial_3_text" label="Texte" />
+                            </div>
+                            <c-cms-field :field="form.testimonial_3_author" label="Auteur" />
+                            <c-cms-field :field="form.testimonial_3_role" label="Rôle" />
+                        </div>
+                    </div>
+                </div>
+            </c-cms-card>
+
+            <!-- CTA final -->
+            <c-cms-card title="Call-to-action final">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2">
+                        <c-cms-field :field="form.cta_title" />
+                    </div>
+                    <div class="sm:col-span-2">
+                        <c-cms-field :field="form.cta_text" />
+                    </div>
+                </div>
+            </c-cms-card>
+
+            <!-- Save -->
+            <div class="sticky bottom-4 bg-zinc-900/95 backdrop-blur-sm border border-zinc-800 rounded-xl p-4 flex items-center justify-between">
+                <p class="text-sm text-zinc-400">Modifié en dernier le {{ form.instance.updated_at|date:"d/m/Y à H:i"|default:"—" }}</p>
+                <c-cms-btn type="submit" variant="primary" size="md">Enregistrer les modifications</c-cms-btn>
+            </div>
+        </div>
+    </form>
+
+</c-cms-layout>

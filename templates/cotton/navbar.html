@@ -1,0 +1,157 @@
+{% load static %}
+
+<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm"
+        x-data="{ mobileOpen: false, coursesOpen: false, workshopsOpen: false }">
+    <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+
+        <!-- Logo -->
+        <a href="{% url 'home:home' %}" class="flex items-center">
+            <img src="{% static 'img/logo/logo_horizontal.webp' %}" alt="Institut Torii" class="h-9 md:h-10 w-auto">
+        </a>
+
+        <!-- Desktop Nav -->
+        <div class="hidden lg:flex items-center gap-1">
+
+            <!-- Formations dropdown -->
+            <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                <button class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-red-500 rounded-lg hover:bg-red-50 transition-all duration-200 flex items-center gap-1 cursor-pointer"
+                        @click="open = !open">
+                    Formations
+                    <i class="bx bx-chevron-down text-base transition-transform" :class="open && 'rotate-180'"></i>
+                </button>
+                <div x-show="open" x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-100"
+                     x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1"
+                     class="absolute top-full left-0 mt-1 w-56 bg-white rounded-xl shadow-xl border border-gray-100 p-2"
+                     x-cloak>
+                    <a href="{% url 'courses:japanese' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 transition-colors group">
+                        <img src="{% static 'img/flags/jp.svg' %}" alt="Japon" class="w-6 h-4 rounded-sm object-cover">
+                        <div>
+                            <div class="text-sm font-medium text-gray-800 group-hover:text-red-500">Japonais</div>
+                            <div class="text-xs text-gray-400">日本語</div>
+                        </div>
+                    </a>
+                    <a href="{% url 'courses:chinese' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 transition-colors group">
+                        <img src="{% static 'img/flags/cn.svg' %}" alt="Chine" class="w-6 h-4 rounded-sm object-cover">
+                        <div>
+                            <div class="text-sm font-medium text-gray-800 group-hover:text-red-500">Chinois</div>
+                            <div class="text-xs text-gray-400">中文</div>
+                        </div>
+                    </a>
+                    <a href="{% url 'courses:korean' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 transition-colors group">
+                        <img src="{% static 'img/flags/kr.svg' %}" alt="Corée" class="w-6 h-4 rounded-sm object-cover">
+                        <div>
+                            <div class="text-sm font-medium text-gray-800 group-hover:text-red-500">Coréen</div>
+                            <div class="text-xs text-gray-400">한국어</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Ateliers dropdown -->
+            <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                <button class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-red-500 rounded-lg hover:bg-red-50 transition-all duration-200 flex items-center gap-1 cursor-pointer"
+                        @click="open = !open">
+                    Ateliers
+                    <i class="bx bx-chevron-down text-base transition-transform" :class="open && 'rotate-180'"></i>
+                </button>
+                <div x-show="open" x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-100"
+                     x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1"
+                     class="absolute top-full left-0 mt-1 w-56 bg-white rounded-xl shadow-xl border border-gray-100 p-2"
+                     x-cloak>
+                    <a href="{% url 'courses:workshops_artistic' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 transition-colors group">
+                        <span class="text-lg">🎨</span>
+                        <div>
+                            <div class="text-sm font-medium text-gray-800 group-hover:text-red-500">Artistiques</div>
+                            <div class="text-xs text-gray-400">Calligraphie, origami…</div>
+                        </div>
+                    </a>
+                    <a href="{% url 'courses:workshops_culinary' %}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 transition-colors group">
+                        <span class="text-lg">🍜</span>
+                        <div>
+                            <div class="text-sm font-medium text-gray-800 group-hover:text-red-500">Culinaires</div>
+                            <div class="text-xs text-gray-400">Sushi, ramen, dim sum…</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <a href="{% url 'home:about' %}" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-red-500 rounded-lg hover:bg-red-50 transition-all duration-200">
+                À propos
+            </a>
+
+            <a href="{% url 'contact:contact' %}"
+               class="ml-4 inline-flex items-center gap-2 px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-full transition-all duration-300 shadow-md shadow-red-500/20 hover:scale-105">
+                <i class="bx bx-envelope"></i>
+                Contact
+            </a>
+        </div>
+
+        <!-- Mobile hamburger -->
+        <button class="lg:hidden p-2 text-gray-600 hover:text-red-500 cursor-pointer"
+                @click="mobileOpen = !mobileOpen">
+            <i class="bx text-2xl" :class="mobileOpen ? 'bx-x' : 'bx-menu'"></i>
+        </button>
+    </nav>
+
+    <!-- Mobile menu -->
+    <div x-show="mobileOpen"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 -translate-y-2"
+         class="lg:hidden border-t border-gray-100 bg-white px-6 py-4 space-y-1"
+         x-cloak>
+
+        <!-- Formations -->
+        <div>
+            <button @click="coursesOpen = !coursesOpen"
+                    class="w-full flex items-center justify-between py-3 text-sm font-medium text-gray-700 cursor-pointer">
+                Formations
+                <i class="bx bx-chevron-down transition-transform" :class="coursesOpen && 'rotate-180'"></i>
+            </button>
+            <div x-show="coursesOpen" x-transition class="pl-4 space-y-1">
+                <a href="{% url 'courses:japanese' %}" class="flex items-center gap-3 py-2 text-sm text-gray-600 hover:text-red-500">
+                    <img src="{% static 'img/flags/jp.svg' %}" alt="Japon" class="w-5 h-3.5 rounded-sm object-cover"> Japonais
+                </a>
+                <a href="{% url 'courses:chinese' %}" class="flex items-center gap-3 py-2 text-sm text-gray-600 hover:text-red-500">
+                    <img src="{% static 'img/flags/cn.svg' %}" alt="Chine" class="w-5 h-3.5 rounded-sm object-cover"> Chinois
+                </a>
+                <a href="{% url 'courses:korean' %}" class="flex items-center gap-3 py-2 text-sm text-gray-600 hover:text-red-500">
+                    <img src="{% static 'img/flags/kr.svg' %}" alt="Corée" class="w-5 h-3.5 rounded-sm object-cover"> Coréen
+                </a>
+            </div>
+        </div>
+
+        <!-- Ateliers -->
+        <div>
+            <button @click="workshopsOpen = !workshopsOpen"
+                    class="w-full flex items-center justify-between py-3 text-sm font-medium text-gray-700 cursor-pointer">
+                Ateliers
+                <i class="bx bx-chevron-down transition-transform" :class="workshopsOpen && 'rotate-180'"></i>
+            </button>
+            <div x-show="workshopsOpen" x-transition class="pl-4 space-y-1">
+                <a href="{% url 'courses:workshops_artistic' %}" class="flex items-center gap-3 py-2 text-sm text-gray-600 hover:text-red-500">
+                    <span>🎨</span> Artistiques
+                </a>
+                <a href="{% url 'courses:workshops_culinary' %}" class="flex items-center gap-3 py-2 text-sm text-gray-600 hover:text-red-500">
+                    <span>🍜</span> Culinaires
+                </a>
+            </div>
+        </div>
+
+        <a href="{% url 'home:about' %}" class="block py-3 text-sm font-medium text-gray-700 hover:text-red-500">
+            À propos
+        </a>
+
+        <a href="{% url 'contact:contact' %}"
+           class="block mt-4 text-center py-3 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-full transition-colors">
+            <i class="bx bx-envelope mr-1"></i> Nous contacter
+        </a>
+    </div>
+</header>

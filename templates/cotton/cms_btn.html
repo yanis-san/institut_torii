@@ -1,0 +1,30 @@
+<!-- templates/cotton/cms_btn.html -->
+<c-vars href="" type="button" variant="primary" size="md" />
+
+{% if href %}
+<a href="{{ href }}"
+   class="inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200
+          {% if variant == 'primary' %}bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-600/20
+          {% elif variant == 'secondary' %}bg-zinc-800 text-zinc-100 hover:bg-zinc-700 border border-zinc-700
+          {% elif variant == 'danger' %}bg-red-900/50 text-red-400 hover:bg-red-900/80 border border-red-800/50
+          {% elif variant == 'ghost' %}text-zinc-400 hover:bg-zinc-800/60 hover:text-white{% endif %}
+          {% if size == 'sm' %}px-3 py-1.5 text-xs
+          {% elif size == 'lg' %}px-6 py-3 text-base
+          {% else %}px-4 py-2 text-sm{% endif %}"
+   {{ attrs }}>
+    {{ slot }}
+</a>
+{% else %}
+<button type="{{ type }}"
+        class="inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200
+               {% if variant == 'primary' %}bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-600/20
+               {% elif variant == 'secondary' %}bg-zinc-800 text-zinc-100 hover:bg-zinc-700 border border-zinc-700
+               {% elif variant == 'danger' %}bg-red-900/50 text-red-400 hover:bg-red-900/80 border border-red-800/50
+               {% elif variant == 'ghost' %}text-zinc-400 hover:bg-zinc-800/60 hover:text-white{% endif %}
+               {% if size == 'sm' %}px-3 py-1.5 text-xs
+               {% elif size == 'lg' %}px-6 py-3 text-base
+               {% else %}px-4 py-2 text-sm{% endif %}"
+        {{ attrs }}>
+    {{ slot }}
+</button>
+{% endif %}

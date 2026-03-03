@@ -1,0 +1,94 @@
+{% load static %}
+
+<footer class="bg-gray-50 border-t border-gray-100">
+    <!-- Main footer -->
+    <div class="max-w-6xl mx-auto px-6 py-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+
+            <!-- Brand -->
+            <div class="lg:col-span-1">
+                <a href="{% url 'home:home' %}" class="inline-block mb-4">
+                    <img src="{% static 'img/logo/logo_horizontal.webp' %}" alt="Institut Torii" class="h-11 w-auto">
+                </a>
+                <p class="text-sm text-gray-500 leading-relaxed mb-6">
+                    Centre culturel et linguistique asiatique à Alger.
+                    Découvrez le Japon, la Chine et la Corée à travers nos formations et ateliers.
+                </p>
+                <div class="flex gap-3">
+                    <a href="#" class="w-9 h-9 bg-gray-200 hover:bg-red-500 hover:text-white text-gray-500 rounded-full flex items-center justify-center transition-all duration-200">
+                        <i class="bx bxl-facebook text-lg"></i>
+                    </a>
+                    <a href="#" class="w-9 h-9 bg-gray-200 hover:bg-red-500 hover:text-white text-gray-500 rounded-full flex items-center justify-center transition-all duration-200">
+                        <i class="bx bxl-instagram text-lg"></i>
+                    </a>
+                    <a href="#" class="w-9 h-9 bg-gray-200 hover:bg-red-500 hover:text-white text-gray-500 rounded-full flex items-center justify-center transition-all duration-200">
+                        <i class="bx bxl-tiktok text-lg"></i>
+                    </a>
+                    <a href="#" class="w-9 h-9 bg-gray-200 hover:bg-red-500 hover:text-white text-gray-500 rounded-full flex items-center justify-center transition-all duration-200">
+                        <i class="bx bxl-youtube text-lg"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Formations -->
+            <div>
+                <h4 class="text-sm font-semibold text-gray-800 mb-4 uppercase tracking-wider">Formations</h4>
+                <ul class="space-y-3">
+                    <li><a href="{% url 'courses:japanese' %}" class="text-sm text-gray-500 hover:text-red-500 transition-colors flex items-center gap-2"><img src="{% static 'img/flags/jp.svg' %}" alt="Japon" class="w-5 h-3.5 rounded-sm object-cover"> Japonais</a></li>
+                    <li><a href="{% url 'courses:chinese' %}" class="text-sm text-gray-500 hover:text-red-500 transition-colors flex items-center gap-2"><img src="{% static 'img/flags/cn.svg' %}" alt="Chine" class="w-5 h-3.5 rounded-sm object-cover"> Chinois</a></li>
+                    <li><a href="{% url 'courses:korean' %}" class="text-sm text-gray-500 hover:text-red-500 transition-colors flex items-center gap-2"><img src="{% static 'img/flags/kr.svg' %}" alt="Corée" class="w-5 h-3.5 rounded-sm object-cover"> Coréen</a></li>
+                    <li><a href="{% url 'courses:workshops_artistic' %}" class="text-sm text-gray-500 hover:text-red-500 transition-colors flex items-center gap-2">🎨 Ateliers artistiques</a></li>
+                    <li><a href="{% url 'courses:workshops_culinary' %}" class="text-sm text-gray-500 hover:text-red-500 transition-colors flex items-center gap-2">🍜 Ateliers culinaires</a></li>
+                </ul>
+            </div>
+
+            <!-- Liens utiles -->
+            <div>
+                <h4 class="text-sm font-semibold text-gray-800 mb-4 uppercase tracking-wider">Liens utiles</h4>
+                <ul class="space-y-3">
+                    <li><a href="{% url 'home:about' %}" class="text-sm text-gray-500 hover:text-red-500 transition-colors">À propos</a></li>
+                    <li><a href="{% url 'contact:contact' %}" class="text-sm text-gray-500 hover:text-red-500 transition-colors">Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div>
+                <h4 class="text-sm font-semibold text-gray-800 mb-4 uppercase tracking-wider">Contact</h4>
+                <ul class="space-y-3">
+                    <li class="flex items-start gap-3">
+                        <i class="bx bx-map text-red-400 text-lg mt-0.5"></i>
+                        <span class="text-sm text-gray-500">Alger, Algérie</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="bx bx-phone text-red-400 text-lg mt-0.5"></i>
+                        <span class="text-sm text-gray-500">+213 XX XX XX XX</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="bx bx-envelope text-red-400 text-lg mt-0.5"></i>
+                        <span class="text-sm text-gray-500">contact@institut-torii.com</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA banner -->
+    <div class="bg-red-500 py-8">
+        <div class="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-white font-medium text-center sm:text-left">
+                Prêt à découvrir l'Asie ? Contactez-nous dès maintenant.
+            </p>
+            <a href="{% url 'contact:contact' %}"
+               class="inline-flex items-center gap-2 bg-white text-red-500 px-6 py-2.5 rounded-full font-medium hover:bg-red-50 transition-all duration-200 hover:scale-105 shadow-md">
+                <i class="bx bx-envelope"></i> Nous écrire
+            </a>
+        </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="bg-gray-100 py-4">
+        <p class="text-center text-xs text-gray-400">
+            © {% now "Y" %} Institut Torii. Tous droits réservés.
+        </p>
+    </div>
+</footer>

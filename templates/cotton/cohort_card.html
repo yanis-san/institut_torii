@@ -1,0 +1,84 @@
+<c-vars accent="red" />
+
+<div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden border border-gray-100 group">
+    <!-- Top accent bar -->
+    <div class="h-2 bg-gradient-to-r
+        {% if accent == 'pink' %}from-pink-400 to-rose-500
+        {% elif accent == 'red' %}from-red-500 to-red-600
+        {% elif accent == 'gold' %}from-yellow-500 to-amber-500
+        {% elif accent == 'blue' %}from-blue-400 to-indigo-500
+        {% elif accent == 'purple' %}from-purple-400 to-fuchsia-500
+        {% elif accent == 'orange' %}from-orange-400 to-red-400
+        {% else %}from-red-500 to-red-600
+        {% endif %}">
+    </div>
+
+    <div class="p-6">
+        <!-- Header : name + format -->
+        <div class="flex items-start justify-between mb-3">
+            <h3 class="text-lg font-semibold text-gray-800 group-hover:text-red-500 transition-colors">
+                {{ cohort.name }}
+            </h3>
+            {% if cohort.format.is_online %}
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded-full">
+                <i class="bx bx-globe"></i> En ligne
+            </span>
+            {% endif %}
+            {% if cohort.format.is_individual %}
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-purple-50 text-purple-600 text-xs font-medium rounded-full">
+                <i class="bx bx-user"></i> Individuel
+            </span>
+            {% endif %}
+        </div>
+
+        {% if cohort.description %}
+        <p class="text-sm text-gray-500 mb-4 leading-relaxed line-clamp-2">{{ cohort.description }}</p>
+        {% endif %}
+
+        <!-- Infos -->
+        <div class="space-y-2 mb-5">
+            <div class="flex items-center gap-2 text-sm text-gray-500">
+                <i class="bx bx-time-five text-red-400"></i>
+                <span>{{ cohort.duration_display }} — {{ cohort.hours_per_session }}h/séance</span>
+            </div>
+            {% if cohort.sessions_per_week %}
+            <div class="flex items-center gap-2 text-sm text-gray-500">
+                <i class="bx bx-calendar text-red-400"></i>
+                <span>{{ cohort.sessions_per_week }} séance{{ cohort.sessions_per_week|pluralize }} / semaine</span>
+            </div>
+            {% endif %}
+            {% if cohort.start_date %}
+            <div class="flex items-center gap-2 text-sm text-gray-500">
+                <i class="bx bx-calendar-check text-red-400"></i>
+                <span>Début : {{ cohort.start_date|date:"d M Y" }}</span>
+            </div>
+            {% endif %}
+            {% for sched in cohort.schedules.all %}
+            <div class="flex items-center gap-2 text-sm text-gray-500">
+                <i class="bx bx-time text-red-400"></i>
+                <span>{{ sched }}</span>
+            </div>
+            {% endfor %}
+            {% if cohort.ramadan_schedule_note %}
+            <div class="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg">
+                <i class="bx bx-moon"></i>
+                <span>{{ cohort.ramadan_schedule_note }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Prix + CTA -->
+        <div class="flex items-end justify-between pt-4 border-t border-gray-100">
+            <div>
+                <div class="text-2xl font-bold text-gray-800">{{ cohort.price|floatformat:0 }} <span class="text-sm font-normal text-gray-400">DA</span></div>
+                {% if cohort.registration_fee %}
+                <div class="text-xs text-gray-400 mt-0.5">+ {{ cohort.registration_fee|floatformat:0 }} DA frais d'inscription</div>
+                {% endif %}
+            </div>
+            <a href="{% url 'contact:contact' %}"
+               class="inline-flex items-center gap-1 px-5 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-full transition-all duration-200 hover:scale-105">
+                S'inscrire <i class="bx bx-right-arrow-alt"></i>
+            </a>
+        </div>
+    </div>
+</div>

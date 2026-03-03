@@ -1,0 +1,159 @@
+<c-cms-layout title="Prospect — {{ prospect.first_name }} {{ prospect.last_name }}">
+
+    <c-cms-page-header title="{{ prospect.first_name }} {{ prospect.last_name }}" subtitle="Prospect #{{ prospect.pk }}">
+        <c-cms-btn href="{% url 'cms:prospect_list' %}" variant="secondary" size="sm">← Retour</c-cms-btn>
+    </c-cms-page-header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Info column -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Identity -->
+            <c-cms-card title="Informations">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Nom complet</p>
+                        <p class="text-sm font-medium text-white">{{ prospect.first_name }} {{ prospect.last_name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Email</p>
+                        <p class="text-sm text-zinc-200">
+                            <a href="mailto:{{ prospect.email }}" class="hover:text-red-400 transition-colors">{{ prospect.email }}</a>
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Téléphone</p>
+                        <p class="text-sm text-zinc-200">{{ prospect.phone|default:"—" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Date de naissance</p>
+                        <p class="text-sm text-zinc-200">{{ prospect.birth_date|date:"d/m/Y"|default:"—" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Niveau estimé</p>
+                        <p class="text-sm text-zinc-200">{{ prospect.get_level_display|default:"—" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Source</p>
+                        <p class="text-sm text-zinc-200">{{ prospect.get_source_display }}</p>
+                    </div>
+                </div>
+            </c-cms-card>
+
+            <!-- Interests -->
+            <c-cms-card title="Intérêts">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Catégorie</p>
+                        <p class="text-sm text-zinc-200">{{ prospect.interested_category|default:"—" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Langue</p>
+                        <p class="text-sm text-zinc-200">{{ prospect.interested_language|default:"—" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Cohorte spécifique</p>
+                        <p class="text-sm text-zinc-200">{{ prospect.interested_cohort|default:"—" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Préférences de contact</p>
+                        <p class="text-sm text-zinc-200">
+                            {% for pref in prospect.contact_preferences %}
+                            <c-cms-badge label="{{ pref }}" color="blue" />
+                            {% empty %}
+                            —
+                            {% endfor %}
+                        </p>
+                    </div>
+                </div>
+            </c-cms-card>
+
+            <!-- Message -->
+            {% if prospect.message %}
+            <c-cms-card title="Message">
+                <p class="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">{{ prospect.message }}</p>
+            </c-cms-card>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Status -->
+            <c-cms-card title="Statut">
+                <div class="space-y-3 mb-4">
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Statut actuel</p>
+                        {% if prospect.converted %}
+                            <c-cms-badge label="Converti" color="emerald" />
+                        {% elif not prospect.notes %}
+                            <c-cms-badge label="Non traité" color="amber" />
+                        {% else %}
+                            <c-cms-badge label="Traité" color="blue" />
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Note qualité</p>
+                        {% if prospect.rating %}
+                            <c-cms-badge label="{{ prospect.get_rating_display }}" color="{{ prospect.rating_color }}" />
+                        {% else %}
+                            <span class="text-sm text-zinc-500">Non évalué</span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Reçu le</p>
+                        <p class="text-sm text-zinc-200">{{ prospect.created_at|date:"d/m/Y à H:i" }}</p>
+                    </div>
+                    {% if prospect.converted_date %}
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Converti le</p>
+                        <p class="text-sm text-emerald-400">{{ prospect.converted_date|date:"d/m/Y à H:i" }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </c-cms-card>
+
+            <!-- Notes form -->
+            <c-cms-card title="Notes & actions">
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <div>
+                        <label for="rating" class="block text-sm font-medium text-zinc-300 mb-1.5">Note qualité</label>
+                        <select id="rating" name="rating"
+                                class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none">
+                            <option value="">— Non évalué —</option>
+                            {% for value, label in rating_choices %}
+                            <option value="{{ value }}" {% if prospect.rating == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="notes" class="block text-sm font-medium text-zinc-300 mb-1.5">Notes internes</label>
+                        <textarea id="notes" name="notes" rows="5"
+                                  class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 placeholder:text-zinc-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none resize-y">{{ prospect.notes }}</textarea>
+                    </div>
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" name="converted"
+                               {% if prospect.converted %}checked{% endif %}
+                               class="w-4 h-4 rounded border-zinc-600 bg-zinc-800 text-red-500 focus:ring-red-500" />
+                        <span class="text-sm text-zinc-300">Marquer comme converti</span>
+                    </label>
+                    <c-cms-btn type="submit" variant="primary" size="md">
+                        Enregistrer
+                    </c-cms-btn>
+                </form>
+            </c-cms-card>
+
+            <!-- Danger zone -->
+            <c-cms-card>
+                <form method="post" action="{% url 'cms:prospect_delete' prospect.pk %}"
+                      x-data
+                      @submit.prevent="if (confirm('Supprimer ce prospect définitivement ?')) $el.submit()">
+                    {% csrf_token %}
+                    <c-cms-btn type="submit" variant="danger" size="sm">
+                        Supprimer ce prospect
+                    </c-cms-btn>
+                </form>
+            </c-cms-card>
+        </div>
+    </div>
+
+</c-cms-layout>

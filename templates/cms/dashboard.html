@@ -1,0 +1,184 @@
+<c-cms-layout title="Dashboard">
+
+    <c-cms-page-header title="Dashboard" subtitle="Vue d'ensemble de votre activité" />
+
+    <!-- KPI Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <c-cms-stat-card value="{{ pending_enrollments }}" label="Inscriptions en attente" color="amber" icon="⏳">
+            {{ recent_enrollments }} cette semaine
+        </c-cms-stat-card>
+        <c-cms-stat-card value="{{ confirmed_enrollments }}" label="Inscriptions confirmées" color="emerald" icon="✅" />
+        <c-cms-stat-card value="{{ total_prospects }}" label="Prospects" color="blue" icon="📬">
+            {{ recent_prospects }} cette semaine · {{ unread_prospects }} non traités
+        </c-cms-stat-card>
+        <c-cms-stat-card value="{{ revenue|floatformat:0 }} DA" label="Revenu net" color="red" icon="💰">
+            {{ monthly_revenue|floatformat:0 }} DA ce mois
+        </c-cms-stat-card>
+    </div>
+
+    <!-- Secondary KPI -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+        <c-cms-stat-card value="{{ active_cohorts }}" label="Cohortes actives" color="purple" icon="👥" />
+        <c-cms-stat-card value="{{ open_registrations }}" label="Inscriptions ouvertes" color="emerald" icon="📝" />
+        <c-cms-stat-card value="{{ total_active_enrollments }}" label="Inscrits actifs" icon="📊">
+            confirmés + en attente
+        </c-cms-stat-card>
+        <c-cms-stat-card value="{{ rejected_enrollments }}" label="Rejetées" color="red" icon="❌" />
+        <c-cms-stat-card value="{{ refunded_enrollments }}" label="Remboursées" color="purple" icon="💸" />
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Last enrollments -->
+        <c-cms-card title="Dernières inscriptions">
+            {% if latest_enrollments %}
+            <div class="divide-y divide-zinc-800 -my-1">
+                {% for e in latest_enrollments %}
+                <a href="{% url 'cms:enrollment_detail' e.pk %}"
+                   class="flex items-center justify-between py-3 hover:bg-zinc-800/30 -mx-5 px-5 transition-colors">
+                    <div>
+                        <p class="text-sm font-medium text-white">{{ e.first_name }} {{ e.last_name }}</p>
+                        <p class="text-xs text-zinc-400">{{ e.cohort.name }}</p>
+                    </div>
+                    <div class="text-right">
+                        {% if e.status == 'pending' %}
+                            <c-cms-badge label="En attente" color="amber" />
+                        {% elif e.status == 'confirmed' %}
+                            <c-cms-badge label="Confirmé" color="emerald" />
+                        {% elif e.status == 'rejected' %}
+                            <c-cms-badge label="Rejeté" color="red" />
+                        {% elif e.status == 'refunded' %}
+                            <c-cms-badge label="Remboursé" color="purple" />
+                        {% endif %}
+                        <p class="text-xs text-zinc-500 mt-1">{{ e.created_at|timesince }} ago</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            <div class="mt-4 pt-3 border-t border-zinc-800">
+                <a href="{% url 'cms:enrollment_list' %}" class="text-sm text-red-400 hover:text-red-300 transition-colors">
+                    Voir toutes les inscriptions →
+                </a>
+            </div>
+            {% else %}
+            <p class="text-sm text-zinc-500">Aucune inscription pour le moment.</p>
+            {% endif %}
+        </c-cms-card>
+
+        <!-- Last prospects -->
+        <c-cms-card title="Derniers prospects">
+            {% if latest_prospects %}
+            <div class="divide-y divide-zinc-800 -my-1">
+                {% for p in latest_prospects %}
+                <a href="{% url 'cms:prospect_detail' p.pk %}"
+                   class="flex items-center justify-between py-3 hover:bg-zinc-800/30 -mx-5 px-5 transition-colors">
+                    <div>
+                        <p class="text-sm font-medium text-white">{{ p.first_name }} {{ p.last_name }}</p>
+                        <p class="text-xs text-zinc-400">
+                            {{ p.email }}
+                            {% if p.interested_language %} · {{ p.interested_language.name }}{% endif %}
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        {% if p.converted %}
+                            <c-cms-badge label="Converti" color="emerald" />
+                        {% elif not p.notes %}
+                            <c-cms-badge label="Non traité" color="amber" />
+                        {% else %}
+                            <c-cms-badge label="Traité" color="blue" />
+                        {% endif %}
+                        <p class="text-xs text-zinc-500 mt-1">{{ p.created_at|timesince }}</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            <div class="mt-4 pt-3 border-t border-zinc-800">
+                <a href="{% url 'cms:prospect_list' %}" class="text-sm text-red-400 hover:text-red-300 transition-colors">
+                    Voir tous les prospects →
+                </a>
+            </div>
+            {% else %}
+            <p class="text-sm text-zinc-500">Aucun prospect pour le moment.</p>
+            {% endif %}
+        </c-cms-card>
+    </div>
+
+    <!-- Charts/data -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Enrollments by status -->
+        <c-cms-card title="Inscriptions par statut">
+            {% if enrollment_by_status %}
+            <div class="space-y-3">
+                {% for item in enrollment_by_status %}
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        {% if item.status == 'pending' %}
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                            <span class="text-sm text-zinc-300">En attente</span>
+                        {% elif item.status == 'confirmed' %}
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                            <span class="text-sm text-zinc-300">Confirmé</span>
+                        {% elif item.status == 'rejected' %}
+                            <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+                            <span class="text-sm text-zinc-300">Rejeté</span>
+                        {% elif item.status == 'refunded' %}
+                            <span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span>
+                            <span class="text-sm text-zinc-300">Remboursé</span>
+                        {% endif %}
+                    </div>
+                    <span class="text-sm font-semibold text-white">{{ item.count }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-sm text-zinc-500">Pas encore de données.</p>
+            {% endif %}
+        </c-cms-card>
+
+        <!-- Prospects by language -->
+        <c-cms-card title="Prospects par langue">
+            {% if prospects_by_language %}
+            <div class="space-y-3">
+                {% for item in prospects_by_language %}
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-zinc-300">{{ item.interested_language__name }}</span>
+                    <span class="text-sm font-semibold text-white">{{ item.count }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-sm text-zinc-500">Pas encore de données.</p>
+            {% endif %}
+        </c-cms-card>
+    </div>
+
+    <!-- Enrollments by cohort -->
+    {% if enrollments_by_cohort %}
+    <div class="mt-6">
+        <c-cms-card title="Inscriptions par cohorte active">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-left text-xs text-zinc-500 uppercase tracking-wider">
+                            <th class="pb-3 pr-4">Cohorte</th>
+                            <th class="pb-3 pr-4 text-center">Confirmés</th>
+                            <th class="pb-3 pr-4 text-center">En attente</th>
+                            <th class="pb-3 text-center">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-800">
+                        {% for c in enrollments_by_cohort %}
+                        <tr class="hover:bg-zinc-800/30 transition-colors">
+                            <td class="py-3 pr-4 text-zinc-200">{{ c.name }}</td>
+                            <td class="py-3 pr-4 text-center text-emerald-400 font-medium">{{ c.confirmed_count }}</td>
+                            <td class="py-3 pr-4 text-center text-amber-400 font-medium">{{ c.pending_count }}</td>
+                            <td class="py-3 text-center text-white font-semibold">{{ c.enrollment_count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </c-cms-card>
+    </div>
+    {% endif %}
+
+</c-cms-layout>

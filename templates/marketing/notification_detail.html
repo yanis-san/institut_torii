@@ -1,0 +1,88 @@
+<!-- templates/marketing/notification_detail.html -->
+<c-cms-layout title="Notification #{{ notification.pk }}">
+
+    <c-cms-page-header title="Détail de la notification" subtitle="#{{ notification.pk }}">
+        <a href="{% url 'marketing:notification_list' %}"
+           class="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors">
+            <i class="bx bx-arrow-back"></i> Retour aux notifications
+        </a>
+    </c-cms-page-header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Metadata -->
+        <div class="lg:col-span-1 space-y-4">
+            <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4">
+                <h3 class="text-white font-medium text-sm mb-3 border-b border-zinc-800 pb-2">Informations</h3>
+
+                <div>
+                    <span class="text-xs text-zinc-500 block mb-1">Statut</span>
+                    {% if notification.status == 'sent' %}
+                        <c-cms-badge label="Envoyé" color="emerald" />
+                    {% else %}
+                        <c-cms-badge label="Échoué" color="red" />
+                    {% endif %}
+                </div>
+
+                <div>
+                    <span class="text-xs text-zinc-500 block mb-1">Type d'événement</span>
+                    <span class="text-white text-sm">{{ notification.get_event_type_display }}</span>
+                </div>
+
+                <div>
+                    <span class="text-xs text-zinc-500 block mb-1">Date d'envoi</span>
+                    <span class="text-white text-sm">{{ notification.sent_at|date:"d/m/Y à H:i:s" }}</span>
+                </div>
+
+                <div>
+                    <span class="text-xs text-zinc-500 block mb-1">Destinataire</span>
+                    <span class="text-white text-sm">{{ notification.recipient_email }}</span>
+                    {% if notification.recipient_name %}
+                    <span class="text-zinc-400 text-xs block">{{ notification.recipient_name }}</span>
+                    {% endif %}
+                </div>
+
+                {% if notification.sent_by %}
+                <div>
+                    <span class="text-xs text-zinc-500 block mb-1">Déclenché par</span>
+                    <span class="text-white text-sm">{{ notification.sent_by.username }}</span>
+                </div>
+                {% endif %}
+
+                {% if notification.related_model %}
+                <div>
+                    <span class="text-xs text-zinc-500 block mb-1">Objet lié</span>
+                    <span class="text-zinc-400 text-sm">{{ notification.related_model }} #{{ notification.related_id }}</span>
+                </div>
+                {% endif %}
+
+                {% if notification.error_message %}
+                <div>
+                    <span class="text-xs text-zinc-500 block mb-1">Erreur</span>
+                    <p class="text-red-400 text-sm bg-red-500/10 rounded-lg p-3 border border-red-500/20">{{ notification.error_message }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Email Content -->
+        <div class="lg:col-span-2 space-y-4">
+            <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
+                <h3 class="text-white font-medium text-sm mb-1 border-b border-zinc-800 pb-2">Contenu de l'email</h3>
+
+                <div class="mt-4 mb-3">
+                    <span class="text-xs text-zinc-500 block mb-1">Objet</span>
+                    <span class="text-white text-sm font-medium">{{ notification.subject }}</span>
+                </div>
+
+                <div>
+                    <span class="text-xs text-zinc-500 block mb-2">Corps du message</span>
+                    <div class="bg-white rounded-lg p-5 text-black text-sm max-h-[600px] overflow-y-auto">
+                        {{ notification.body_html|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</c-cms-layout>

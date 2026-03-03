@@ -1,0 +1,139 @@
+{% load static %}
+<c-layout title="Coréen — Institut Torii" description="Apprenez le coréen à Alger. Formations TOPIK, cours en groupe et individuels. Hallyu, K-drama, K-pop.">
+
+    <!-- Hero -->
+    <section class="relative min-h-[70vh] flex items-center overflow-hidden bg-gradient-to-br from-indigo-800 via-blue-900 to-slate-900">
+        <!-- Decorative hangul -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none select-none">
+            <div class="absolute top-16 left-16 text-blue-400/10 text-9xl font-bold">한</div>
+            <div class="absolute top-32 right-24 text-indigo-400/10 text-7xl font-bold">글</div>
+            <div class="absolute bottom-32 left-24 text-blue-300/10 text-8xl font-bold">말</div>
+            <div class="absolute bottom-16 right-16 text-indigo-300/10 text-6xl font-bold">꿈</div>
+        </div>
+
+        <!-- Wave transition -->
+        <div class="absolute bottom-0 left-0 right-0">
+            <svg viewBox="0 0 1440 120" fill="none" class="w-full">
+                <path d="M0 120L48 110C96 100 192 80 288 75C384 70 480 80 576 85C672 90 768 90 864 82C960 75 1056 60 1152 58C1248 55 1344 65 1392 70L1440 75V120H0Z" fill="white"/>
+            </svg>
+        </div>
+
+        <div class="relative z-10 max-w-5xl mx-auto px-6 py-20 text-center">
+            <h1 class="text-7xl md:text-9xl font-bold text-white mb-6 drop-shadow-md">
+                한국어
+            </h1>
+            <h2 class="text-3xl md:text-5xl text-white font-light mb-6">
+                La Langue du <span class="font-semibold">Pays du Matin Calme</span>
+            </h2>
+            <p class="text-lg md:text-xl text-white/80 max-w-3xl mx-auto leading-relaxed mb-10">
+                Découvrez le coréen et plongez dans la vague Hallyu qui conquiert le monde
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <c-btn href="{% url 'contact:contact' %}" variant="white">
+                    <i class="bx bx-pencil"></i> Commencer mon parcours
+                </c-btn>
+                <c-btn href="#formations" variant="outline">
+                    <i class="bx bx-book-open"></i> Voir les formations
+                </c-btn>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 max-w-xl mx-auto">
+                <c-stat-card value="Débutant" label="à avancé" />
+                <c-stat-card value="Groupe" label="& individuel" />
+                <c-stat-card value="Présentiel" label="& en ligne" />
+            </div>
+        </div>
+    </section>
+
+    <!-- TOPIK Section -->
+    <c-section bg="bg-gray-50">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <div class="inline-flex items-center gap-2 bg-sky-50 text-sky-600 px-4 py-2 rounded-full text-sm font-medium mb-6">
+                    <img src="{% static 'img/flags/kr.svg' %}" alt="Corée" class="w-5 h-3.5 rounded-sm object-cover"> Certification officielle
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                    Préparation <span class="text-sky-500">TOPIK</span>
+                </h2>
+                <p class="text-gray-500 leading-relaxed mb-6">
+                    Le TOPIK (Test of Proficiency in Korean) est l'examen officiel
+                    de compétence en coréen, indispensable pour étudier ou travailler en Corée du Sud.
+                </p>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 text-sm text-gray-600">
+                        <i class="bx bx-check-circle text-sky-500 text-lg"></i>
+                        6 niveaux : TOPIK I (1-2) et TOPIK II (3-6)
+                    </div>
+                    <div class="flex items-center gap-3 text-sm text-gray-600">
+                        <i class="bx bx-check-circle text-sky-500 text-lg"></i>
+                        Requis pour les bourses KGSP (Global Korea Scholarship)
+                    </div>
+                    <div class="flex items-center gap-3 text-sm text-gray-600">
+                        <i class="bx bx-check-circle text-sky-500 text-lg"></i>
+                        Préparation intensive avec supports officiels
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-center">
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-10 text-center">
+                    <div class="text-6xl mb-4">🏛️</div>
+                    <p class="text-lg font-semibold text-gray-800 mb-1">TOPIK — 한국어능력시험</p>
+                    <p class="text-sm text-gray-500">Test of Proficiency in Korean</p>
+                </div>
+            </div>
+        </div>
+    </c-section>
+
+    <!-- Cohorts -->
+    <c-section bg="bg-white" id="formations">
+        <c-section-heading title="Nos Formations Coréen" subtitle="Du Hangul débutant au coréen avancé" />
+
+        {% if cohorts %}
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for cohort in cohorts %}
+                <c-cohort-card :cohort="cohort" accent="sky" />
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <p class="text-gray-500 text-lg mb-2">Nos formations coréen sont en cours de mise à jour.</p>
+            <p class="text-gray-400">Contactez-nous pour plus d'informations.</p>
+            <c-btn href="{% url 'contact:contact' %}" class="mt-6">Nous contacter</c-btn>
+        </div>
+        {% endif %}
+    </c-section>
+
+    <!-- Pourquoi le coréen -->
+    <c-section bg="bg-gray-50">
+        <c-section-heading title="Pourquoi apprendre le coréen ?" />
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+                <div class="w-14 h-14 bg-sky-50 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">🎬</div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Vague Hallyu</h3>
+                <p class="text-sm text-gray-500 leading-relaxed">K-drama, K-pop, cinéma… La culture coréenne rayonne dans le monde. Vivez-la dans sa langue.</p>
+            </div>
+            <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+                <div class="w-14 h-14 bg-sky-50 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">💻</div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Tech & innovation</h3>
+                <p class="text-sm text-gray-500 leading-relaxed">Samsung, LG, Hyundai… La Corée est un leader mondial de la technologie et de l'innovation.</p>
+            </div>
+            <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
+                <div class="w-14 h-14 bg-sky-50 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">🎓</div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Bourses KGSP</h3>
+                <p class="text-sm text-gray-500 leading-relaxed">Étudiez gratuitement en Corée grâce aux bourses du gouvernement coréen.</p>
+            </div>
+        </div>
+    </c-section>
+
+    <!-- CTA -->
+    <c-section bg="bg-white">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Prêt à apprendre le coréen ?</h2>
+            <p class="text-gray-500 mb-8">Rejoignez la vague Hallyu et commencez dès maintenant.</p>
+            <c-btn href="{% url 'contact:contact' %}">S'inscrire maintenant</c-btn>
+        </div>
+    </c-section>
+
+</c-layout>

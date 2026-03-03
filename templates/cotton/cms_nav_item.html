@@ -1,0 +1,12 @@
+<!-- templates/cotton/cms_nav_item.html -->
+<c-vars href="" icon="" label="" />
+
+{% with current_path=request.path %}
+<a href="{{ href }}"
+   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+          {% if current_path == href %}bg-red-600/15 text-red-400{% else %}text-zinc-400 hover:bg-zinc-800/60 hover:text-white{% endif %}"
+   {{ attrs }}>
+    <span class="text-lg">{{ icon }}</span>
+    <span>{{ label }}</span>
+</a>
+{% endwith %}

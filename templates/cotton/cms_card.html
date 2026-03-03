@@ -1,0 +1,13 @@
+<!-- templates/cotton/cms_card.html -->
+<c-vars title="" />
+
+<div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden" {{ attrs }}>
+    {% if title %}
+    <div class="px-5 py-4 border-b border-zinc-800">
+        <h2 class="font-semibold text-white">{{ title }}</h2>
+    </div>
+    {% endif %}
+    <div class="p-5">
+        {{ slot }}
+    </div>
+</div>
