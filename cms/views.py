@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Count, F, Q, Sum
-from django.db.models.functions import TruncDate
+from django.db.models.functions import ExtractHour, TruncDate
 from django.forms import inlineformset_factory
 from django.http import FileResponse, Http404
 from django.urls import reverse_lazy
@@ -685,7 +685,7 @@ def analytics(request):
     # ── Peak hours (which hours get the most traffic) ──
     hourly_views = list(
         qs_no_bots
-        .extra(select={'hour': "strftime('%%H', timestamp)"})
+        .annotate(hour=ExtractHour('timestamp'))
         .values('hour')
         .annotate(count=Count('id'))
         .order_by('hour')
