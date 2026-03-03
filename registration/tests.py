@@ -109,6 +109,37 @@ class EnrollmentModelTest(TestCase):
         )
         self.assertEqual(e.phone, '+213666123456')
 
+    @override_settings(MEDIA_ROOT=None)
+    def test_receipt_compressed_to_webp_no_resize(self):
+        """Payment receipt is converted to WebP without resizing."""
+        import tempfile, shutil, os
+        tmpdir = tempfile.mkdtemp()
+        try:
+            with self.settings(MEDIA_ROOT=tmpdir):
+                # Create a large PNG image (2000x3000)
+                big_img = Image.new('RGB', (2000, 3000), color='blue')
+                buf = io.BytesIO()
+                big_img.save(buf, format='PNG')
+                buf.seek(0)
+                receipt = SimpleUploadedFile('big_receipt.png', buf.read(), content_type='image/png')
+
+                e = Enrollment.objects.create(
+                    first_name='Test', last_name='Optim',
+                    email='optim@test.com', cohort=self.cohort,
+                    payment_receipt=receipt,
+                )
+                # File should now be WebP
+                self.assertTrue(e.payment_receipt.name.endswith('.webp'))
+                # Dimensions must be preserved (no resize)
+                saved_img = Image.open(e.payment_receipt.path)
+                self.assertEqual(saved_img.width, 2000)
+                self.assertEqual(saved_img.height, 3000)
+                saved_img.close()
+                # Close Django's file handle before cleanup
+                e.payment_receipt.close()
+        finally:
+            shutil.rmtree(tmpdir, ignore_errors=True)
+
 
 # ──────────────────────────────────────────────
 # Form Tests

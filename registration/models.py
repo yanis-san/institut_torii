@@ -133,7 +133,38 @@ class Enrollment(models.Model):
             phone = re.sub(r'^(\+\d{2,3})0+', r'\1', phone)
             self.phone = phone
 
+        # Compress payment receipt → WebP (no resize, preserve full resolution)
+        if self.payment_receipt and hasattr(self.payment_receipt, 'file'):
+            self._compress_receipt()
+
         super().save(*args, **kwargs)
+
+    def _compress_receipt(self):
+        """Convert receipt to WebP without resizing — keeps full resolution."""
+        from io import BytesIO
+        from PIL import Image as PILImage
+        from django.core.files.base import ContentFile
+
+        try:
+            img = PILImage.open(self.payment_receipt)
+        except Exception:
+            return
+
+        if img.mode in ('RGBA', 'P', 'LA'):
+            bg = PILImage.new('RGB', img.size, (255, 255, 255))
+            if img.mode == 'P':
+                img = img.convert('RGBA')
+            bg.paste(img, mask=img.split()[-1])
+            img = bg
+        elif img.mode != 'RGB':
+            img = img.convert('RGB')
+
+        buf = BytesIO()
+        img.save(buf, format='WEBP', quality=85)
+        buf.seek(0)
+
+        name = self.payment_receipt.name.rsplit('.', 1)[0] + '.webp'
+        self.payment_receipt.save(name, ContentFile(buf.read()), save=False)
 
     def confirm(self, user=None):
         """Valide l'inscription (appelé par l'admin)."""
