@@ -7,6 +7,8 @@
               bg-red-500 hover:bg-red-600 text-white shadow-red-500/20
           {% elif variant == 'outline' %}
               border-2 border-red-400 text-red-500 hover:bg-red-500 hover:text-white shadow-none
+          {% elif variant == 'outline-light' %}
+              border-2 border-white/30 text-white hover:bg-white/20 shadow-none backdrop-blur-sm
           {% elif variant == 'ghost' %}
               text-gray-600 hover:text-red-500 shadow-none hover:bg-red-50
           {% elif variant == 'white' %}
@@ -22,6 +24,8 @@
                    bg-red-500 hover:bg-red-600 text-white shadow-red-500/20
                {% elif variant == 'outline' %}
                    border-2 border-red-400 text-red-500 hover:bg-red-500 hover:text-white shadow-none
+               {% elif variant == 'outline-light' %}
+                   border-2 border-white/30 text-white hover:bg-white/20 shadow-none backdrop-blur-sm
                {% elif variant == 'ghost' %}
                    text-gray-600 hover:text-red-500 shadow-none hover:bg-red-50
                {% elif variant == 'white' %}
