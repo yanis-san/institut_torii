@@ -71,9 +71,7 @@
         <div class="flex items-end justify-between pt-4 border-t border-gray-100">
             <div>
                 <div class="text-2xl font-bold text-gray-800">{{ cohort.price|floatformat:0 }} <span class="text-sm font-normal text-gray-400">DA</span></div>
-                {% if cohort.registration_fee %}
-                <div class="text-xs text-gray-400 mt-0.5">+ {{ cohort.registration_fee|floatformat:0 }} DA frais d'inscription</div>
-                {% endif %}
+                <div class="text-xs text-gray-400 mt-0.5">+1000 DA de frais</div>
             </div>
             {% if cohort.is_registration_open %}
             <a href="{% url 'registration:enroll' cohort.slug %}"
