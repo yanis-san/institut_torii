@@ -96,12 +96,21 @@
             {% endif %}
 
             <!-- Check status link -->
-            <div class="mt-12 text-center border-t border-gray-100 pt-8">
-                <p class="text-sm text-gray-500 mb-3">Déjà inscrit ?</p>
-                <a href="{% url 'registration:check_status' %}"
-                   class="inline-flex items-center gap-2 text-red-500 hover:text-red-600 font-medium transition-colors">
-                    <i class="bx bx-search-alt"></i> Consulter le statut de mon inscription
-                </a>
+            <div class="mt-12 text-center border-t border-gray-100 pt-8 space-y-4">
+                <div>
+                    <p class="text-sm text-gray-500 mb-3">Déjà inscrit ?</p>
+                    <a href="{% url 'registration:check_status' %}"
+                       class="inline-flex items-center gap-2 text-red-500 hover:text-red-600 font-medium transition-colors">
+                        <i class="bx bx-search-alt"></i> Consulter le statut de mon inscription
+                    </a>
+                </div>
+                <div class="border-t border-gray-100 pt-4">
+                    <p class="text-sm text-gray-500 mb-3">Besoin d'informations avant de vous inscrire ?</p>
+                    <a href="{% url 'contact:contact' %}"
+                       class="inline-flex items-center gap-2 text-gray-500 hover:text-red-500 font-medium transition-colors">
+                        <i class="bx bx-envelope"></i> Contactez-nous
+                    </a>
+                </div>
             </div>
         </div>
     </c-section>

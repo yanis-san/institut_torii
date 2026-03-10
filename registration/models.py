@@ -135,9 +135,11 @@ class Enrollment(models.Model):
 
         # Compress payment receipt → WebP (no resize, preserve full resolution)
         # Skip compression for PDFs
-        if self.payment_receipt and hasattr(self.payment_receipt, 'file'):
-            if not self.payment_receipt.name.lower().endswith('.pdf'):
-                self._compress_receipt()
+        # Only compress fresh uploads (not already-saved paths from DB)
+        if (self.payment_receipt
+                and not getattr(self.payment_receipt, '_committed', True)
+                and not self.payment_receipt.name.lower().endswith('.pdf')):
+            self._compress_receipt()
 
         super().save(*args, **kwargs)
 

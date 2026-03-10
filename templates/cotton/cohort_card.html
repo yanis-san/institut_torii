@@ -75,10 +75,17 @@
                 <div class="text-xs text-gray-400 mt-0.5">+ {{ cohort.registration_fee|floatformat:0 }} DA frais d'inscription</div>
                 {% endif %}
             </div>
-            <a href="{% url 'contact:contact' %}"
+            {% if cohort.is_registration_open %}
+            <a href="{% url 'registration:enroll' cohort.slug %}"
                class="inline-flex items-center gap-1 px-5 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-full transition-all duration-200 hover:scale-105">
                 S'inscrire <i class="bx bx-right-arrow-alt"></i>
             </a>
+            {% else %}
+            <a href="{% url 'contact:contact' %}"
+               class="inline-flex items-center gap-1 px-5 py-2 border border-gray-200 text-gray-600 hover:border-red-300 hover:text-red-500 text-sm font-medium rounded-full transition-all duration-200">
+                <i class="bx bx-info-circle"></i> Plus d'infos
+            </a>
+            {% endif %}
         </div>
     </div>
 </div>
