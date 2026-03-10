@@ -1,3 +1,34 @@
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+import datetime
+def clean_datetime_field(value):
+    if not value or str(value) in ('0000-00-00 00:00:00', ''):
+        return None
+    return value
+
+# Signal pour nettoyer les DateTimeField avant sauvegarde
+@receiver(pre_save)
+def clean_all_datetimefields(sender, instance, **kwargs):
+    # Liste des champs à nettoyer (à adapter selon les modèles)
+    datetime_fields = [
+        'confirmed_at',
+        'registration_open_date',
+        'registration_close_date',
+        'scheduled_at',
+        'started_at',
+        'completed_at',
+        'sent_at',
+        'opened_at',
+        'clicked_at',
+        'unsubscribed_at',
+        'converted_date',
+    ]
+    for field in datetime_fields:
+        if hasattr(instance, field):
+            value = getattr(instance, field)
+            cleaned = clean_datetime_field(value)
+            if value != cleaned:
+                setattr(instance, field, cleaned)
 """
 Modèle d'inscription en ligne avec validation de paiement CCP.
 
