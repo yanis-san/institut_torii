@@ -15,4 +15,4 @@ class ProspectAdmin(admin.ModelAdmin):
     )
     search_fields = ('first_name', 'last_name', 'email', 'phone')
     readonly_fields = ('created_at',)
-    date_hierarchy = 'created_at'
+    #date_hierarchy = 'created_at'
