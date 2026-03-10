@@ -25,7 +25,30 @@
                 {% if cohort.start_date %}
                 <span class="flex items-center gap-1"><i class="bx bx-calendar"></i> Début : {{ cohort.start_date|date:"d/m/Y" }}</span>
                 {% endif %}
-                <span class="flex items-center gap-1"><i class="bx bx-money"></i> {{ cohort.price|floatformat:0 }} DA</span>
+            </div>
+
+            <!-- Tarification -->
+            <div class="mt-6 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+                <div class="flex items-center gap-2 mb-3">
+                    <i class="bx bx-money text-red-500 text-lg"></i>
+                    <h3 class="font-semibold text-gray-800">Tarification</h3>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Frais de formation</span>
+                        <span class="text-lg font-bold text-gray-800">{{ cohort.price|floatformat:0 }} DA</span>
+                    </div>
+                    <div class="flex items-center justify-between bg-amber-50 -mx-2 px-2 py-2 rounded-lg">
+                        <span class="text-sm text-amber-700 flex items-center gap-1">
+                            <i class="bx bx-info-circle"></i>
+                            Frais d'inscription <span class="text-xs text-amber-500">(1ère inscription de l'année)</span>
+                        </span>
+                        <span class="text-sm font-semibold text-amber-700">+ 1 000 DA</span>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-400 mt-3">
+                    Les frais d'inscription de 1 000 DA ne s'appliquent qu'une seule fois par année scolaire, lors de votre première inscription.
+                </p>
             </div>
         </div>
     </section>
