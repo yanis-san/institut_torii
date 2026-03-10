@@ -21,7 +21,7 @@ class EnrollmentAdmin(admin.ModelAdmin):
         'confirmed_at', 'confirmed_by', 'receipt_preview',
     )
     list_per_page = 30
-    date_hierarchy = 'created_at'
+#    date_hierarchy = 'created_at'
 
     actions = ['validate_payment', 'reject_enrollment', 'mark_refunded']
 
