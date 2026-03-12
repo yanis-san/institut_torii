@@ -66,7 +66,7 @@ def _build_email_wrapper():
         '</td></tr>'
         # Phone
         '<tr><td align="center" style="padding:16px 24px 0;">'
-        '<span style="font-size:13px;color:#a1a1aa;">&#9742; 0542 07 33 33</span>'
+        '<span style="font-size:13px;color:#a1a1aa;">&#9742; 0557 74 59 20</span>'
         '</td></tr>'
         # Address
         '<tr><td align="center" style="padding:8px 24px 0;">'
