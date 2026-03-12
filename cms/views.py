@@ -241,21 +241,32 @@ def prospect_detail(request, pk):
         notes = request.POST.get('notes', '')
         converted = request.POST.get('converted') == 'on'
         rating = request.POST.get('rating', '')
+        status = request.POST.get('status', '')
         # Validate rating value
         valid_ratings = {c[0] for c in Prospect.Rating.choices}
         if rating and rating not in valid_ratings:
             rating = ''
+        # Validate status value
+        valid_statuses = {c[0] for c in Prospect.Status.choices}
+        if status not in valid_statuses:
+            status = prospect.status
         prospect.notes = notes
         prospect.converted = converted
         prospect.rating = rating
+        prospect.status = status
         if converted and not prospect.converted_date:
             prospect.converted_date = timezone.now()
-        prospect.save(update_fields=['notes', 'converted', 'converted_date', 'rating'])
+        if status == 'converted' and not converted:
+            prospect.converted = True
+            if not prospect.converted_date:
+                prospect.converted_date = timezone.now()
+        prospect.save(update_fields=['notes', 'converted', 'converted_date', 'rating', 'status'])
         messages.success(request, _('Prospect mis à jour.'))
         return redirect('cms:prospect_detail', pk=pk)
     return render(request, 'cms/prospects/detail.html', {
         'prospect': prospect,
         'rating_choices': Prospect.Rating.choices,
+        'status_choices': Prospect.Status.choices,
     })
 
 

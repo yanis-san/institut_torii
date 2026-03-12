@@ -225,6 +225,39 @@ class CMSProspectsTestCase(CMSTestMixin, TestCase):
         self.assertContains(response, 'USER')
         self.assertNotContains(response, 'PERSON')
 
+    # --- Status ---
+
+    def test_prospect_update_status(self):
+        """Can change status from prospect detail page."""
+        response = self.client.post(
+            reverse('cms:prospect_detail', args=[self.prospect.pk]),
+            {'notes': '', 'converted': '', 'rating': '', 'status': 'contacted'},
+        )
+        self.assertRedirects(response, reverse('cms:prospect_detail', args=[self.prospect.pk]))
+        self.prospect.refresh_from_db()
+        self.assertEqual(self.prospect.status, 'contacted')
+
+    def test_prospect_status_converted_auto_sets_converted_flag(self):
+        """Setting status to 'converted' also sets converted=True and converted_date."""
+        self.client.post(
+            reverse('cms:prospect_detail', args=[self.prospect.pk]),
+            {'notes': '', 'converted': '', 'rating': '', 'status': 'converted'},
+        )
+        self.prospect.refresh_from_db()
+        self.assertTrue(self.prospect.converted)
+        self.assertIsNotNone(self.prospect.converted_date)
+
+    def test_prospect_status_invalid_keeps_current(self):
+        """Invalid status value preserves current status."""
+        self.prospect.status = 'in_progress'
+        self.prospect.save()
+        self.client.post(
+            reverse('cms:prospect_detail', args=[self.prospect.pk]),
+            {'notes': '', 'converted': '', 'rating': '', 'status': 'FAKESTATUS'},
+        )
+        self.prospect.refresh_from_db()
+        self.assertEqual(self.prospect.status, 'in_progress')
+
 
 class CMSEnrollmentsTestCase(CMSTestMixin, TestCase):
     """Test enrollment management."""

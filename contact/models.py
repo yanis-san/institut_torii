@@ -32,12 +32,27 @@ class Prospect(models.Model):
         COLD = 'cold', _('Froid')
         UNQUALIFIED = 'unqualified', _('Non qualifié')
 
+    class Status(models.TextChoices):
+        NEW = 'new', _('Nouveau')
+        CONTACTED = 'contacted', _('Contacté')
+        IN_PROGRESS = 'in_progress', _('En cours')
+        CONVERTED = 'converted', _('Converti')
+        LOST = 'lost', _('Perdu')
+
     # Color mapping for template rendering
     RATING_COLORS = {
         'hot': 'emerald',
         'warm': 'amber',
         'cold': 'blue',
         'unqualified': 'red',
+    }
+
+    STATUS_COLORS = {
+        'new': 'amber',
+        'contacted': 'blue',
+        'in_progress': 'purple',
+        'converted': 'emerald',
+        'lost': 'red',
     }
 
     # --- Identité ---
@@ -112,6 +127,12 @@ class Prospect(models.Model):
         help_text=_('Évaluation qualitative du prospect pour le ciblage marketing.'),
     )
     notes = models.TextField(_('notes internes'), blank=True)
+    status = models.CharField(
+        _('statut'),
+        max_length=20,
+        choices=Status.choices,
+        default=Status.NEW,
+    )
     created_at = models.DateTimeField(_('créé le'), auto_now_add=True)
     converted = models.BooleanField(_('converti'), default=False)
     converted_date = models.DateTimeField(_('date conversion'), null=True, blank=True)
@@ -128,6 +149,11 @@ class Prospect(models.Model):
     def rating_color(self):
         """Return Tailwind color name for the rating badge."""
         return self.RATING_COLORS.get(self.rating, 'zinc')
+
+    @property
+    def status_color(self):
+        """Return Tailwind color name for the status badge."""
+        return self.STATUS_COLORS.get(self.status, 'zinc')
 
     def save(self, *args, **kwargs):
         # Standardize names: NOM → MAJUSCULE, Prénom → Title Case

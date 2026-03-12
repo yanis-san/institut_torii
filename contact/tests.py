@@ -118,6 +118,34 @@ class ProspectModelTest(TestCase):
         )
         self.assertEqual(p.get_rating_display(), 'Sérieux')
 
+    def test_status_defaults_new(self):
+        """Status field defaults to 'new'."""
+        p = Prospect.objects.create(
+            first_name='Test', last_name='User', email='s@test.com',
+        )
+        self.assertEqual(p.status, 'new')
+        self.assertEqual(p.get_status_display(), 'Nouveau')
+
+    def test_status_choices_valid(self):
+        """Can set all valid status values."""
+        for value, label in Prospect.Status.choices:
+            p = Prospect.objects.create(
+                first_name='Test', last_name='User',
+                email=f'{value}@test.com', status=value,
+            )
+            self.assertEqual(p.status, value)
+            self.assertEqual(p.get_status_display(), label)
+
+    def test_status_color_property(self):
+        """status_color returns correct Tailwind color name."""
+        expected = {
+            'new': 'amber', 'contacted': 'blue', 'in_progress': 'purple',
+            'converted': 'emerald', 'lost': 'red',
+        }
+        for value, color in expected.items():
+            p = Prospect(status=value)
+            self.assertEqual(p.status_color, color)
+
 
 class ProspectFormValidationTest(TestCase):
     """Test server-side form validation."""
