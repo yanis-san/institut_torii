@@ -225,6 +225,7 @@ def prospect_list(request):
         'current_status': status,
         'current_rating': rating or '',
         'rating_choices': Prospect.Rating.choices,
+        'status_choices': Prospect.Status.choices,
         'search_query': search or '',
     })
 
@@ -284,6 +285,30 @@ def prospect_set_rating(request, pk):
     return render(request, 'cms/prospects/_rating_cell.html', {
         'prospect': prospect,
         'rating_choices': Prospect.Rating.choices,
+    })
+
+
+@login_required(login_url=_LOGIN_URL)
+@require_POST
+def prospect_set_status(request, pk):
+    """HTMX endpoint to update prospect status inline from the list."""
+    prospect = get_object_or_404(Prospect, pk=pk)
+    status = request.POST.get('status', '')
+    valid_statuses = {c[0] for c in Prospect.Status.choices}
+    if status not in valid_statuses:
+        status = prospect.status
+    prospect.status = status
+    # Auto-set converted flag when status is 'converted'
+    if status == 'converted' and not prospect.converted:
+        prospect.converted = True
+        if not prospect.converted_date:
+            prospect.converted_date = timezone.now()
+        prospect.save(update_fields=['status', 'converted', 'converted_date'])
+    else:
+        prospect.save(update_fields=['status'])
+    return render(request, 'cms/prospects/_status_cell.html', {
+        'prospect': prospect,
+        'status_choices': Prospect.Status.choices,
     })
 
 

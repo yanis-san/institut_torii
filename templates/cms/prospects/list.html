@@ -79,15 +79,7 @@
                             {% endif %}
                         </td>
                         {% include "cms/prospects/_rating_cell.html" with prospect=p %}
-                        <td class="px-5 py-3">
-                            {% if p.converted %}
-                                <c-cms-badge label="Converti" color="emerald" />
-                            {% elif not p.notes %}
-                                <c-cms-badge label="Non traité" color="amber" />
-                            {% else %}
-                                <c-cms-badge label="Traité" color="blue" />
-                            {% endif %}
-                        </td>
+                        {% include "cms/prospects/_status_cell.html" with prospect=p %}
                         <td class="px-5 py-3 text-zinc-400 text-xs whitespace-nowrap">
                             {{ p.created_at|date:"d/m/Y H:i" }}
                         </td>

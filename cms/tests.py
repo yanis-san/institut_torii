@@ -258,6 +258,32 @@ class CMSProspectsTestCase(CMSTestMixin, TestCase):
         self.prospect.refresh_from_db()
         self.assertEqual(self.prospect.status, 'in_progress')
 
+    def test_prospect_status_inline_htmx(self):
+        """HTMX endpoint to update status inline returns partial."""
+        url = reverse('cms:prospect_set_status', args=[self.prospect.pk])
+        response = self.client.post(url, {'status': 'contacted'},
+                                    HTTP_HX_REQUEST='true')
+        self.assertEqual(response.status_code, 200)
+        self.prospect.refresh_from_db()
+        self.assertEqual(self.prospect.status, 'contacted')
+
+    def test_prospect_status_inline_converted_sets_flag(self):
+        """HTMX status endpoint auto-sets converted flag."""
+        url = reverse('cms:prospect_set_status', args=[self.prospect.pk])
+        self.client.post(url, {'status': 'converted'}, HTTP_HX_REQUEST='true')
+        self.prospect.refresh_from_db()
+        self.assertTrue(self.prospect.converted)
+        self.assertIsNotNone(self.prospect.converted_date)
+
+    def test_prospect_status_inline_bad_value(self):
+        """HTMX endpoint rejects invalid status values."""
+        self.prospect.status = 'in_progress'
+        self.prospect.save()
+        url = reverse('cms:prospect_set_status', args=[self.prospect.pk])
+        self.client.post(url, {'status': 'INVALID'}, HTTP_HX_REQUEST='true')
+        self.prospect.refresh_from_db()
+        self.assertEqual(self.prospect.status, 'in_progress')
+
 
 class CMSEnrollmentsTestCase(CMSTestMixin, TestCase):
     """Test enrollment management."""

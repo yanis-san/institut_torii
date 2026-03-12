@@ -15,6 +15,7 @@ urlpatterns = [
     path('prospects/', views.prospect_list, name='prospect_list'),
     path('prospects/<int:pk>/', views.prospect_detail, name='prospect_detail'),
     path('prospects/<int:pk>/rating/', views.prospect_set_rating, name='prospect_set_rating'),
+    path('prospects/<int:pk>/status/', views.prospect_set_status, name='prospect_set_status'),
     path('prospects/<int:pk>/delete/', views.prospect_delete, name='prospect_delete'),
 
     # Enrollments
