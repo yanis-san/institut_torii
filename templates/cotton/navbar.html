@@ -87,6 +87,10 @@
                 Contact
             </a>
 
+            <a href="{% url 'appointments:book' %}" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-red-500 rounded-lg hover:bg-red-50 transition-all duration-200">
+                Rendez-vous
+            </a>
+
             <a href="{% url 'registration:cohort_list' %}"
                class="ml-4 inline-flex items-center gap-2 px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-full transition-all duration-300 shadow-md shadow-red-500/20 hover:scale-105">
                 <i class="bx bx-edit"></i>
@@ -155,6 +159,10 @@
 
         <a href="{% url 'contact:contact' %}" class="block py-3 text-sm font-medium text-gray-700 hover:text-red-500">
             <i class="bx bx-envelope mr-1"></i> Contact
+        </a>
+
+        <a href="{% url 'appointments:book' %}" class="block py-3 text-sm font-medium text-gray-700 hover:text-red-500">
+            <i class="bx bx-calendar mr-1"></i> Rendez-vous
         </a>
 
         <a href="{% url 'registration:cohort_list' %}"
