@@ -20,7 +20,9 @@
         <div class="max-w-xl mx-auto">
 
             <!-- Code form -->
-            <form method="post" action="{% url 'registration:check_status' %}" class="mb-10">
+            <form method="post" action="{% url 'registration:check_status' %}" class="mb-10"
+                  x-data="{ submitting: false }"
+                  @submit="if (submitting) { $event.preventDefault(); return; } submitting = true">
                 {% csrf_token %}
                 <c-form-field label="Code d'inscription" required="true">
                     {{ form.code }}
@@ -29,8 +31,9 @@
                     {% endif %}
                 </c-form-field>
                 <div class="mt-4">
-                    <c-btn type="submit">
-                        <i class="bx bx-search"></i> Consulter
+                    <c-btn type="submit" :disabled="submitting" :class="submitting && 'opacity-50 cursor-not-allowed'">
+                        <template x-if="!submitting"><span><i class="bx bx-search"></i> Consulter</span></template>
+                        <template x-if="submitting"><span><i class="bx bx-loader-alt bx-spin"></i> Recherche…</span></template>
                     </c-btn>
                 </div>
             </form>

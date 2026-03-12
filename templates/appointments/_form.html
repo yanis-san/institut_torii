@@ -20,7 +20,10 @@
 <form hx-post="{% url 'appointments:confirm_booking' slot.pk %}"
       hx-target="#form-container"
       hx-swap="innerHTML"
-      class="space-y-5">
+      class="space-y-5"
+      x-data="{ submitting: false }"
+      @submit="if (submitting) { $event.preventDefault(); return; } submitting = true"
+      hx-on::after-request="submitting = false">
     {% csrf_token %}
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -55,8 +58,10 @@
     </c-form-field>
 
     <button type="submit"
+            :disabled="submitting"
+            :class="submitting && 'opacity-50 cursor-not-allowed'"
             class="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl transition-all duration-300 shadow-lg shadow-red-500/20">
-        <i class="bx bx-check-circle text-lg"></i>
-        Confirmer le rendez-vous
+        <template x-if="!submitting"><span class="inline-flex items-center gap-2"><i class="bx bx-check-circle text-lg"></i> Confirmer le rendez-vous</span></template>
+        <template x-if="submitting"><span class="inline-flex items-center gap-2"><i class="bx bx-loader-alt bx-spin text-lg"></i> Envoi en cours…</span></template>
     </button>
 </form>
