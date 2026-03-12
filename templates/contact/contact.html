@@ -33,7 +33,9 @@
             <form method="post"
                   action="{% url 'contact:contact' %}"
                   class="space-y-8"
+                  @submit="if (submitting) { $event.preventDefault(); return; } submitting = true"
                   x-data="{
+                      submitting: false,
                       category: '',
                       showLanguage: false,
                       showCohort: false,
@@ -325,8 +327,9 @@
 
                 <!-- Submit -->
                 <div class="pt-4">
-                    <c-btn type="submit">
-                        <i class="bx bx-send"></i> Envoyer ma demande
+                    <c-btn type="submit" :disabled="submitting" :class="submitting && 'opacity-50 cursor-not-allowed'">
+                        <template x-if="!submitting"><span><i class="bx bx-send"></i> Envoyer ma demande</span></template>
+                        <template x-if="submitting"><span><i class="bx bx-loader-alt bx-spin"></i> Envoi en cours…</span></template>
                     </c-btn>
                     <p class="text-xs text-gray-400 mt-3">
                         En soumettant ce formulaire, vous acceptez d'être contacté par l'Institut Torii.
