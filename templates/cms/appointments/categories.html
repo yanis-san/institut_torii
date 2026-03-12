@@ -25,6 +25,10 @@
                        class="px-3 py-1.5 text-xs font-medium bg-zinc-800 text-zinc-300 rounded-lg hover:bg-zinc-700 border border-zinc-700 transition-colors">
                         + Ajouter créneau
                     </a>
+                    <a href="{% url 'cms:timeslot_bulk_create' cat.pk %}"
+                       class="px-3 py-1.5 text-xs font-medium bg-zinc-800 text-zinc-300 rounded-lg hover:bg-zinc-700 border border-zinc-700 transition-colors">
+                        + Créneaux en lot
+                    </a>
                     <a href="{% url 'cms:appointment_category_edit' cat.pk %}"
                        class="px-3 py-1.5 text-xs font-medium bg-zinc-800 text-zinc-300 rounded-lg hover:bg-zinc-700 border border-zinc-700 transition-colors">
                         Modifier

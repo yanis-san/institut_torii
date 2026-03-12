@@ -1,0 +1,118 @@
+<c-cms-layout title="Créer des créneaux en lot — {{ category.name }}">
+
+    <c-cms-page-header title="Créneaux en lot" subtitle="{{ category.icon }} {{ category.name }}">
+        <c-cms-btn href="{% url 'cms:appointment_category_list' %}" variant="secondary" size="sm">← Retour</c-cms-btn>
+    </c-cms-page-header>
+
+    {% if errors %}
+    <div class="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl space-y-1">
+        {% for error in errors %}
+        <p class="text-sm text-red-400">{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post"
+          x-data="{
+              times: [{ start: '{{ posted.start_times.0|default:"10:00" }}', end: '{{ posted.end_times.0|default:"11:00" }}' }],
+              addTime() { this.times.push({ start: '', end: '' }) },
+              removeTime(i) { if (this.times.length > 1) this.times.splice(i, 1) }
+          }">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main column -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Date range -->
+                <c-cms-card title="Période">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-medium text-zinc-300">Date de début</label>
+                            <input type="date" name="start_date" value="{{ posted.start_date|default:"" }}" required
+                                   class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-medium text-zinc-300">Date de fin</label>
+                            <input type="date" name="end_date" value="{{ posted.end_date|default:"" }}" required
+                                   class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
+                        </div>
+                    </div>
+                </c-cms-card>
+
+                <!-- Weekdays -->
+                <c-cms-card title="Jours de la semaine">
+                    <p class="text-xs text-zinc-500 mb-3">Sélectionnez les jours où les créneaux seront créés.</p>
+                    <div class="flex flex-wrap gap-3">
+                        {% for value, label in weekday_choices %}
+                        <label class="flex items-center gap-2 px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 hover:border-zinc-600 transition-colors cursor-pointer has-[:checked]:border-red-500 has-[:checked]:bg-red-500/10 has-[:checked]:text-red-400">
+                            <input type="checkbox" name="weekdays" value="{{ value }}"
+                                   {% if value|stringformat:"d" in posted.weekdays %}checked{% endif %}
+                                   class="rounded bg-zinc-800 border-zinc-700 text-red-500 focus:ring-red-500" />
+                            {{ label }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </c-cms-card>
+
+                <!-- Time pairs -->
+                <c-cms-card title="Horaires">
+                    <p class="text-xs text-zinc-500 mb-4">Chaque horaire sera créé pour chaque jour sélectionné dans la période.</p>
+
+                    <div class="space-y-3">
+                        <template x-for="(t, i) in times" :key="i">
+                            <div class="flex items-end gap-3">
+                                <div class="flex-1 space-y-1.5">
+                                    <label class="block text-xs text-zinc-500" x-text="'Début ' + (i + 1)"></label>
+                                    <input type="time" name="start_times" x-model="t.start" required
+                                           class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
+                                </div>
+                                <div class="flex-1 space-y-1.5">
+                                    <label class="block text-xs text-zinc-500" x-text="'Fin ' + (i + 1)"></label>
+                                    <input type="time" name="end_times" x-model="t.end" required
+                                           class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
+                                </div>
+                                <button type="button" @click="removeTime(i)" x-show="times.length > 1"
+                                        class="px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded-lg transition-colors">
+                                    <i class="bx bx-trash"></i>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+
+                    <button type="button" @click="addTime()"
+                            class="mt-4 flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-300 bg-zinc-800 border border-zinc-700 rounded-lg hover:bg-zinc-700 transition-colors">
+                        <i class="bx bx-plus"></i> Ajouter un horaire
+                    </button>
+                </c-cms-card>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <c-cms-card title="Options">
+                    <div class="space-y-4">
+                        <div class="space-y-1.5">
+                            <label class="block text-sm font-medium text-zinc-300">Places par créneau</label>
+                            <input type="number" name="max_bookings" value="{{ posted.max_bookings|default:"1" }}" min="1" required
+                                   class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
+                        </div>
+                    </div>
+                </c-cms-card>
+
+                <c-cms-card title="Résumé">
+                    <p class="text-xs text-zinc-500">
+                        Les créneaux existants (même catégorie, même date et même heure de début) seront ignorés automatiquement.
+                    </p>
+                </c-cms-card>
+
+                <div class="sticky bottom-4">
+                    <button type="submit"
+                            class="w-full px-4 py-3 text-sm font-medium bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20">
+                        Créer les créneaux
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</c-cms-layout>

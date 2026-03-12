@@ -56,6 +56,7 @@ urlpatterns = [
     path('appointments/categories/<int:pk>/edit/', views.appointment_category_form, name='appointment_category_edit'),
     path('appointments/categories/<int:pk>/delete/', views.appointment_category_delete, name='appointment_category_delete'),
     path('appointments/categories/<int:category_pk>/timeslots/create/', views.timeslot_form, name='timeslot_create'),
+    path('appointments/categories/<int:category_pk>/timeslots/bulk/', views.timeslot_bulk_create, name='timeslot_bulk_create'),
     path('appointments/categories/<int:category_pk>/timeslots/<int:pk>/edit/', views.timeslot_form, name='timeslot_edit'),
     path('appointments/timeslots/<int:pk>/delete/', views.timeslot_delete, name='timeslot_delete'),
 

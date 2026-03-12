@@ -1013,3 +1013,113 @@ def timeslot_delete(request, pk):
     slot.delete()
     messages.success(request, _('Créneau supprimé.'))
     return redirect('cms:appointment_category_list')
+
+
+@login_required(login_url=_LOGIN_URL)
+def timeslot_bulk_create(request, category_pk):
+    """Créer plusieurs créneaux en une fois (plage de dates + jours + horaires)."""
+    from datetime import timedelta
+
+    category = get_object_or_404(AppointmentCategory, pk=category_pk)
+
+    WEEKDAY_CHOICES = [
+        (0, _('Lundi')),
+        (1, _('Mardi')),
+        (2, _('Mercredi')),
+        (3, _('Jeudi')),
+        (4, _('Vendredi')),
+        (5, _('Samedi')),
+        (6, _('Dimanche')),
+    ]
+
+    if request.method == 'POST':
+        start_date_str = request.POST.get('start_date', '')
+        end_date_str = request.POST.get('end_date', '')
+        weekdays = request.POST.getlist('weekdays')
+        start_times = request.POST.getlist('start_times')
+        end_times = request.POST.getlist('end_times')
+        max_bookings = request.POST.get('max_bookings', '1')
+
+        # Validation
+        from datetime import date as date_cls, time as time_cls
+
+        errors = []
+        try:
+            start_date = date_cls.fromisoformat(start_date_str)
+            end_date = date_cls.fromisoformat(end_date_str)
+            if end_date < start_date:
+                errors.append(_('La date de fin doit être après la date de début.'))
+        except (ValueError, TypeError):
+            errors.append(_('Dates invalides.'))
+            start_date = end_date = None
+
+        weekday_ints = []
+        for w in weekdays:
+            try:
+                weekday_ints.append(int(w))
+            except (ValueError, TypeError):
+                pass
+        if not weekday_ints:
+            errors.append(_('Sélectionnez au moins un jour de la semaine.'))
+
+        time_pairs = []
+        for st, et in zip(start_times, end_times):
+            try:
+                s = time_cls.fromisoformat(st)
+                e = time_cls.fromisoformat(et)
+                if e <= s:
+                    errors.append(_(f'L\'heure de fin ({et}) doit être après l\'heure de début ({st}).'))
+                else:
+                    time_pairs.append((s, e))
+            except (ValueError, TypeError):
+                pass
+        if not time_pairs:
+            errors.append(_('Ajoutez au moins un horaire valide.'))
+
+        try:
+            max_bookings_int = max(1, int(max_bookings))
+        except (ValueError, TypeError):
+            max_bookings_int = 1
+
+        if not errors and start_date and end_date:
+            created = 0
+            skipped = 0
+            current = start_date
+            while current <= end_date:
+                if current.weekday() in weekday_ints:
+                    for s, e in time_pairs:
+                        obj, was_created = TimeSlot.objects.get_or_create(
+                            category=category,
+                            date=current,
+                            start_time=s,
+                            defaults={
+                                'end_time': e,
+                                'max_bookings': max_bookings_int,
+                                'is_active': True,
+                            },
+                        )
+                        if was_created:
+                            created += 1
+                        else:
+                            skipped += 1
+                current += timedelta(days=1)
+
+            msg = f'{created} créneau(x) créé(s).'
+            if skipped:
+                msg += f' {skipped} ignoré(s) (déjà existants).'
+            messages.success(request, msg)
+            return redirect('cms:appointment_category_list')
+
+        return render(request, 'cms/appointments/timeslot_bulk.html', {
+            'category': category,
+            'weekday_choices': WEEKDAY_CHOICES,
+            'errors': errors,
+            'posted': request.POST,
+        })
+
+    return render(request, 'cms/appointments/timeslot_bulk.html', {
+        'category': category,
+        'weekday_choices': WEEKDAY_CHOICES,
+        'errors': [],
+        'posted': {},
+    })

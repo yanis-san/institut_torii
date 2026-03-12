@@ -295,3 +295,106 @@ class CMSAppointmentViewsTest(TestCase):
         self.client.logout()
         response = self.client.get(reverse('cms:appointment_list'))
         self.assertEqual(response.status_code, 302)
+
+
+class BulkTimeslotCreateTest(TestCase):
+    """Tests pour la création de créneaux en lot."""
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='admin', password='testpass123')
+        self.client.login(username='admin', password='testpass123')
+        self.cat = AppointmentCategory.objects.create(
+            name='Consultation', slug='consultation', is_active=True,
+        )
+
+    def test_bulk_page_renders(self):
+        response = self.client.get(reverse('cms:timeslot_bulk_create', args=[self.cat.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Créneaux en lot')
+
+    def test_bulk_create_sundays_3_times(self):
+        """Crée des créneaux tous les dimanches pendant 4 semaines à 3 horaires."""
+        # Find next Sunday
+        today = date.today()
+        days_until_sunday = (6 - today.weekday()) % 7
+        if days_until_sunday == 0:
+            days_until_sunday = 7
+        start = today + timedelta(days=days_until_sunday)
+        end = start + timedelta(weeks=3)  # 4 Sundays
+
+        response = self.client.post(
+            reverse('cms:timeslot_bulk_create', args=[self.cat.pk]),
+            {
+                'start_date': start.isoformat(),
+                'end_date': end.isoformat(),
+                'weekdays': ['6'],  # Sunday
+                'start_times': ['10:00', '14:00', '17:00'],
+                'end_times': ['11:00', '15:00', '18:00'],
+                'max_bookings': '2',
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        slots = TimeSlot.objects.filter(category=self.cat)
+        self.assertEqual(slots.count(), 12)  # 4 Sundays × 3 times
+        self.assertTrue(all(s.max_bookings == 2 for s in slots))
+
+    def test_bulk_create_skips_duplicates(self):
+        """Les créneaux existants ne sont pas dupliqués."""
+        today = date.today()
+        days_until_monday = (0 - today.weekday()) % 7
+        if days_until_monday == 0:
+            days_until_monday = 7
+        target = today + timedelta(days=days_until_monday)
+
+        TimeSlot.objects.create(
+            category=self.cat, date=target,
+            start_time=time(10, 0), end_time=time(11, 0),
+        )
+
+        response = self.client.post(
+            reverse('cms:timeslot_bulk_create', args=[self.cat.pk]),
+            {
+                'start_date': target.isoformat(),
+                'end_date': target.isoformat(),
+                'weekdays': ['0'],  # Monday
+                'start_times': ['10:00', '14:00'],
+                'end_times': ['11:00', '15:00'],
+                'max_bookings': '1',
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(TimeSlot.objects.filter(category=self.cat).count(), 2)
+
+    def test_bulk_create_validation_no_weekday(self):
+        """Erreur si aucun jour sélectionné."""
+        today = date.today()
+        response = self.client.post(
+            reverse('cms:timeslot_bulk_create', args=[self.cat.pk]),
+            {
+                'start_date': today.isoformat(),
+                'end_date': (today + timedelta(days=7)).isoformat(),
+                'start_times': ['10:00'],
+                'end_times': ['11:00'],
+                'max_bookings': '1',
+            },
+        )
+        self.assertEqual(response.status_code, 200)  # Re-renders with errors
+        self.assertEqual(TimeSlot.objects.filter(category=self.cat).count(), 0)
+
+    def test_bulk_create_validation_end_before_start(self):
+        """Erreur si date de fin avant date de début."""
+        today = date.today()
+        response = self.client.post(
+            reverse('cms:timeslot_bulk_create', args=[self.cat.pk]),
+            {
+                'start_date': (today + timedelta(days=7)).isoformat(),
+                'end_date': today.isoformat(),
+                'weekdays': ['0'],
+                'start_times': ['10:00'],
+                'end_times': ['11:00'],
+                'max_bookings': '1',
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(TimeSlot.objects.filter(category=self.cat).count(), 0)
