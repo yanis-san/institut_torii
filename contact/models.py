@@ -36,6 +36,7 @@ class Prospect(models.Model):
         NEW = 'new', _('Nouveau')
         CONTACTED = 'contacted', _('Contacté')
         IN_PROGRESS = 'in_progress', _('En cours')
+        PROCESSED = 'processed', _('Traité')
         CONVERTED = 'converted', _('Converti')
         LOST = 'lost', _('Perdu')
 
@@ -51,6 +52,7 @@ class Prospect(models.Model):
         'new': 'amber',
         'contacted': 'blue',
         'in_progress': 'purple',
+        'processed': 'cyan',
         'converted': 'emerald',
         'lost': 'red',
     }
