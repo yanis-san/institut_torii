@@ -231,6 +231,7 @@ class CMSAppointmentViewsTest(TestCase):
             'name': 'Consultation',
             'slug': 'consultation',
             'duration_minutes': 45,
+            'booking_margin_hours': 2,
             'is_active': True,
             'order': 1,
         })
@@ -242,6 +243,7 @@ class CMSAppointmentViewsTest(TestCase):
             'name': 'Entretien modifié',
             'slug': 'entretien',
             'duration_minutes': 30,
+            'booking_margin_hours': 2,
             'is_active': True,
             'order': 0,
         })

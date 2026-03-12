@@ -26,12 +26,13 @@ def available_dates(request, slug):
     """HTMX: retourne les dates disponibles pour une catégorie."""
     category = get_object_or_404(AppointmentCategory, slug=slug, is_active=True)
     today = date.today()
-    cutoff = (datetime.now() + timedelta(hours=2)).time()
+    margin = category.booking_margin_hours
+    cutoff = (datetime.now() + timedelta(hours=margin)).time()
 
     qs = TimeSlot.objects.filter(
         category=category, is_active=True, date__gte=today,
     )
-    # Exclure les créneaux d'aujourd'hui dont l'heure est dans moins de 2h
+    # Exclure les créneaux d'aujourd'hui dont l'heure est dans moins de Xh
     future_slots = [
         s for s in qs
         if s.date > today or s.start_time > cutoff
@@ -56,9 +57,10 @@ def available_slots(request, slug):
         category=category, date=selected_date, is_active=True,
     ).order_by('start_time')
 
-    # Si c'est aujourd'hui, exclure les créneaux dans moins de 2h
+    # Si c'est aujourd'hui, exclure les créneaux dans moins de Xh
     if selected_date == date.today():
-        cutoff = (datetime.now() + timedelta(hours=2)).time()
+        margin = category.booking_margin_hours
+        cutoff = (datetime.now() + timedelta(hours=margin)).time()
         slots = slots.filter(start_time__gt=cutoff)
 
     return render(request, 'appointments/_slots.html', {

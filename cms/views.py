@@ -930,13 +930,14 @@ def appointment_category_form(request, pk=None):
     class AppointmentCategoryForm(django_forms.ModelForm):
         class Meta:
             model = AppointmentCategory
-            fields = ['name', 'slug', 'description', 'icon', 'duration_minutes', 'is_active', 'order']
+            fields = ['name', 'slug', 'description', 'icon', 'duration_minutes', 'booking_margin_hours', 'is_active', 'order']
             widgets = {
                 'name': django_forms.TextInput(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none'}),
                 'slug': django_forms.TextInput(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none', 'placeholder': 'Laissez vide pour auto-générer'}),
                 'description': django_forms.Textarea(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none resize-none', 'rows': 3}),
                 'icon': django_forms.TextInput(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none', 'placeholder': '📅'}),
                 'duration_minutes': django_forms.NumberInput(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none'}),
+                'booking_margin_hours': django_forms.NumberInput(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none', 'min': '0'}),
                 'order': django_forms.NumberInput(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none'}),
                 'is_active': django_forms.CheckboxInput(attrs={'class': 'rounded bg-zinc-800 border-zinc-700 text-red-500 focus:ring-red-500'}),
             }

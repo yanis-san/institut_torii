@@ -19,6 +19,10 @@ class AppointmentCategory(models.Model):
         help_text=_('Durée indicative du rendez-vous'),
     )
     is_active = models.BooleanField(_('actif'), default=True)
+    booking_margin_hours = models.PositiveSmallIntegerField(
+        _('marge de réservation (heures)'), default=2,
+        help_text=_('Nombre d\'heures minimum avant le créneau pour pouvoir réserver'),
+    )
     order = models.PositiveSmallIntegerField(_('ordre'), default=0)
 
     class Meta:
