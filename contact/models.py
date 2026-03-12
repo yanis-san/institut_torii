@@ -52,7 +52,7 @@ class Prospect(models.Model):
         'new': 'amber',
         'contacted': 'blue',
         'in_progress': 'purple',
-        'processed': 'cyan',
+        'processed': 'green',
         'converted': 'emerald',
         'lost': 'red',
     }
