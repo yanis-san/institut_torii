@@ -1700,9 +1700,10 @@ class NotificationTemplateListViewTestCase(MarketingTestMixin, TestCase):
 
     def test_auto_creates_defaults(self):
         from marketing.models import NotificationTemplate
+        from marketing.notifications import DEFAULT_TEMPLATES
         self.assertEqual(NotificationTemplate.objects.count(), 0)
         self.client.get(self.url)
-        self.assertEqual(NotificationTemplate.objects.count(), 5)
+        self.assertEqual(NotificationTemplate.objects.count(), len(DEFAULT_TEMPLATES))
 
     def test_displays_all_templates(self):
         response = self.client.get(self.url)
