@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 
@@ -7,7 +8,7 @@ class AppointmentCategory(models.Model):
     """Catégorie de rendez-vous (ex: Test de niveau, Entretien, Consultation…)."""
 
     name = models.CharField(_('nom'), max_length=200)
-    slug = models.SlugField(_('slug'), unique=True)
+    slug = models.SlugField(_('slug'), unique=True, blank=True)
     description = models.TextField(_('description'), blank=True)
     icon = models.CharField(
         _('icône'), max_length=10, blank=True,
@@ -24,6 +25,17 @@ class AppointmentCategory(models.Model):
         verbose_name = _('catégorie de rendez-vous')
         verbose_name_plural = _('catégories de rendez-vous')
         ordering = ['order', 'name']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base = slugify(self.name)
+            slug = base
+            n = 1
+            while AppointmentCategory.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f'{base}-{n}'
+                n += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
