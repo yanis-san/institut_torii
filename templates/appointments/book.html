@@ -53,7 +53,7 @@
                 <div class="space-y-3">
                     {% for cat in categories %}
                     <c-appointment-category-card
-                        category="{{ cat }}"
+                        :category="cat"
                         @click="selectedCategory = '{{ cat.slug }}'; selectedCategoryName = '{{ cat.name }}'; step = 2;
                                 $nextTick(() => {
                                     htmx.ajax('GET', '{% url 'appointments:available_dates' cat.slug %}', {target: '#dates-container', swap: 'innerHTML'})
