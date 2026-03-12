@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 from .models import HomePage, SiteSettings
@@ -184,6 +185,19 @@ class CohortForm(forms.ModelForm):
             'is_featured': forms.CheckboxInput(attrs={'class': _CHECKBOX}),
             'order': forms.NumberInput(attrs={'class': _INPUT}),
         }
+
+    def clean(self):
+        cleaned = super().clean()
+        slug = cleaned.get('slug', '')
+        name = cleaned.get('name', '')
+        if not slug and name:
+            generated = slugify(name)
+            if len(generated) > 50:
+                self.add_error('slug', _(
+                    'Le nom est trop long pour générer un slug automatique '
+                    '(%(len)s/50 caractères). Renseignez un slug court manuellement.'
+                ) % {'len': len(generated)})
+        return cleaned
 
 
 class CohortScheduleForm(forms.ModelForm):
