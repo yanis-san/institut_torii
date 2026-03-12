@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -26,15 +26,15 @@ def available_dates(request, slug):
     """HTMX: retourne les dates disponibles pour une catégorie."""
     category = get_object_or_404(AppointmentCategory, slug=slug, is_active=True)
     today = date.today()
-    now = datetime.now().time()
+    cutoff = (datetime.now() + timedelta(hours=2)).time()
 
     qs = TimeSlot.objects.filter(
         category=category, is_active=True, date__gte=today,
     )
-    # Exclure les créneaux d'aujourd'hui dont l'heure est déjà passée
+    # Exclure les créneaux d'aujourd'hui dont l'heure est dans moins de 2h
     future_slots = [
         s for s in qs
-        if s.date > today or s.start_time > now
+        if s.date > today or s.start_time > cutoff
     ]
     dates_list = sorted({s.date for s in future_slots})
     return render(request, 'appointments/_dates.html', {
@@ -56,10 +56,10 @@ def available_slots(request, slug):
         category=category, date=selected_date, is_active=True,
     ).order_by('start_time')
 
-    # Si c'est aujourd'hui, exclure les créneaux dont l'heure est passée
+    # Si c'est aujourd'hui, exclure les créneaux dans moins de 2h
     if selected_date == date.today():
-        now = datetime.now().time()
-        slots = slots.filter(start_time__gt=now)
+        cutoff = (datetime.now() + timedelta(hours=2)).time()
+        slots = slots.filter(start_time__gt=cutoff)
 
     return render(request, 'appointments/_slots.html', {
         'category': category,
