@@ -1,0 +1,62 @@
+<!-- templates/appointments/_form.html -->
+<!-- HTMX partial: formulaire de réservation -->
+
+<div class="bg-gray-50 rounded-2xl border border-gray-100 p-5 mb-6">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
+            <i class="bx bx-calendar-check text-red-500 text-xl"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-800">
+                {{ slot.category.name }}
+            </p>
+            <p class="text-xs text-gray-500">
+                {{ slot.date|date:"l d F Y" }} · {{ slot.start_time|time:"H:i" }} — {{ slot.end_time|time:"H:i" }}
+            </p>
+        </div>
+    </div>
+</div>
+
+<form hx-post="{% url 'appointments:confirm_booking' slot.pk %}"
+      hx-target="#form-container"
+      hx-swap="innerHTML"
+      class="space-y-5">
+    {% csrf_token %}
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <c-form-field label="Prénom" required="true">
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
+            <p class="text-xs text-red-500 mt-1">{{ form.first_name.errors.0 }}</p>
+            {% endif %}
+        </c-form-field>
+
+        <c-form-field label="Nom" required="true">
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
+            <p class="text-xs text-red-500 mt-1">{{ form.last_name.errors.0 }}</p>
+            {% endif %}
+        </c-form-field>
+    </div>
+
+    <c-form-field label="Email" required="true">
+        {{ form.email }}
+        {% if form.email.errors %}
+        <p class="text-xs text-red-500 mt-1">{{ form.email.errors.0 }}</p>
+        {% endif %}
+    </c-form-field>
+
+    <c-form-field label="Téléphone" help_text="Optionnel, pour vous joindre rapidement">
+        {{ form.phone }}
+    </c-form-field>
+
+    <c-form-field label="Notes" help_text="Informations complémentaires (optionnel)">
+        {{ form.notes }}
+    </c-form-field>
+
+    <button type="submit"
+            class="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl transition-all duration-300 shadow-lg shadow-red-500/20">
+        <i class="bx bx-check-circle text-lg"></i>
+        Confirmer le rendez-vous
+    </button>
+</form>

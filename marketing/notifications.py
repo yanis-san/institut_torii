@@ -173,6 +173,24 @@ DEFAULT_TEMPLATES = {
     <p>Pour toute question, n'hésitez pas à nous répondre à cet email.</p>
 </div>""",
     },
+
+    'appointment_booked': {
+        'subject': 'Confirmation de rendez-vous — {{ category_name }} — {{ site_name }}',
+        'body_html': """
+<div style="font-family: sans-serif; padding: 24px;">
+    <h2 style="color: #333;">Bonjour {{ first_name }},</h2>
+    <p>Votre rendez-vous a bien été enregistré. Voici le récapitulatif :</p>
+    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <p style="margin: 0 0 8px 0; font-weight: 600;">📅 Détails du rendez-vous</p>
+        <p style="margin: 0;">Catégorie : <strong>{{ category_name }}</strong></p>
+        <p style="margin: 0;">Date : <strong>{{ date }}</strong></p>
+        <p style="margin: 0;">Horaire : <strong>{{ start_time }} – {{ end_time }}</strong></p>
+        <p style="margin: 0;">Code : <strong>{{ appointment_code }}</strong></p>
+    </div>
+    <p>Veuillez vous présenter à l'accueil de l'Institut Torii à l'heure convenue avec votre code de rendez-vous.</p>
+    <p>Pour toute question ou annulation, n'hésitez pas à nous contacter.</p>
+</div>""",
+    },
 }
 
 

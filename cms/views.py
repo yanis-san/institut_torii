@@ -26,6 +26,8 @@ from .forms import (
 from courses.models import Category, Language, CourseFormat, Cohort, CohortSchedule
 from contact.models import Prospect
 from registration.models import Enrollment
+from appointments.models import AppointmentCategory, TimeSlot, Appointment
+from appointments.forms import AppointmentForm as PublicAppointmentForm
 
 _LOGIN_URL = reverse_lazy('cms:login')
 
@@ -844,3 +846,170 @@ def serve_receipt(request, path):
     import mimetypes
     content_type, _ = mimetypes.guess_type(file_path)
     return FileResponse(open(file_path, 'rb'), content_type=content_type or 'application/octet-stream')
+
+
+# ──────────────────────────────────────────────
+# Appointments
+# ──────────────────────────────────────────────
+
+@login_required(login_url=_LOGIN_URL)
+def appointment_list(request):
+    """Liste de tous les rendez-vous."""
+    appointments = Appointment.objects.select_related('timeslot', 'timeslot__category').all()
+
+    status_filter = request.GET.get('status', '')
+    category_filter = request.GET.get('category', '')
+    search_query = request.GET.get('q', '').strip()
+
+    if status_filter:
+        appointments = appointments.filter(status=status_filter)
+    if category_filter:
+        appointments = appointments.filter(timeslot__category__pk=category_filter)
+    if search_query:
+        appointments = appointments.filter(
+            Q(first_name__icontains=search_query)
+            | Q(last_name__icontains=search_query)
+            | Q(email__icontains=search_query)
+            | Q(appointment_code__icontains=search_query)
+        )
+
+    categories = AppointmentCategory.objects.filter(is_active=True)
+
+    return render(request, 'cms/appointments/list.html', {
+        'appointments': appointments,
+        'categories': categories,
+        'current_status': status_filter,
+        'current_category': category_filter,
+        'search_query': search_query,
+    })
+
+
+@login_required(login_url=_LOGIN_URL)
+def appointment_detail(request, pk):
+    """Détail d'un rendez-vous avec mise à jour du statut et notes."""
+    appt = get_object_or_404(Appointment.objects.select_related('timeslot', 'timeslot__category'), pk=pk)
+
+    if request.method == 'POST':
+        new_status = request.POST.get('status', appt.status)
+        admin_notes = request.POST.get('admin_notes', appt.admin_notes)
+        appt.status = new_status
+        appt.admin_notes = admin_notes
+        appt.save(update_fields=['status', 'admin_notes', 'updated_at'])
+        messages.success(request, _('Rendez-vous mis à jour.'))
+        return redirect('cms:appointment_detail', pk=pk)
+
+    return render(request, 'cms/appointments/detail.html', {
+        'appointment': appt,
+    })
+
+
+@login_required(login_url=_LOGIN_URL)
+@require_POST
+def appointment_delete(request, pk):
+    """Supprimer un rendez-vous."""
+    appt = get_object_or_404(Appointment, pk=pk)
+    appt.delete()
+    messages.success(request, _('Rendez-vous supprimé.'))
+    return redirect('cms:appointment_list')
+
+
+@login_required(login_url=_LOGIN_URL)
+def appointment_category_list(request):
+    """Gestion des catégories et créneaux."""
+    categories = AppointmentCategory.objects.prefetch_related('timeslots').all()
+    return render(request, 'cms/appointments/categories.html', {
+        'categories': categories,
+    })
+
+
+@login_required(login_url=_LOGIN_URL)
+def appointment_category_form(request, pk=None):
+    """Créer ou éditer une catégorie de rendez-vous."""
+    from django import forms as django_forms
+
+    class AppointmentCategoryForm(django_forms.ModelForm):
+        class Meta:
+            model = AppointmentCategory
+            fields = ['name', 'slug', 'description', 'icon', 'duration_minutes', 'is_active', 'order']
+            widgets = {
+                'name': django_forms.TextInput(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none'}),
+                'slug': django_forms.TextInput(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none'}),
+                'description': django_forms.Textarea(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none resize-none', 'rows': 3}),
+                'icon': django_forms.TextInput(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none', 'placeholder': '📅'}),
+                'duration_minutes': django_forms.NumberInput(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none'}),
+                'order': django_forms.NumberInput(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none'}),
+                'is_active': django_forms.CheckboxInput(attrs={'class': 'rounded bg-zinc-800 border-zinc-700 text-red-500 focus:ring-red-500'}),
+            }
+
+    instance = get_object_or_404(AppointmentCategory, pk=pk) if pk else None
+    if request.method == 'POST':
+        form = AppointmentCategoryForm(request.POST, instance=instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, _('Catégorie enregistrée.'))
+            return redirect('cms:appointment_category_list')
+    else:
+        form = AppointmentCategoryForm(instance=instance)
+
+    return render(request, 'cms/appointments/category_form.html', {
+        'form': form,
+        'instance': instance,
+    })
+
+
+@login_required(login_url=_LOGIN_URL)
+@require_POST
+def appointment_category_delete(request, pk):
+    """Supprimer une catégorie."""
+    cat = get_object_or_404(AppointmentCategory, pk=pk)
+    cat.delete()
+    messages.success(request, _('Catégorie supprimée.'))
+    return redirect('cms:appointment_category_list')
+
+
+@login_required(login_url=_LOGIN_URL)
+def timeslot_form(request, category_pk, pk=None):
+    """Créer ou éditer un créneau horaire."""
+    from django import forms as django_forms
+
+    category = get_object_or_404(AppointmentCategory, pk=category_pk)
+
+    class TimeSlotForm(django_forms.ModelForm):
+        class Meta:
+            model = TimeSlot
+            fields = ['date', 'start_time', 'end_time', 'max_bookings', 'is_active']
+            widgets = {
+                'date': django_forms.DateInput(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none', 'type': 'date'}),
+                'start_time': django_forms.TimeInput(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none', 'type': 'time'}),
+                'end_time': django_forms.TimeInput(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none', 'type': 'time'}),
+                'max_bookings': django_forms.NumberInput(attrs={'class': 'w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none', 'min': '1'}),
+                'is_active': django_forms.CheckboxInput(attrs={'class': 'rounded bg-zinc-800 border-zinc-700 text-red-500 focus:ring-red-500'}),
+            }
+
+    instance = get_object_or_404(TimeSlot, pk=pk, category=category) if pk else None
+    if request.method == 'POST':
+        form = TimeSlotForm(request.POST, instance=instance)
+        if form.is_valid():
+            slot = form.save(commit=False)
+            slot.category = category
+            slot.save()
+            messages.success(request, _('Créneau enregistré.'))
+            return redirect('cms:appointment_category_list')
+    else:
+        form = TimeSlotForm(instance=instance)
+
+    return render(request, 'cms/appointments/timeslot_form.html', {
+        'form': form,
+        'category': category,
+        'instance': instance,
+    })
+
+
+@login_required(login_url=_LOGIN_URL)
+@require_POST
+def timeslot_delete(request, pk):
+    """Supprimer un créneau."""
+    slot = get_object_or_404(TimeSlot, pk=pk)
+    slot.delete()
+    messages.success(request, _('Créneau supprimé.'))
+    return redirect('cms:appointment_category_list')

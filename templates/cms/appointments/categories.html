@@ -1,0 +1,113 @@
+<c-cms-layout title="Catégories de rendez-vous">
+
+    <c-cms-page-header title="Catégories & créneaux" subtitle="{{ categories|length }} catégorie{{ categories|length|pluralize:'s' }}">
+        <c-cms-btn href="{% url 'cms:appointment_list' %}" variant="secondary" size="sm">← Rendez-vous</c-cms-btn>
+        <c-cms-btn href="{% url 'cms:appointment_category_create' %}" variant="primary" size="sm">+ Nouvelle catégorie</c-cms-btn>
+    </c-cms-page-header>
+
+    <div class="space-y-6">
+        {% for cat in categories %}
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+            <!-- Category header -->
+            <div class="px-5 py-4 border-b border-zinc-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">{{ cat.icon }}</span>
+                    <div>
+                        <h2 class="font-semibold text-white">{{ cat.name }}</h2>
+                        <p class="text-xs text-zinc-500">{{ cat.duration_minutes }} min · {{ cat.timeslots.count }} créneau{{ cat.timeslots.count|pluralize:"x" }}</p>
+                    </div>
+                    {% if not cat.is_active %}
+                        <c-cms-badge label="Inactive" color="zinc" />
+                    {% endif %}
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="{% url 'cms:timeslot_create' cat.pk %}"
+                       class="px-3 py-1.5 text-xs font-medium bg-zinc-800 text-zinc-300 rounded-lg hover:bg-zinc-700 border border-zinc-700 transition-colors">
+                        + Ajouter créneau
+                    </a>
+                    <a href="{% url 'cms:appointment_category_edit' cat.pk %}"
+                       class="px-3 py-1.5 text-xs font-medium bg-zinc-800 text-zinc-300 rounded-lg hover:bg-zinc-700 border border-zinc-700 transition-colors">
+                        Modifier
+                    </a>
+                    <form method="post" action="{% url 'cms:appointment_category_delete' cat.pk %}"
+                          x-data
+                          @submit.prevent="if (confirm('Supprimer cette catégorie et tous ses créneaux ?')) $el.submit()"
+                          class="inline">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="px-3 py-1.5 text-xs font-medium bg-red-900/50 text-red-400 rounded-lg hover:bg-red-900/80 border border-red-800/50 transition-colors">
+                            Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Timeslots table -->
+            {% if cat.timeslots.all %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-left text-xs text-zinc-500 uppercase tracking-wider border-b border-zinc-800">
+                            <th class="px-5 py-2.5">Date</th>
+                            <th class="px-5 py-2.5">Horaire</th>
+                            <th class="px-5 py-2.5">Places</th>
+                            <th class="px-5 py-2.5">Actif</th>
+                            <th class="px-5 py-2.5"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-800">
+                        {% for slot in cat.timeslots.all %}
+                        <tr class="hover:bg-zinc-800/30 transition-colors">
+                            <td class="px-5 py-2.5 text-zinc-200">{{ slot.date|date:"d/m/Y" }}</td>
+                            <td class="px-5 py-2.5 text-zinc-300">{{ slot.start_time|time:"H:i" }} – {{ slot.end_time|time:"H:i" }}</td>
+                            <td class="px-5 py-2.5">
+                                <span class="text-zinc-200">{{ slot.bookings_count }}/{{ slot.max_bookings }}</span>
+                                {% if not slot.is_available %}
+                                    <span class="text-xs text-red-400 ml-1">Complet</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-5 py-2.5">
+                                {% if slot.is_active %}
+                                    <span class="text-emerald-400 text-xs">●</span>
+                                {% else %}
+                                    <span class="text-zinc-600 text-xs">●</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-5 py-2.5">
+                                <div class="flex items-center gap-2 justify-end">
+                                    <a href="{% url 'cms:timeslot_edit' cat.pk slot.pk %}"
+                                       class="text-zinc-400 hover:text-white transition-colors text-xs">
+                                        Modifier
+                                    </a>
+                                    <form method="post" action="{% url 'cms:timeslot_delete' slot.pk %}"
+                                          x-data
+                                          @submit.prevent="if (confirm('Supprimer ce créneau ?')) $el.submit()"
+                                          class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="text-red-400 hover:text-red-300 transition-colors text-xs">
+                                            Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="px-5 py-6 text-center text-zinc-500 text-sm">
+                Aucun créneau pour cette catégorie.
+                <a href="{% url 'cms:timeslot_create' cat.pk %}" class="text-red-400 hover:text-red-300 transition-colors">Ajouter un créneau →</a>
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-8 text-center text-zinc-500">
+            Aucune catégorie créée.
+            <a href="{% url 'cms:appointment_category_create' %}" class="text-red-400 hover:text-red-300 transition-colors">Créer la première →</a>
+        </div>
+        {% endfor %}
+    </div>
+
+</c-cms-layout>

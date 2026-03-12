@@ -1,0 +1,31 @@
+<!-- templates/appointments/_dates.html -->
+<!-- HTMX partial: liste des dates disponibles pour une catégorie -->
+
+{% if dates %}
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    {% for d in dates %}
+    <button type="button"
+            @click="selectedDate = '{{ d|date:'d/m/Y' }}'; step = 3;
+                    $nextTick(() => {
+                        htmx.ajax('GET', '{% url 'appointments:available_slots' category.slug %}?date={{ d|date:'Y-m-d' }}', {target: '#slots-container', swap: 'innerHTML'})
+                    })"
+            class="group flex flex-col items-center px-4 py-4 rounded-2xl border-2 border-gray-100 hover:border-red-300 hover:bg-red-50/50 transition-all duration-200">
+        <span class="text-xs font-medium text-gray-400 uppercase">
+            {{ d|date:"l" }}
+        </span>
+        <span class="text-2xl font-bold text-gray-800 group-hover:text-red-500 transition-colors mt-1">
+            {{ d|date:"d" }}
+        </span>
+        <span class="text-sm text-gray-500 mt-0.5">
+            {{ d|date:"F Y" }}
+        </span>
+    </button>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-10">
+    <span class="text-4xl mb-4 block">📭</span>
+    <p class="text-gray-500">Aucune date disponible pour cette catégorie.</p>
+    <p class="text-sm text-gray-400 mt-1">Revenez plus tard ou contactez-nous directement.</p>
+</div>
+{% endif %}

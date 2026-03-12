@@ -304,6 +304,7 @@ class NotificationTemplate(models.Model):
         ENROLLMENT_CONFIRMED = 'enrollment_confirmed', _('Inscription — Confirmée')
         ENROLLMENT_REJECTED = 'enrollment_rejected', _('Inscription — Rejetée')
         ENROLLMENT_REFUNDED = 'enrollment_refunded', _('Inscription — Remboursée')
+        APPOINTMENT_BOOKED = 'appointment_booked', _('Rendez-vous — Confirmation')
 
     event_type = models.CharField(
         _("type d'événement"), max_length=30,
@@ -386,6 +387,7 @@ class NotificationLog(models.Model):
         ENROLLMENT_CONFIRMED = 'enrollment_confirmed', _('Inscription — Confirmée')
         ENROLLMENT_REJECTED = 'enrollment_rejected', _('Inscription — Rejetée')
         ENROLLMENT_REFUNDED = 'enrollment_refunded', _('Inscription — Remboursée')
+        APPOINTMENT_BOOKED = 'appointment_booked', _('Rendez-vous — Confirmation')
 
     class Status(models.TextChoices):
         SENT = 'sent', _('Envoyé')

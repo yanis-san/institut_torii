@@ -1,0 +1,106 @@
+<c-cms-layout title="Rendez-vous">
+
+    <c-cms-page-header title="Rendez-vous" subtitle="{{ appointments|length }} rendez-vous">
+        <c-cms-btn href="{% url 'cms:appointment_category_list' %}" variant="secondary" size="sm">
+            Gérer les catégories
+        </c-cms-btn>
+    </c-cms-page-header>
+
+    <!-- Filters -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-6">
+        <form method="get" class="flex flex-col sm:flex-row gap-3 flex-wrap">
+            <div class="flex-1 min-w-[200px]">
+                <input type="text" name="q" value="{{ search_query }}"
+                       placeholder="Rechercher (nom, email, code)..."
+                       class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 placeholder:text-zinc-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none" />
+            </div>
+            <select name="status"
+                    class="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none">
+                <option value="">Tous les statuts</option>
+                <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>En attente</option>
+                <option value="confirmed" {% if current_status == 'confirmed' %}selected{% endif %}>Confirmé</option>
+                <option value="cancelled" {% if current_status == 'cancelled' %}selected{% endif %}>Annulé</option>
+                <option value="completed" {% if current_status == 'completed' %}selected{% endif %}>Terminé</option>
+                <option value="no_show" {% if current_status == 'no_show' %}selected{% endif %}>Absent</option>
+            </select>
+            <select name="category"
+                    class="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none">
+                <option value="">Toutes les catégories</option>
+                {% for cat in categories %}
+                <option value="{{ cat.pk }}" {% if current_category == cat.pk|stringformat:"d" %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+            <c-cms-btn type="submit" variant="secondary" size="md">Filtrer</c-cms-btn>
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-left text-xs text-zinc-500 uppercase tracking-wider border-b border-zinc-800">
+                        <th class="px-5 py-3">Code</th>
+                        <th class="px-5 py-3">Client</th>
+                        <th class="px-5 py-3">Catégorie</th>
+                        <th class="px-5 py-3">Date & heure</th>
+                        <th class="px-5 py-3">Statut</th>
+                        <th class="px-5 py-3">Créé le</th>
+                        <th class="px-5 py-3"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-800">
+                    {% for appt in appointments %}
+                    <tr class="hover:bg-zinc-800/30 transition-colors">
+                        <td class="px-5 py-3">
+                            <a href="{% url 'cms:appointment_detail' appt.pk %}" class="font-mono text-red-400 hover:text-red-300 transition-colors">
+                                {{ appt.appointment_code }}
+                            </a>
+                        </td>
+                        <td class="px-5 py-3">
+                            <p class="font-medium text-white">{{ appt.first_name }} {{ appt.last_name }}</p>
+                            <p class="text-xs text-zinc-500">{{ appt.email }}</p>
+                        </td>
+                        <td class="px-5 py-3 text-zinc-300">
+                            {{ appt.timeslot.category.icon }} {{ appt.timeslot.category.name }}
+                        </td>
+                        <td class="px-5 py-3 text-zinc-300 whitespace-nowrap">
+                            {{ appt.timeslot.date|date:"d/m/Y" }}
+                            <span class="text-zinc-500">{{ appt.timeslot.start_time|time:"H:i" }} – {{ appt.timeslot.end_time|time:"H:i" }}</span>
+                        </td>
+                        <td class="px-5 py-3">
+                            {% if appt.status == 'pending' %}
+                                <c-cms-badge label="En attente" color="amber" />
+                            {% elif appt.status == 'confirmed' %}
+                                <c-cms-badge label="Confirmé" color="emerald" />
+                            {% elif appt.status == 'cancelled' %}
+                                <c-cms-badge label="Annulé" color="red" />
+                            {% elif appt.status == 'completed' %}
+                                <c-cms-badge label="Terminé" color="blue" />
+                            {% elif appt.status == 'no_show' %}
+                                <c-cms-badge label="Absent" color="zinc" />
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-3 text-zinc-400 text-xs whitespace-nowrap">
+                            {{ appt.created_at|date:"d/m/Y H:i" }}
+                        </td>
+                        <td class="px-5 py-3">
+                            <a href="{% url 'cms:appointment_detail' appt.pk %}"
+                               class="text-zinc-400 hover:text-white transition-colors text-xs">
+                                Voir →
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-5 py-8 text-center text-zinc-500">
+                            Aucun rendez-vous trouvé.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</c-cms-layout>

@@ -47,6 +47,18 @@ urlpatterns = [
     # Analytics
     path('analytics/', views.analytics, name='analytics'),
 
+    # Appointments
+    path('appointments/', views.appointment_list, name='appointment_list'),
+    path('appointments/<int:pk>/', views.appointment_detail, name='appointment_detail'),
+    path('appointments/<int:pk>/delete/', views.appointment_delete, name='appointment_delete'),
+    path('appointments/categories/', views.appointment_category_list, name='appointment_category_list'),
+    path('appointments/categories/create/', views.appointment_category_form, name='appointment_category_create'),
+    path('appointments/categories/<int:pk>/edit/', views.appointment_category_form, name='appointment_category_edit'),
+    path('appointments/categories/<int:pk>/delete/', views.appointment_category_delete, name='appointment_category_delete'),
+    path('appointments/categories/<int:category_pk>/timeslots/create/', views.timeslot_form, name='timeslot_create'),
+    path('appointments/categories/<int:category_pk>/timeslots/<int:pk>/edit/', views.timeslot_form, name='timeslot_edit'),
+    path('appointments/timeslots/<int:pk>/delete/', views.timeslot_delete, name='timeslot_delete'),
+
     # Protected media (receipts)
     path('media/receipts/<path:path>', views.serve_receipt, name='serve_receipt'),
 ]

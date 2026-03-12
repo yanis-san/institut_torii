@@ -1,0 +1,41 @@
+<!-- templates/appointments/_slots.html -->
+<!-- HTMX partial: créneaux disponibles pour une date -->
+
+{% if slots %}
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    {% for slot in slots %}
+    {% if slot.is_available %}
+    <button type="button"
+            @click="selectedSlot = {{ slot.pk }}; step = 4;
+                    $nextTick(() => {
+                        htmx.ajax('GET', '{% url 'appointments:booking_form' slot.pk %}', {target: '#form-container', swap: 'innerHTML'})
+                    })"
+            class="group flex flex-col items-center px-4 py-3 rounded-xl border-2 border-gray-200 hover:border-red-300 hover:bg-red-50/50 transition-all duration-200">
+        <span class="text-lg font-semibold text-gray-800 group-hover:text-red-500 transition-colors">
+            {{ slot.start_time|time:"H:i" }}
+        </span>
+        <span class="text-xs text-gray-400">
+            → {{ slot.end_time|time:"H:i" }}
+        </span>
+        {% if slot.remaining_spots <= 2 %}
+        <span class="mt-1 text-[10px] font-medium text-amber-600">
+            {{ slot.remaining_spots }} place{{ slot.remaining_spots|pluralize }}
+        </span>
+        {% endif %}
+    </button>
+    {% else %}
+    <div class="flex flex-col items-center px-4 py-3 rounded-xl border-2 border-gray-100 bg-gray-50 opacity-50">
+        <span class="text-lg font-semibold text-gray-400 line-through">
+            {{ slot.start_time|time:"H:i" }}
+        </span>
+        <span class="text-xs text-gray-300">Complet</span>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-10">
+    <span class="text-4xl mb-4 block">⏰</span>
+    <p class="text-gray-500">Aucun créneau disponible pour cette date.</p>
+</div>
+{% endif %}

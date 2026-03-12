@@ -1,0 +1,47 @@
+<c-cms-layout title="{% if instance %}Modifier{% else %}Nouvelle{% endif %} catégorie">
+
+    <c-cms-page-header title="{% if instance %}Modifier : {{ instance.name }}{% else %}Nouvelle catégorie{% endif %}">
+        <c-cms-btn href="{% url 'cms:appointment_category_list' %}" variant="secondary" size="sm">← Retour</c-cms-btn>
+    </c-cms-page-header>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main column -->
+            <div class="lg:col-span-2 space-y-6">
+                <c-cms-card title="Informations">
+                    <div class="space-y-4">
+                        <c-cms-field :field="form.name" label="Nom" />
+                        <c-cms-field :field="form.slug" label="Slug" />
+                        <c-cms-field :field="form.description" label="Description" />
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <c-cms-field :field="form.icon" label="Icône (emoji)" />
+                            <c-cms-field :field="form.duration_minutes" label="Durée (minutes)" />
+                        </div>
+                    </div>
+                </c-cms-card>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <c-cms-card title="Publication">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3">
+                            {{ form.is_active }}
+                            <label for="{{ form.is_active.id_for_label }}" class="text-sm text-zinc-200">Active</label>
+                        </div>
+                        <c-cms-field :field="form.order" label="Ordre d'affichage" />
+                    </div>
+                </c-cms-card>
+
+                <div class="sticky bottom-4">
+                    <button type="submit"
+                            class="w-full px-4 py-3 text-sm font-medium bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20">
+                        {% if instance %}Enregistrer{% else %}Créer la catégorie{% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</c-cms-layout>

@@ -1,0 +1,131 @@
+<c-cms-layout title="Rendez-vous — {{ appointment.appointment_code }}">
+
+    <c-cms-page-header title="{{ appointment.first_name }} {{ appointment.last_name }}" subtitle="Code : {{ appointment.appointment_code }}">
+        <c-cms-btn href="{% url 'cms:appointment_list' %}" variant="secondary" size="sm">← Retour</c-cms-btn>
+    </c-cms-page-header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main column -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Client info -->
+            <c-cms-card title="Informations client">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Nom complet</p>
+                        <p class="text-sm font-medium text-white">{{ appointment.first_name }} {{ appointment.last_name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Email</p>
+                        <p class="text-sm text-zinc-200">
+                            <a href="mailto:{{ appointment.email }}" class="hover:text-red-400 transition-colors">{{ appointment.email }}</a>
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Téléphone</p>
+                        <p class="text-sm text-zinc-200">{{ appointment.phone|default:"—" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Code de rendez-vous</p>
+                        <p class="text-sm font-mono text-red-400">{{ appointment.appointment_code }}</p>
+                    </div>
+                </div>
+            </c-cms-card>
+
+            <!-- Appointment details -->
+            <c-cms-card title="Détails du rendez-vous">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Catégorie</p>
+                        <p class="text-sm text-zinc-200">{{ appointment.timeslot.category.icon }} {{ appointment.timeslot.category.name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Durée</p>
+                        <p class="text-sm text-zinc-200">{{ appointment.timeslot.category.duration_minutes }} min</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Date</p>
+                        <p class="text-sm text-zinc-200">{{ appointment.timeslot.date|date:"l d F Y" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Horaire</p>
+                        <p class="text-sm text-zinc-200">{{ appointment.timeslot.start_time|time:"H:i" }} – {{ appointment.timeslot.end_time|time:"H:i" }}</p>
+                    </div>
+                </div>
+            </c-cms-card>
+
+            <!-- Notes -->
+            {% if appointment.notes %}
+            <c-cms-card title="Notes du client">
+                <p class="text-sm text-zinc-300 whitespace-pre-line">{{ appointment.notes }}</p>
+            </c-cms-card>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Status & actions -->
+            <c-cms-card title="Statut & actions">
+                <div class="space-y-3 mb-4">
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Statut actuel</p>
+                        {% if appointment.status == 'pending' %}
+                            <c-cms-badge label="En attente" color="amber" />
+                        {% elif appointment.status == 'confirmed' %}
+                            <c-cms-badge label="Confirmé" color="emerald" />
+                        {% elif appointment.status == 'cancelled' %}
+                            <c-cms-badge label="Annulé" color="red" />
+                        {% elif appointment.status == 'completed' %}
+                            <c-cms-badge label="Terminé" color="blue" />
+                        {% elif appointment.status == 'no_show' %}
+                            <c-cms-badge label="Absent" color="zinc" />
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-500 mb-1">Créé le</p>
+                        <p class="text-sm text-zinc-200">{{ appointment.created_at|date:"d/m/Y à H:i" }}</p>
+                    </div>
+                </div>
+
+                <!-- Update form -->
+                <form method="post" class="space-y-3 pt-3 border-t border-zinc-800">
+                    {% csrf_token %}
+                    <div>
+                        <label class="block text-xs text-zinc-500 mb-1">Changer le statut</label>
+                        <select name="status"
+                                class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none">
+                            <option value="pending" {% if appointment.status == 'pending' %}selected{% endif %}>En attente</option>
+                            <option value="confirmed" {% if appointment.status == 'confirmed' %}selected{% endif %}>Confirmé</option>
+                            <option value="cancelled" {% if appointment.status == 'cancelled' %}selected{% endif %}>Annulé</option>
+                            <option value="completed" {% if appointment.status == 'completed' %}selected{% endif %}>Terminé</option>
+                            <option value="no_show" {% if appointment.status == 'no_show' %}selected{% endif %}>Absent</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-zinc-500 mb-1">Notes admin</label>
+                        <textarea name="admin_notes" rows="3"
+                                  class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-100 placeholder:text-zinc-500 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none resize-none"
+                                  placeholder="Notes internes...">{{ appointment.admin_notes|default:"" }}</textarea>
+                    </div>
+                    <button type="submit"
+                            class="w-full px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        Mettre à jour
+                    </button>
+                </form>
+            </c-cms-card>
+
+            <!-- Danger zone -->
+            <c-cms-card title="Zone dangereuse">
+                <form method="post" action="{% url 'cms:appointment_delete' appointment.pk %}"
+                      x-data
+                      @submit.prevent="if (confirm('Supprimer définitivement ce rendez-vous ?')) $el.submit()">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="w-full px-4 py-2 text-sm font-medium bg-red-900/50 text-red-400 rounded-lg hover:bg-red-900/80 border border-red-800/50 transition-colors">
+                        Supprimer le rendez-vous
+                    </button>
+                </form>
+            </c-cms-card>
+        </div>
+    </div>
+
+</c-cms-layout>

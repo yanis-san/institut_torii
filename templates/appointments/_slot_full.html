@@ -1,0 +1,16 @@
+<!-- templates/appointments/_slot_full.html -->
+<!-- HTMX partial: créneau complet -->
+
+<div class="text-center py-8">
+    <div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="bx bx-error text-amber-500 text-3xl"></i>
+    </div>
+    <h3 class="text-lg font-semibold text-gray-800 mb-2">Ce créneau est complet</h3>
+    <p class="text-sm text-gray-500 mb-6">Il a été réservé pendant votre navigation. Veuillez en choisir un autre.</p>
+    <button type="button"
+            @click="step = 3"
+            class="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-xl transition-colors">
+        <i class="bx bx-arrow-back"></i>
+        Choisir un autre créneau
+    </button>
+</div>
