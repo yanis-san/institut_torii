@@ -109,7 +109,7 @@ class Appointment(models.Model):
     first_name = models.CharField(_('prénom'), max_length=100)
     last_name = models.CharField(_('nom'), max_length=100)
     email = models.EmailField(_('email'))
-    phone = models.CharField(_('téléphone'), max_length=30, blank=True)
+    phone = models.CharField(_('téléphone'), max_length=30)
 
     # --- Suivi ---
     appointment_code = models.CharField(

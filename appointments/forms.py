@@ -23,7 +23,7 @@ class AppointmentForm(forms.ModelForm):
             }),
             'phone': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-colors text-gray-800',
-                'placeholder': '0XXX XX XX XX (optionnel)',
+                'placeholder': '06 12 34 56 78',
             }),
             'notes': forms.Textarea(attrs={
                 'class': 'w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-colors text-gray-800 resize-none',
