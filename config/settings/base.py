@@ -141,11 +141,6 @@ USE_TZ = False
 
 LANGUAGES = [
     ('fr', _('Français')),
-    ('en', _('English')),
-    ('ar', _('العربية')),
-    ('ja', _('日本語')),
-    ('zh-hans', _('中文')),
-    ('ko', _('한국어')),
 ]
 
 LOCALE_PATHS = [BASE_DIR / 'locale']
