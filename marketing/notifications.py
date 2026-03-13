@@ -140,7 +140,7 @@ DEFAULT_TEMPLATES = {
             {% if start_date %}<li>Début : <strong>{{ start_date }}</strong></li>{% endif %}
         </ul>
     </div>
-    <p>Nous vous contacterons prochainement avec les détails pratiques (horaires, lieu, etc.).</p>
+    <p>Vous retrouverez tous les details sur le site web. Si vous avez des questions, n'hésitez pas à nous contacter.</p>
 </div>""",
     },
 
