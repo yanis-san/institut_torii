@@ -8,3 +8,4 @@ Pillow
 # Database Prod (MySQL)
 PyMySQL
 cryptography
+python-dotenv
