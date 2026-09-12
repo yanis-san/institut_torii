@@ -10,6 +10,25 @@ from .models import Enrollment
 class EnrollmentAdmin(admin.ModelAdmin):
     """Admin pour les inscriptions avec validation de paiement."""
 
+    def save_model(self, request, obj, form, change):
+        if change and 'status' in form.changed_data:
+            from marketing.notifications import (
+                notify_enrollment_confirmed,
+                notify_teacher_enrollment_update,
+                notify_enrollment_rejected,
+                notify_enrollment_refunded
+            )
+            if obj.status == 'confirmed':
+                obj.confirm(user=request.user)
+                notify_enrollment_confirmed(obj, user=request.user)
+                notify_teacher_enrollment_update(obj)
+            elif obj.status == 'rejected':
+                obj.reject(reason=obj.rejection_reason, user=request.user)
+                notify_enrollment_rejected(obj, user=request.user)
+            elif obj.status == 'refunded':
+                notify_enrollment_refunded(obj, user=request.user)
+        super().save_model(request, obj, form, change)
+
     list_display = (
         'full_name', 'email', 'cohort', 'status_badge',
         'enrollment_code', 'created_at',
@@ -80,24 +99,35 @@ class EnrollmentAdmin(admin.ModelAdmin):
     @admin.action(description='✅ Valider le paiement')
     def validate_payment(self, request, queryset):
         """Valide les paiements des inscriptions sélectionnées."""
+        from marketing.notifications import notify_enrollment_confirmed, notify_teacher_enrollment_update
         count = 0
         for enrollment in queryset.filter(status='pending'):
             enrollment.confirm(user=request.user)
+            notify_enrollment_confirmed(enrollment, user=request.user)
+            notify_teacher_enrollment_update(enrollment)
             count += 1
-        self.message_user(request, f'{count} inscription(s) validée(s).')
+        self.message_user(request, f'{count} inscription(s) validée(s) et notifiée(s).')
 
     @admin.action(description='❌ Rejeter l\'inscription')
     def reject_enrollment(self, request, queryset):
         """Rejette les inscriptions sélectionnées."""
-        count = queryset.exclude(status='confirmed').update(
-            status='rejected',
-        )
-        self.message_user(request, f'{count} inscription(s) rejetée(s).')
+        from marketing.notifications import notify_enrollment_rejected
+        count = 0
+        for enrollment in queryset.exclude(status='confirmed'):
+            enrollment.status = 'rejected'
+            enrollment.save(update_fields=['status'])
+            notify_enrollment_rejected(enrollment, user=request.user)
+            count += 1
+        self.message_user(request, f'{count} inscription(s) rejetée(s) et notifiée(s).')
 
     @admin.action(description='💰 Marquer comme remboursé')
     def mark_refunded(self, request, queryset):
         """Marque les inscriptions comme remboursées."""
-        count = queryset.filter(status__in=['confirmed', 'rejected']).update(
-            status='refunded',
-        )
-        self.message_user(request, f'{count} inscription(s) marquée(s) remboursée(s).')
+        from marketing.notifications import notify_enrollment_refunded
+        count = 0
+        for enrollment in queryset.filter(status__in=['confirmed', 'rejected']):
+            enrollment.status = 'refunded'
+            enrollment.save(update_fields=['status'])
+            notify_enrollment_refunded(enrollment, user=request.user)
+            count += 1
+        self.message_user(request, f'{count} inscription(s) marquée(s) remboursée(s) et notifiée(s).')
