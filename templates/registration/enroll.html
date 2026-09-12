@@ -25,6 +25,13 @@
                 {% if cohort.start_date %}
                 <span class="flex items-center gap-1"><i class="bx bx-calendar"></i> Début : {{ cohort.start_date|date:"d/m/Y" }}</span>
                 {% endif %}
+                {% if cohort.schedules.exists %}
+                <span class="flex items-center gap-1"><i class="bx bx-calendar-event"></i> 
+                    {% for schedule in cohort.schedules.all %}
+                        {{ schedule }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </span>
+                {% endif %}
             </div>
 
             <!-- Tarification -->
