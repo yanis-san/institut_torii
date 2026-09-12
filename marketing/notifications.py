@@ -246,8 +246,30 @@ DEFAULT_TEMPLATES = {
         <p style="margin: 0 0 8px 0; font-weight: 600;">Nouvel élève :</p>
         <p style="margin: 0;">Nom : <strong>{{ student_name }}</strong></p>
     </div>
-    <p>Il y a maintenant <strong>{{ confirmed_count }} / {{ max_capacity }}</strong> élèves confirmés dans ce groupe.</p>
-    <p>Bon cours !</p>
+    
+    <p>Il y a maintenant <strong>{{ confirmed_count }} / {{ max_capacity }}</strong> élèves confirmés dans ce groupe :</p>
+    {% if confirmed_students %}
+    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
+        <thead>
+            <tr style="background-color: #f3f4f6; border-bottom: 2px solid #e5e7eb; text-align: left;">
+                <th style="padding: 8px;">Nom complet</th>
+                <th style="padding: 8px;">Email</th>
+                <th style="padding: 8px;">Téléphone</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in confirmed_students %}
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 8px;">{{ student.name }}</td>
+                <td style="padding: 8px;"><a href="mailto:{{ student.email }}">{{ student.email }}</a></td>
+                <td style="padding: 8px;">{{ student.phone }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    
+    <p style="margin-top: 24px;">Bon cours !</p>
 </div>""",
     },
 
@@ -258,10 +280,34 @@ DEFAULT_TEMPLATES = {
     <h2 style="color: #333;">Bonjour {{ teacher_name }},</h2>
     <p>Nous vous informons qu'un élève a annulé son inscription (remboursée) pour votre groupe <strong>{{ cohort_name }}</strong>.</p>
     <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin: 16px 0;">
-        <p style="margin: 0 0 8px 0; font-weight: 600;">Élève concerné :</p>
+        <p style="margin: 0 0 8px 0; font-weight: 600; color: #b91c1c;">Élève annulé :</p>
         <p style="margin: 0;">Nom : <strong>{{ student_name }}</strong></p>
+        <p style="margin: 0;">Email : <strong>{{ student_email }}</strong></p>
     </div>
-    <p>Il y a maintenant <strong>{{ confirmed_count }} / {{ max_capacity }}</strong> élèves confirmés dans ce groupe.</p>
+    
+    <p>Il y a maintenant <strong>{{ confirmed_count }} / {{ max_capacity }}</strong> élèves confirmés dans ce groupe :</p>
+    {% if confirmed_students %}
+    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
+        <thead>
+            <tr style="background-color: #f3f4f6; border-bottom: 2px solid #e5e7eb; text-align: left;">
+                <th style="padding: 8px;">Nom complet</th>
+                <th style="padding: 8px;">Email</th>
+                <th style="padding: 8px;">Téléphone</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in confirmed_students %}
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 8px;">{{ student.name }}</td>
+                <td style="padding: 8px;"><a href="mailto:{{ student.email }}">{{ student.email }}</a></td>
+                <td style="padding: 8px;">{{ student.phone }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    
+    <p style="margin-top: 24px;">Bon cours !</p>
 </div>""",
     },
 }
@@ -564,9 +610,18 @@ def notify_teacher_enrollment_update(enrollment):
     if not cohort or not cohort.teacher_email:
         return None
         
-    confirmed_count = cohort.enrollments.filter(status='confirmed').count()
+    confirmed_qs = cohort.enrollments.filter(status='confirmed').order_by('first_name', 'last_name')
+    confirmed_count = confirmed_qs.count()
     max_capacity = cohort.max_capacity if cohort.max_capacity else '∞'
     teacher_name = cohort.teacher_name if cohort.teacher_name else 'Professeur'
+    
+    confirmed_students = []
+    for e in confirmed_qs:
+        confirmed_students.append({
+            'name': f"{e.first_name} {e.last_name}",
+            'email': e.email,
+            'phone': e.phone or 'Non renseigné'
+        })
     
     return send_notification(
         event_type='teacher_enrollment_update',
@@ -577,6 +632,7 @@ def notify_teacher_enrollment_update(enrollment):
             'cohort_name': cohort.name,
             'confirmed_count': confirmed_count,
             'max_capacity': max_capacity,
+            'confirmed_students': confirmed_students,
         },
         recipient_name=teacher_name,
         related_model='enrollment',
@@ -593,9 +649,18 @@ def notify_teacher_enrollment_refunded(enrollment):
     if not cohort or not cohort.teacher_email:
         return None
         
-    confirmed_count = cohort.enrollments.filter(status='confirmed').count()
+    confirmed_qs = cohort.enrollments.filter(status='confirmed').order_by('first_name', 'last_name')
+    confirmed_count = confirmed_qs.count()
     max_capacity = cohort.max_capacity if cohort.max_capacity else '∞'
     teacher_name = cohort.teacher_name if cohort.teacher_name else 'Professeur'
+    
+    confirmed_students = []
+    for e in confirmed_qs:
+        confirmed_students.append({
+            'name': f"{e.first_name} {e.last_name}",
+            'email': e.email,
+            'phone': e.phone or 'Non renseigné'
+        })
     
     return send_notification(
         event_type='teacher_enrollment_refunded',
@@ -603,9 +668,11 @@ def notify_teacher_enrollment_refunded(enrollment):
         context={
             'teacher_name': teacher_name,
             'student_name': f"{enrollment.first_name} {enrollment.last_name}",
+            'student_email': enrollment.email,
             'cohort_name': cohort.name,
             'confirmed_count': confirmed_count,
             'max_capacity': max_capacity,
+            'confirmed_students': confirmed_students,
         },
         recipient_name=teacher_name,
         related_model='enrollment',
