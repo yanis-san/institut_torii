@@ -16,7 +16,8 @@ class EnrollmentAdmin(admin.ModelAdmin):
                 notify_enrollment_confirmed,
                 notify_teacher_enrollment_update,
                 notify_enrollment_rejected,
-                notify_enrollment_refunded
+                notify_enrollment_refunded,
+                notify_teacher_enrollment_refunded
             )
             if obj.status == 'confirmed':
                 obj.confirm(user=request.user)
@@ -27,6 +28,7 @@ class EnrollmentAdmin(admin.ModelAdmin):
                 notify_enrollment_rejected(obj, user=request.user)
             elif obj.status == 'refunded':
                 notify_enrollment_refunded(obj, user=request.user)
+                notify_teacher_enrollment_refunded(obj)
         super().save_model(request, obj, form, change)
 
     def get_urls(self):
@@ -153,11 +155,12 @@ class EnrollmentAdmin(admin.ModelAdmin):
     @admin.action(description='💰 Marquer comme remboursé')
     def mark_refunded(self, request, queryset):
         """Marque les inscriptions comme remboursées."""
-        from marketing.notifications import notify_enrollment_refunded
+        from marketing.notifications import notify_enrollment_refunded, notify_teacher_enrollment_refunded
         count = 0
         for enrollment in queryset.filter(status__in=['confirmed', 'rejected']):
             enrollment.status = 'refunded'
             enrollment.save(update_fields=['status'])
             notify_enrollment_refunded(enrollment, user=request.user)
+            notify_teacher_enrollment_refunded(enrollment)
             count += 1
         self.message_user(request, f'{count} inscription(s) marquée(s) remboursée(s) et notifiée(s).')

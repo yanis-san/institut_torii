@@ -440,8 +440,10 @@ def enrollment_refund(request, pk):
     enrollment.status = 'refunded'
     enrollment.save(update_fields=['status', 'updated_at'])
     # Send refund email to student
-    from marketing.notifications import notify_enrollment_refunded
+    from marketing.notifications import notify_enrollment_refunded, notify_teacher_enrollment_refunded
     notify_enrollment_refunded(enrollment, user=request.user)
+    # Notify teacher of the cancellation
+    notify_teacher_enrollment_refunded(enrollment)
     messages.success(request, _('Inscription marquée comme remboursée. Email de notification envoyé.'))
     return redirect('cms:enrollment_detail', pk=pk)
 
