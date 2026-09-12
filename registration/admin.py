@@ -29,6 +29,36 @@ class EnrollmentAdmin(admin.ModelAdmin):
                 notify_enrollment_refunded(obj, user=request.user)
         super().save_model(request, obj, form, change)
 
+    def get_urls(self):
+        from django.urls import path
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                '<path:object_id>/confirm/',
+                self.admin_site.admin_view(self.confirm_enrollment_view),
+                name='registration_enrollment_confirm',
+            ),
+        ]
+        return custom_urls + urls
+
+    def confirm_enrollment_view(self, request, object_id):
+        from django.urls import reverse
+        from django.http import HttpResponseRedirect
+        from marketing.notifications import notify_enrollment_confirmed, notify_teacher_enrollment_update
+        
+        obj = self.get_object(request, object_id)
+        if obj and request.method == 'POST':
+            if obj.status != 'confirmed':
+                obj.confirm(user=request.user)
+                notify_enrollment_confirmed(obj, user=request.user)
+                notify_teacher_enrollment_update(obj)
+                self.message_user(request, '✅ L\'inscription a été confirmée et les emails ont été envoyés.')
+            else:
+                from django.contrib import messages
+                self.message_user(request, 'Cette inscription est déjà confirmée.', level=messages.WARNING)
+        
+        return HttpResponseRedirect(reverse('admin:registration_enrollment_change', args=[object_id]))
+
     list_display = (
         'full_name', 'email', 'cohort', 'status_badge',
         'enrollment_code', 'created_at',

@@ -1,0 +1,16 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+    {% if original and original.status != 'confirmed' %}
+        <li>
+            <form action="{% url 'admin:registration_enrollment_confirm' original.pk %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="addlink" style="background-color: #10b981; color: white; border: none; cursor: pointer; height: 100%; border-radius: 4px; padding: 10px 15px; font-weight: bold; margin-left: 15px;">
+                    ✅ Confirmer l'inscription
+                </button>
+            </form>
+        </li>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}
