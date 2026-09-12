@@ -4,7 +4,15 @@ from .models import Category, Language, Cohort
 
 def language_detail(request, slug):
     """Page d'une langue : Japonais, Chinois, Coréen."""
-    language = Language.objects.filter(slug=slug).first()
+    db_slugs = {
+        'japanese': ['japanese', 'japonais'],
+        'chinese': ['chinese', 'chinois'],
+        'korean': ['korean', 'coreen'],
+    }
+    
+    lookup_slugs = db_slugs.get(slug, [slug])
+    language = Language.objects.filter(slug__in=lookup_slugs).first()
+    
     cohorts = (
         Cohort.objects
         .filter(is_active=True, language=language)
