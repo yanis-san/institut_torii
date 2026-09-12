@@ -235,6 +235,21 @@ DEFAULT_TEMPLATES = {
     <p><a href="{{ admin_link }}" style="display: inline-block; padding: 10px 16px; background-color: #dc2626; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold;">Voir dans l'administration</a></p>
 </div>""",
     },
+
+    'teacher_enrollment_update': {
+        'subject': '[VOTRE GROUPE] Nouvelle inscription validée - {{ cohort_name }}',
+        'body_html': """
+<div style="font-family: sans-serif; padding: 24px;">
+    <h2 style="color: #333;">Bonjour {{ teacher_name }},</h2>
+    <p>Une nouvelle inscription a été validée pour votre groupe <strong>{{ cohort_name }}</strong>.</p>
+    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <p style="margin: 0 0 8px 0; font-weight: 600;">Nouvel élève :</p>
+        <p style="margin: 0;">Nom : <strong>{{ student_name }}</strong></p>
+    </div>
+    <p>Il y a maintenant <strong>{{ confirmed_count }} / {{ max_capacity }}</strong> élèves confirmés dans ce groupe.</p>
+    <p>Bon cours !</p>
+</div>""",
+    },
 }
 
 
@@ -521,6 +536,35 @@ def notify_admin_new_enrollment(enrollment):
             'admin_link': admin_link,
         },
         recipient_name='Admin Institut Torii',
+        related_model='enrollment',
+        related_id=enrollment.pk,
+        from_type='inscription',
+    )
+
+
+def notify_teacher_enrollment_update(enrollment):
+    """
+    Alerte le professeur (si configuré) d'une nouvelle inscription validée.
+    """
+    cohort = enrollment.cohort
+    if not cohort or not cohort.teacher_email:
+        return None
+        
+    confirmed_count = cohort.enrollments.filter(status='confirmed').count()
+    max_capacity = cohort.max_capacity if cohort.max_capacity else '∞'
+    teacher_name = cohort.teacher_name if cohort.teacher_name else 'Professeur'
+    
+    return send_notification(
+        event_type='teacher_enrollment_update',
+        recipient_email=cohort.teacher_email,
+        context={
+            'teacher_name': teacher_name,
+            'student_name': f"{enrollment.first_name} {enrollment.last_name}",
+            'cohort_name': cohort.name,
+            'confirmed_count': confirmed_count,
+            'max_capacity': max_capacity,
+        },
+        recipient_name=teacher_name,
         related_model='enrollment',
         related_id=enrollment.pk,
         from_type='inscription',

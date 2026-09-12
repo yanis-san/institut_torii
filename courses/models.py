@@ -176,6 +176,10 @@ class Cohort(models.Model):
         blank=True,
     )
 
+    # --- Professeur ---
+    teacher_name = models.CharField(_('nom du professeur'), max_length=100, blank=True)
+    teacher_email = models.EmailField(_('email du professeur'), blank=True)
+
     # --- Horaires Ramadan (optionnel) ---
     ramadan_schedule_note = models.TextField(
         _('horaires Ramadan'),

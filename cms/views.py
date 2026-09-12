@@ -412,8 +412,10 @@ def enrollment_confirm(request, pk):
     enrollment = get_object_or_404(Enrollment, pk=pk)
     enrollment.confirm(user=request.user)
     # Send confirmation email to student
-    from marketing.notifications import notify_enrollment_confirmed
+    from marketing.notifications import notify_enrollment_confirmed, notify_teacher_enrollment_update
     notify_enrollment_confirmed(enrollment, user=request.user)
+    # Send notification to teacher if configured
+    notify_teacher_enrollment_update(enrollment)
     messages.success(request, _('Paiement validé — inscription confirmée. Email de confirmation envoyé.'))
     return redirect('cms:enrollment_detail', pk=pk)
 
