@@ -120,20 +120,20 @@ DEFAULT_TEMPLATES = {
     <p>Votre code de suivi est : <strong style="font-size: 18px; color: #dc2626;">{{ enrollment_code }}</strong></p>
     <p>Conservez bien ce code, il vous permettra de suivre l'état de votre inscription à tout moment.</p>
     <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 16px 0;">
-        <p style="margin: 0 0 8px 0; font-weight: 600;">📋 Prochaine étape :</p>
+        <p style="margin: 0 0 8px 0; font-weight: 600;">Prochaine étape :</p>
         <p style="margin: 0;">Notre équipe va vérifier votre reçu de paiement. Vous recevrez un email de confirmation dès que votre inscription sera validée.</p>
     </div>
 </div>""",
     },
 
     'enrollment_confirmed': {
-        'subject': '✅ Inscription confirmée — {{ cohort_name }} — {{ site_name }}',
+        'subject': 'Inscription confirmée — {{ cohort_name }} — {{ site_name }}',
         'body_html': """
 <div style="font-family: sans-serif; padding: 24px;">
-    <h2 style="color: #16a34a;">Félicitations {{ first_name }} ! 🎉</h2>
+    <h2 style="color: #16a34a;">Félicitations {{ first_name }} !</h2>
     <p>Votre inscription à <strong>{{ cohort_name }}</strong> est officiellement <strong style="color: #16a34a;">confirmée</strong>.</p>
     <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin: 16px 0;">
-        <p style="margin: 0 0 8px 0; font-weight: 600;">📌 Vos informations :</p>
+        <p style="margin: 0 0 8px 0; font-weight: 600;">Vos informations :</p>
         <ul style="margin: 0; padding-left: 20px;">
             <li>Formation : <strong>{{ cohort_name }}</strong></li>
             <li>Code de suivi : <strong>{{ enrollment_code }}</strong></li>
@@ -152,7 +152,7 @@ DEFAULT_TEMPLATES = {
     <p>Nous avons examiné votre inscription à <strong>{{ cohort_name }}</strong> et malheureusement, celle-ci n'a pas pu être validée.</p>
     {% if rejection_reason %}
     <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin: 16px 0;">
-        <p style="margin: 0 0 8px 0; font-weight: 600;">📋 Motif :</p>
+        <p style="margin: 0 0 8px 0; font-weight: 600;">Motif :</p>
         <p style="margin: 0;">{{ rejection_reason }}</p>
     </div>
     {% endif %}
@@ -167,7 +167,7 @@ DEFAULT_TEMPLATES = {
     <h2 style="color: #333;">Bonjour {{ first_name }},</h2>
     <p>Nous vous informons que votre inscription à <strong>{{ cohort_name }}</strong> a été remboursée.</p>
     <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; margin: 16px 0;">
-        <p style="margin: 0 0 8px 0; font-weight: 600;">💰 Remboursement :</p>
+        <p style="margin: 0 0 8px 0; font-weight: 600;">Remboursement :</p>
         <p style="margin: 0;">Le remboursement sera effectué selon le même mode de paiement utilisé lors de votre inscription. Le délai peut varier selon votre banque.</p>
     </div>
     <p>Pour toute question, n'hésitez pas à nous répondre à cet email.</p>
@@ -181,7 +181,7 @@ DEFAULT_TEMPLATES = {
     <h2 style="color: #333;">Bonjour {{ first_name }},</h2>
     <p>Votre rendez-vous a bien été enregistré. Voici le récapitulatif :</p>
     <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin: 16px 0;">
-        <p style="margin: 0 0 8px 0; font-weight: 600;">📅 Détails du rendez-vous</p>
+        <p style="margin: 0 0 8px 0; font-weight: 600;">Détails du rendez-vous</p>
         <p style="margin: 0;">Catégorie : <strong>{{ category_name }}</strong></p>
         <p style="margin: 0;">Date : <strong>{{ date }}</strong></p>
         <p style="margin: 0;">Horaire : <strong>{{ start_time }} – {{ end_time }}</strong></p>
