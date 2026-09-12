@@ -232,7 +232,7 @@ DEFAULT_TEMPLATES = {
             <li>Reçu CCP envoyé : <strong>{{ has_receipt }}</strong></li>
         </ul>
     </div>
-    <p><a href="{{ site_url }}/admin/registration/enrollment/{{ enrollment_id }}/change/" style="display: inline-block; padding: 10px 16px; background-color: #dc2626; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold;">Voir dans l'administration</a></p>
+    <p><a href="{{ admin_link }}" style="display: inline-block; padding: 10px 16px; background-color: #dc2626; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold;">Voir dans l'administration</a></p>
 </div>""",
     },
 }
@@ -496,8 +496,16 @@ def notify_admin_new_enrollment(enrollment):
     """
     Alerte l'administrateur d'une nouvelle inscription.
     """
+    from django.urls import reverse
+    
     cohort = enrollment.cohort
     expected_amount = cohort.price + cohort.registration_fee if cohort else 0
+    
+    try:
+        admin_path = reverse('admin:registration_enrollment_change', args=[enrollment.pk])
+        admin_link = f"{SITE_URL}{admin_path}"
+    except Exception:
+        admin_link = f"{SITE_URL}/admin/registration/enrollment/{enrollment.pk}/change/"
     
     return send_notification(
         event_type='admin_new_enrollment',
@@ -510,7 +518,7 @@ def notify_admin_new_enrollment(enrollment):
             'cohort_name': cohort.name if cohort else 'Inconnue',
             'expected_amount': expected_amount,
             'has_receipt': 'Oui' if enrollment.payment_receipt else 'Non',
-            'enrollment_id': enrollment.pk,
+            'admin_link': admin_link,
         },
         recipient_name='Admin Institut Torii',
         related_model='enrollment',
