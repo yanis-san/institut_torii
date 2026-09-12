@@ -191,6 +191,50 @@ DEFAULT_TEMPLATES = {
     <p>Pour toute question ou annulation, n'hésitez pas à nous contacter.</p>
 </div>""",
     },
+
+    'admin_new_prospect': {
+        'subject': '[NOUVEAU PROSPECT] {{ first_name }} {{ last_name }}',
+        'body_html': """
+<div style="font-family: sans-serif; padding: 24px;">
+    <h2 style="color: #333;">Nouveau Prospect !</h2>
+    <p>Un nouveau message a été reçu depuis le formulaire de contact.</p>
+    <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <p style="margin: 0 0 8px 0; font-weight: 600;">Informations de contact :</p>
+        <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
+            <li>Nom complet : <strong>{{ first_name }} {{ last_name }}</strong></li>
+            <li>Email : <strong>{{ email }}</strong></li>
+            <li>Téléphone : <strong>{{ phone }}</strong></li>
+            <li>Catégorie : <strong>{{ target_category }}</strong></li>
+            <li>Langue : <strong>{{ target_language }}</strong></li>
+            <li>Formation souhaitée : <strong>{{ target_cohort }}</strong></li>
+        </ul>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 16px 0;">
+        <p style="margin: 0 0 8px 0; font-weight: 600;">Message :</p>
+        <p style="margin: 0; white-space: pre-wrap;">{{ message }}</p>
+    </div>
+</div>""",
+    },
+
+    'admin_new_enrollment': {
+        'subject': '[NOUVELLE INSCRIPTION] {{ first_name }} {{ last_name }} - {{ cohort_name }}',
+        'body_html': """
+<div style="font-family: sans-serif; padding: 24px;">
+    <h2 style="color: #333;">Nouvelle Inscription !</h2>
+    <p>Une nouvelle inscription a été soumise sur le site et est en attente de validation.</p>
+    <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <p style="margin: 0 0 8px 0; font-weight: 600;">Détails de l'inscription :</p>
+        <ul style="margin: 0; padding-left: 20px; line-height: 1.6;">
+            <li>Nom complet : <strong>{{ first_name }} {{ last_name }}</strong></li>
+            <li>Email : <strong>{{ email }}</strong></li>
+            <li>Téléphone : <strong>{{ phone }}</strong></li>
+            <li>Formation : <strong>{{ cohort_name }}</strong></li>
+            <li>Montant à payer : <strong>{{ expected_amount }} DA</strong></li>
+            <li>Reçu CCP envoyé : <strong>{{ has_receipt }}</strong></li>
+        </ul>
+    </div>
+    <p><a href="{{ site_url }}/admin/registration/enrollment/{{ enrollment_id }}/change/" style="display: inline-block; padding: 10px 16px; background-color: #dc2626; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold;">Voir dans l'administration</a></p>
+</div>""",
+    },
 }
 
 
@@ -420,5 +464,56 @@ def notify_enrollment_refunded(enrollment, user=None):
         related_model='enrollment',
         related_id=enrollment.pk,
         sent_by=user,
+        from_type='inscription',
+    )
+
+
+def notify_admin_new_prospect(prospect):
+    """
+    Alerte l'administrateur d'un nouveau prospect.
+    """
+    return send_notification(
+        event_type='admin_new_prospect',
+        recipient_email='contact@institut-torii.com',
+        context={
+            'first_name': prospect.first_name,
+            'last_name': prospect.last_name,
+            'email': prospect.email,
+            'phone': getattr(prospect, 'phone', 'Non renseigné') or 'Non renseigné',
+            'target_category': str(prospect.interested_category) if getattr(prospect, 'interested_category', None) else 'Non renseignée',
+            'target_language': str(prospect.interested_language) if getattr(prospect, 'interested_language', None) else 'Non renseignée',
+            'target_cohort': str(prospect.interested_cohort) if getattr(prospect, 'interested_cohort', None) else 'Non renseignée',
+            'message': getattr(prospect, 'message', 'Aucun message') or 'Aucun message',
+        },
+        recipient_name='Admin Institut Torii',
+        related_model='prospect',
+        related_id=prospect.pk,
+        from_type='contact',
+    )
+
+
+def notify_admin_new_enrollment(enrollment):
+    """
+    Alerte l'administrateur d'une nouvelle inscription.
+    """
+    cohort = enrollment.cohort
+    expected_amount = cohort.price + cohort.registration_fee if cohort else 0
+    
+    return send_notification(
+        event_type='admin_new_enrollment',
+        recipient_email='contact@institut-torii.com',
+        context={
+            'first_name': enrollment.first_name,
+            'last_name': enrollment.last_name,
+            'email': enrollment.email,
+            'phone': getattr(enrollment, 'phone', 'Non renseigné'),
+            'cohort_name': cohort.name if cohort else 'Inconnue',
+            'expected_amount': expected_amount,
+            'has_receipt': 'Oui' if enrollment.payment_receipt else 'Non',
+            'enrollment_id': enrollment.pk,
+        },
+        recipient_name='Admin Institut Torii',
+        related_model='enrollment',
+        related_id=enrollment.pk,
         from_type='inscription',
     )

@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django_ratelimit.decorators import ratelimit
 
 from courses.models import Cohort
-from marketing.notifications import notify_enrollment_received
+from marketing.notifications import notify_enrollment_received, notify_admin_new_enrollment
 from .forms import EnrollmentForm, EnrollmentCodeForm
 from .models import Enrollment
 
@@ -54,6 +54,8 @@ def enroll(request, slug):
             enrollment = form.save()
             # Send acknowledgment email with code
             notify_enrollment_received(enrollment)
+            # Notify admin
+            notify_admin_new_enrollment(enrollment)
             return redirect('registration:success', code=enrollment.enrollment_code)
     else:
         form = EnrollmentForm(cohort=cohort)
