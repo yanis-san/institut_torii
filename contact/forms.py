@@ -6,6 +6,9 @@ import re
 from courses.models import Category, Language, Cohort
 from .models import Prospect
 
+from django_recaptcha.fields import ReCaptchaField
+from django_recaptcha.widgets import ReCaptchaV3
+
 
 CONTACT_PREFERENCE_CHOICES = [
     ('email', _('Email')),
@@ -63,6 +66,8 @@ class ProspectForm(forms.ModelForm):
                      'transition-all duration-200',
         }),
     )
+
+    captcha = ReCaptchaField(widget=ReCaptchaV3(action='contact'))
 
     class Meta:
         model = Prospect

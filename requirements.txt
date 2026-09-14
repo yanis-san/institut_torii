@@ -9,3 +9,4 @@ Pillow
 PyMySQL
 cryptography
 python-dotenv
+django-recaptcha

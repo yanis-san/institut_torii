@@ -315,6 +315,13 @@
                         {% endfor %}
                     </div>
                 </div>
+                
+                {{ form.captcha }}
+                {% if form.captcha.errors %}
+                    <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+                        <p class="text-red-600 text-sm">{{ form.captcha.errors.0 }}</p>
+                    </div>
+                {% endif %}
 
                 <!-- Non-field errors -->
                 {% if form.non_field_errors %}

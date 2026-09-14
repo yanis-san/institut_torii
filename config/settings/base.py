@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django_cotton',
     'django_htmx',
     'tailwind',
+    'django_recaptcha',
     
     # Local
     'theme',
@@ -168,3 +169,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Tailwind
 TAILWIND_APP_NAME = 'theme'
 TAILWIND_USE_STANDALONE_BINARY = True
+
+# reCAPTCHA V3
+import os
+RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY', '')
+RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY', '')
+RECAPTCHA_REQUIRED_SCORE = 0.5
+SILENCED_SYSTEM_CHECKS = ['django_recaptcha.recaptcha_test_key_error']
