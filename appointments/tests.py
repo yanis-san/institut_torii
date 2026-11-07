@@ -110,6 +110,29 @@ class PublicViewsTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
+    def test_same_day_not_bookable(self):
+        today_slot = TimeSlot.objects.create(
+            category=self.cat, date=date.today(),
+            start_time=time(23, 0), end_time=time(23, 30),
+        )
+        response = self.client.get(
+            reverse('appointments:available_dates', args=['test-de-niveau']),
+        )
+        self.assertNotIn(date.today(), response.context['dates'])
+        self.assertIn(date.today() + timedelta(days=1), response.context['dates'])
+
+        response = self.client.get(
+            reverse('appointments:available_slots', args=['test-de-niveau']),
+            {'date': date.today().isoformat()},
+        )
+        self.assertEqual(list(response.context['slots']), [])
+
+        self.client.post(reverse('appointments:confirm_booking', args=[today_slot.pk]), {
+            'first_name': 'Jean', 'last_name': 'Dupont',
+            'email': 'jean@test.com', 'phone': '0555123456',
+        })
+        self.assertEqual(Appointment.objects.count(), 0)
+
     def test_booking_form(self):
         response = self.client.get(reverse('appointments:booking_form', args=[self.slot.pk]))
         self.assertEqual(response.status_code, 200)

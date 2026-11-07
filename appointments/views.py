@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date
 
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -25,19 +25,11 @@ def book(request):
 def available_dates(request, slug):
     """HTMX: retourne les dates disponibles pour une catégorie."""
     category = get_object_or_404(AppointmentCategory, slug=slug, is_active=True)
-    today = date.today()
-    margin = category.booking_margin_hours
-    cutoff = (datetime.now() + timedelta(hours=margin)).time()
-
+    # Pas de réservation le jour même : dès demain seulement
     qs = TimeSlot.objects.filter(
-        category=category, is_active=True, date__gte=today,
+        category=category, is_active=True, date__gt=date.today(),
     )
-    # Exclure les créneaux d'aujourd'hui dont l'heure est dans moins de Xh
-    future_slots = [
-        s for s in qs
-        if s.date > today or s.start_time > cutoff
-    ]
-    dates_list = sorted({s.date for s in future_slots})
+    dates_list = sorted({s.date for s in qs})
     return render(request, 'appointments/_dates.html', {
         'category': category,
         'dates': dates_list,
@@ -53,15 +45,13 @@ def available_slots(request, slug):
     except (ValueError, TypeError):
         return render(request, 'appointments/_slots.html', {'slots': []})
 
+    # Pas de réservation le jour même (ni dans le passé)
+    if selected_date <= date.today():
+        return render(request, 'appointments/_slots.html', {'slots': []})
+
     slots = TimeSlot.objects.filter(
         category=category, date=selected_date, is_active=True,
     ).order_by('start_time')
-
-    # Si c'est aujourd'hui, exclure les créneaux dans moins de Xh
-    if selected_date == date.today():
-        margin = category.booking_margin_hours
-        cutoff = (datetime.now() + timedelta(hours=margin)).time()
-        slots = slots.filter(start_time__gt=cutoff)
 
     return render(request, 'appointments/_slots.html', {
         'category': category,
@@ -73,7 +63,7 @@ def available_slots(request, slug):
 def booking_form(request, pk):
     """HTMX: retourne le formulaire de réservation pour un créneau."""
     slot = get_object_or_404(TimeSlot, pk=pk, is_active=True)
-    if not slot.is_available:
+    if slot.date <= date.today() or not slot.is_available:
         return render(request, 'appointments/_slot_full.html', {'slot': slot})
     form = AppointmentForm()
     return render(request, 'appointments/_form.html', {
@@ -87,7 +77,7 @@ def confirm_booking(request, pk):
     """POST: confirme la réservation."""
     slot = get_object_or_404(TimeSlot, pk=pk, is_active=True)
 
-    if not slot.is_available:
+    if slot.date <= date.today() or not slot.is_available:
         return render(request, 'appointments/_slot_full.html', {'slot': slot})
 
     form = AppointmentForm(request.POST)
